@@ -31,7 +31,11 @@ impl Day for Day01 {
 }
 
 fn parse_input(input: &str) -> Vec<u64> {
-    input.lines().map(|line| line.parse().unwrap()).collect()
+    input
+        .lines()
+        .map(|line| line.parse())
+        .filter_map(Result::ok)
+        .collect()
 }
 
 #[cfg(test)]
@@ -41,12 +45,14 @@ mod tests {
     #[test]
     fn ex1() {
         let d = Day01 {};
-        let input = r#"1721
+        let input = r#"
+1721
 979
 366
 299
 675
-1456"#;
+1456
+"#;
         assert_eq!(d.star1(input), "514579");
         assert_eq!(d.star2(input), "241861950");
     }
