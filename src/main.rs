@@ -13,7 +13,7 @@ fn get_day(day_no: usize) -> Option<Box<dyn Day>> {
 fn run_day(day_no: usize) {
     if let Some(day) = get_day(day_no) {
         println!("Day:      {:02}", day_no);
-        let input = load_input(day_no, "");
+        let input = load_input(day_no);
         let res1 = day.star1(&input);
         let res2 = day.star2(&input);
         println!("Result 1: {}", res1);
@@ -30,7 +30,7 @@ fn main() {
     run_day(day_no);
 }
 
-fn load_input(day_no: usize, suffix: &str) -> String {
-    let filename = format!("input/day{:02}{}", day_no, suffix);
+fn load_input(day_no: usize) -> String {
+    let filename = format!("input/day{:02}.input", day_no);
     std::fs::read_to_string(filename).unwrap()
 }
