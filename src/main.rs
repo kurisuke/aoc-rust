@@ -10,6 +10,14 @@ fn get_day(day_no: usize) -> Option<Box<dyn Day>> {
     }
 }
 
+fn get_day_no_max() -> usize {
+    let mut day_no = 0;
+    while get_day(day_no + 1).is_some() {
+        day_no += 1;
+    }
+    day_no
+}
+
 fn run_day(day_no: usize) {
     if let Some(day) = get_day(day_no) {
         println!("Day:      {:02}", day_no);
@@ -25,7 +33,12 @@ fn run_day(day_no: usize) {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let day_no = args[1].parse::<usize>().unwrap();
+
+    let day_no = if args.len() > 1 {
+        args[1].parse::<usize>().unwrap()
+    } else {
+        get_day_no_max()
+    };
 
     run_day(day_no);
 }
