@@ -3,6 +3,8 @@ mod day01;
 
 use day::Day;
 
+use std::time::Instant;
+
 fn get_day(day_no: usize) -> Option<Box<dyn Day>> {
     match day_no {
         1 => Some(Box::new(day01::Day01 {})),
@@ -20,12 +22,19 @@ fn get_day_no_max() -> usize {
 
 fn run_day(day_no: usize) {
     if let Some(day) = get_day(day_no) {
-        println!("Day:      {:02}", day_no);
+        println!("Day: {:02}", day_no);
         let input = load_input(day_no);
-        let res1 = day.star1(&input);
-        let res2 = day.star2(&input);
-        println!("Result 1: {}", res1);
-        println!("Result 2: {}", res2);
+
+        for star_no in 1..3 {
+            let start = Instant::now();
+            let res = match star_no {
+                1 => day.star1(&input),
+                2 => day.star2(&input),
+                _ => format!("invalid star_no: {}", star_no),
+            };
+            let elapsed_ms = start.elapsed().as_millis();
+            println!("Result {} [{} ms]:\n{}", star_no, elapsed_ms, res);
+        }
     } else {
         println!("Day {} not implemented!", day_no);
     }
