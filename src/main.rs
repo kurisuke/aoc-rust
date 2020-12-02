@@ -1,5 +1,6 @@
 mod day;
 mod day01;
+mod day02;
 
 use day::Day;
 
@@ -8,6 +9,7 @@ use std::time::Instant;
 fn get_day(day_no: usize) -> Option<Box<dyn Day>> {
     match day_no {
         1 => Some(Box::new(day01::Day01 {})),
+        2 => Some(Box::new(day02::Day02 {})),
         _ => None,
     }
 }
