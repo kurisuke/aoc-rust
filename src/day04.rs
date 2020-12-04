@@ -55,11 +55,7 @@ fn field_format_correct(passport: &HashMap<String, String>) -> bool {
 
 fn check_yr(yr_str: &str, yr_min: u16, yr_max: u16) -> bool {
     if let Ok(yr) = yr_str.parse::<u16>() {
-        if yr >= yr_min && yr <= yr_max {
-            true
-        } else {
-            false
-        }
+        yr >= yr_min && yr <= yr_max
     } else {
         false
     }
@@ -88,7 +84,7 @@ fn check_hgt(hgt_str: &str) -> bool {
 }
 
 fn check_hcl(hcl_str: &str) -> bool {
-    if hcl_str.len() != 7 || hcl_str.chars().nth(0).unwrap() != '#' {
+    if hcl_str.len() != 7 || hcl_str.chars().next().unwrap() != '#' {
         false
     } else {
         hcl_str[1..].chars().all(|c| match c {
@@ -101,11 +97,7 @@ fn check_hcl(hcl_str: &str) -> bool {
 
 fn check_pid(pid_str: &str) -> bool {
     if pid_str.len() == 9 {
-        if let Ok(_) = pid_str.parse::<u64>() {
-            true
-        } else {
-            false
-        }
+        matches!(pid_str.parse::<u64>(), Ok(_))
     } else {
         false
     }
@@ -118,7 +110,7 @@ fn parse_input(input: &str) -> Vec<HashMap<String, String>> {
             let fields_map: HashMap<_, _> = e
                 .split_whitespace()
                 .map(|f| {
-                    let mut fi = f.split(":");
+                    let mut fi = f.split(':');
                     let key = String::from(fi.next().unwrap());
                     let value = String::from(fi.next().unwrap());
                     (key, value)

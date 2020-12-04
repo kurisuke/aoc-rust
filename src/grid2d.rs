@@ -29,7 +29,7 @@ impl Grid2D {
     }
 
     pub fn width(&self) -> usize {
-        if self.el.len() == 0 {
+        if self.el.is_empty() {
             0
         } else {
             self.el[0].len()
