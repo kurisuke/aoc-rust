@@ -82,7 +82,7 @@ fn check_hgt(hgt_str: &str) -> bool {
 }
 
 fn check_hcl(hcl_str: &str) -> bool {
-    if hcl_str.len() != 7 || hcl_str.chars().next().unwrap() != '#' {
+    if hcl_str.len() != 7 || !hcl_str.starts_with('#') {
         false
     } else {
         hcl_str[1..].chars().all(|c| match c {
