@@ -2,6 +2,7 @@ mod day;
 mod day01;
 mod day02;
 mod day03;
+mod day04;
 mod grid2d;
 
 use day::Day;
@@ -13,6 +14,7 @@ fn get_day(day_no: usize) -> Option<Box<dyn Day>> {
         1 => Some(Box::new(day01::Day01 {})),
         2 => Some(Box::new(day02::Day02 {})),
         3 => Some(Box::new(day03::Day03 {})),
+        4 => Some(Box::new(day04::Day04 {})),
         _ => None,
     }
 }
@@ -37,8 +39,7 @@ fn run_day(day_no: usize) {
                 2 => day.star2(&input),
                 _ => format!("invalid star_no: {}", star_no),
             };
-            let elapsed_ms = start.elapsed().as_millis();
-            println!("Result {} [{} ms]:\n{}", star_no, elapsed_ms, res);
+            println!("Result {} [{:?}]:\n{}", star_no, start.elapsed(), res);
         }
     } else {
         println!("Day {} not implemented!", day_no);
