@@ -24,18 +24,17 @@ impl Day for Day04 {
     }
 }
 
-fn has_valid_fields(passport: &HashMap<String, String>) -> bool {
+fn has_valid_fields(passport: &HashMap<&str, &str>) -> bool {
     let req_keys: HashSet<_> = vec!["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
-        .iter()
-        .map(|&s| String::from(s))
+        .into_iter()
         .collect();
-    let found_keys: HashSet<_> = passport.keys().cloned().collect();
+    let found_keys: HashSet<_> = passport.keys().copied().collect();
 
     let both_keys_num = req_keys.intersection(&found_keys).count();
     both_keys_num == req_keys.len()
 }
 
-fn field_format_correct(passport: &HashMap<String, String>) -> bool {
+fn field_format_correct(passport: &HashMap<&str, &str>) -> bool {
     let byr_ok = check_yr(&passport["byr"], 1920, 2002);
     let iyr_ok = check_yr(&passport["iyr"], 2010, 2020);
     let eyr_ok = check_yr(&passport["eyr"], 2020, 2030);
@@ -43,8 +42,7 @@ fn field_format_correct(passport: &HashMap<String, String>) -> bool {
     let hcl_ok = check_hcl(&passport["hcl"]);
 
     let valid_ecl: HashSet<_> = vec!["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
-        .iter()
-        .map(|&s| String::from(s))
+        .into_iter()
         .collect();
     let ecl_ok = valid_ecl.contains(&passport["ecl"]);
 
@@ -103,7 +101,7 @@ fn check_pid(pid_str: &str) -> bool {
     }
 }
 
-fn parse_input(input: &str) -> Vec<HashMap<String, String>> {
+fn parse_input(input: &str) -> Vec<HashMap<&str, &str>> {
     input
         .split("\n\n")
         .map(|e| {
@@ -111,8 +109,8 @@ fn parse_input(input: &str) -> Vec<HashMap<String, String>> {
                 .split_whitespace()
                 .map(|f| {
                     let mut fi = f.split(':');
-                    let key = String::from(fi.next().unwrap());
-                    let value = String::from(fi.next().unwrap());
+                    let key = fi.next().unwrap();
+                    let value = fi.next().unwrap();
                     (key, value)
                 })
                 .collect();
