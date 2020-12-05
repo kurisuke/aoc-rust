@@ -10,7 +10,7 @@ impl Day for Day05 {
 
     fn star2(&self, input: &str) -> String {
         let mut seat_ids: Vec<u16> = input.lines().map(|l| seat_str_to_id(l)).collect();
-        seat_ids.sort();
+        seat_ids.sort_unstable();
         let my_seat_id = seat_ids
             .windows(2)
             .filter(|&s| s[1] - s[0] > 1)
@@ -22,8 +22,8 @@ impl Day for Day05 {
 }
 
 fn seat_str_to_id(seat_str: &str) -> u16 {
-    let fb_str = String::from(&seat_str[0..7]);
-    let lr_str = String::from(&seat_str[7..10]);
+    let fb_str = &seat_str[0..7];
+    let lr_str = &seat_str[7..10];
 
     u16::from_str_radix(&fb_str.replace("F", "0").replace("B", "1"), 2).unwrap() * 8
         + u16::from_str_radix(&lr_str.replace("L", "0").replace("R", "1"), 2).unwrap()
