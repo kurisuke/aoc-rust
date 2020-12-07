@@ -52,16 +52,32 @@ fn run_day(day_no: usize) {
     }
 }
 
+fn run_all() {
+    let start_all = Instant::now();
+    for day_no in 0..get_day_no_max() {
+        run_day(day_no + 1);
+    }
+    println!("Total: {:?}", start_all.elapsed());
+}
+
 fn main() {
-    let args: Vec<String> = std::env::args().collect();
+    let args: Vec<_> = std::env::args().collect();
 
-    let day_no = if args.len() > 1 {
-        args[1].parse::<usize>().unwrap()
+    if args.len() == 1 {
+        run_day(get_day_no_max());
     } else {
-        get_day_no_max()
-    };
-
-    run_day(day_no);
+        match args[1].parse::<usize>() {
+            Ok(d) => run_day(d),
+            Err(_) => match args[1].as_ref() {
+                "all" => {
+                    run_all();
+                }
+                _ => {
+                    println!("Invalid parameter: {}", args[1]);
+                }
+            },
+        }
+    }
 }
 
 fn load_input(day_no: usize) -> String {
