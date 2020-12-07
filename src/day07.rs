@@ -12,10 +12,7 @@ impl Day for Day07 {
         let num_valid = bag_rules
             .keys()
             .filter(|color| {
-                *color != "shiny gold" && {
-                    let contained_bags = get_contained(&bag_rules, color);
-                    contained_bags.contains_key("shiny gold")
-                }
+                *color != "shiny gold" && has_child_bag(&bag_rules, color, "shiny gold")
             })
             .count();
         format!("{}", num_valid)
@@ -51,6 +48,20 @@ fn parse_input(input: &str) -> BagRules {
         rules.insert(String::from(parent), child_refs);
     }
     rules
+}
+
+fn has_child_bag(rules: &BagRules, parent_color: &str, search_color: &str) -> bool {
+    if parent_color == search_color {
+        true
+    } else {
+        let child_rules = &rules[parent_color];
+        for child_color in child_rules.keys() {
+            if has_child_bag(rules, child_color, search_color) {
+                return true;
+            }
+        }
+        false
+    }
 }
 
 fn get_contained(rules: &BagRules, color: &str) -> BagRef {
