@@ -47,7 +47,12 @@ fn run_day(day_no: usize) {
                 2 => day.star2(&input),
                 _ => format!("invalid star_no: {}", star_no),
             };
-            println!("Result {} [{:?}]:\n{}", star_no, start.elapsed(), res);
+            println!(
+                "star {}  time: {:>10} µs    res: {}",
+                star_no,
+                start.elapsed().as_micros(),
+                res
+            );
         }
     } else {
         println!("Day {} not implemented!", day_no);
@@ -59,7 +64,7 @@ fn run_all() {
     for day_no in 0..get_day_no_max() {
         run_day(day_no + 1);
     }
-    println!("Total: {:?}", start_all.elapsed());
+    println!("\ntotal   time: {:>10} µs", start_all.elapsed().as_micros());
 }
 
 fn main() {
