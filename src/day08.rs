@@ -32,11 +32,8 @@ impl Day for Day08 {
         for idx in 0..ins.len() {
             let ins_mod = modify_program(&ins, idx);
             let endstate = run_program(&ins_mod);
-            match endstate {
-                EndState::Succ(acc) => {
-                    return format!("{}", acc);
-                }
-                _ => {}
+            if let EndState::Succ(acc) = endstate {
+                return format!("{}", acc);
             }
         }
         String::from("error")
@@ -69,7 +66,7 @@ fn parse_input(input: &str) -> Vec<Instruction> {
         .collect()
 }
 
-fn run_program(ins: &Vec<Instruction>) -> EndState {
+fn run_program(ins: &[Instruction]) -> EndState {
     let mut already_run = vec![false; ins.len()];
     let mut pc = 0;
     let mut acc = 0;
@@ -102,7 +99,7 @@ fn run_program(ins: &Vec<Instruction>) -> EndState {
     }
 }
 
-fn modify_program(ins: &Vec<Instruction>, idx: usize) -> Vec<Instruction> {
+fn modify_program(ins: &[Instruction], idx: usize) -> Vec<Instruction> {
     let mut ins = ins.to_vec();
     match ins[idx] {
         Instruction::Nop(v) => {
