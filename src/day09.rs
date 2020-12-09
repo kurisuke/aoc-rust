@@ -38,19 +38,14 @@ fn find_cont_set(nums: &[i64], target: i64) -> i64 {
     for i in 0..nums.len() {
         let mut sum = nums[i];
         let mut j = 1;
-        let mut found = false;
 
         while sum < target && i + j < nums.len() {
             sum += nums[i + j];
-            if sum == target {
-                found = true;
-                break;
-            }
             j += 1;
         }
 
-        if found {
-            let window = &nums[i..(i + j + 1)];
+        if sum == target {
+            let window = &nums[i..(i + j)];
             return window.iter().min().unwrap() + window.iter().max().unwrap();
         }
     }
