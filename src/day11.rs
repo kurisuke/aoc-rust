@@ -3,6 +3,17 @@ use crate::grid2d::{Grid2D, Wrap};
 
 pub struct Day11 {}
 
+static DIRS: &'static [(i64, i64)] = &[
+    (0, -1),
+    (1, -1),
+    (1, 0),
+    (1, 1),
+    (0, 1),
+    (-1, 1),
+    (-1, 0),
+    (-1, -1),
+];
+
 impl Day for Day11 {
     fn star1(&self, input: &str) -> String {
         format!("{}", iterate(input, 4, direct_neighbors))
@@ -54,17 +65,7 @@ fn direct_neighbors(grid: &Grid2D, x: i64, y: i64) -> Vec<char> {
 }
 
 fn visible_neighbors(grid: &Grid2D, x: i64, y: i64) -> Vec<char> {
-    let dirs = vec![
-        (0, -1),
-        (1, -1),
-        (1, 0),
-        (1, 1),
-        (0, 1),
-        (-1, 1),
-        (-1, 0),
-        (-1, -1),
-    ];
-    dirs.iter()
+    DIRS.iter()
         .map(|d| {
             grid.traverse_init_wrap(x + d.0, y + d.1, d.0, d.1, Wrap::None)
                 .find(|&v| v == 'L' || v == '#')
