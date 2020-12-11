@@ -1,54 +1,71 @@
+use itertools::concat;
 use std::fmt::{self, Display, Formatter};
+use std::iter::Zip;
 
 #[derive(Clone)]
-pub struct Grid2D {
-    el: Vec<Vec<char>>,
+pub struct Grid2D<T> {
+    el: Vec<T>,
+    width: usize,
+    height: usize,
 }
 
 #[derive(Debug, Clone)]
 pub struct Grid2DError;
 
-impl Grid2D {
-    pub fn new(input: &str) -> Result<Grid2D, Grid2DError> {
+#[allow(dead_code)]
+pub enum Wrap {
+    None,
+    WrapX,
+    WrapY,
+    WrapXY,
+}
+
+pub struct Coords {
+    pub x: i64,
+    pub y: i64,
+}
+
+impl Grid2D<char> {
+    pub fn new(input: &str) -> Result<Grid2D<char>, Grid2DError> {
         let line_lens: Vec<_> = input.lines().map(|l| l.len()).collect();
         if line_lens.iter().min() != line_lens.iter().max() {
             Err(Grid2DError {})
         } else {
-            let el: Vec<Vec<_>> = input.lines().map(|l| l.chars().collect()).collect();
-            Ok(Grid2D { el })
+            let width = *line_lens.iter().min().unwrap();
+            let height = input.lines().count();
+            let el: Vec<_> = concat(input.lines().map(|l| l.chars().collect::<Vec<_>>()));
+            Ok(Grid2D { el, width, height })
         }
     }
+}
 
-    pub fn at(&self, x: i64, y: i64) -> Option<char> {
+impl<T> Grid2D<T> {
+    pub fn at(&self, x: i64, y: i64) -> Option<&T> {
         if x < 0 || y < 0 || x >= self.width() || y >= self.height() {
             None
         } else {
-            Some(self.el[y as usize][x as usize])
+            Some(&self.el[y as usize * self.width + x as usize])
         }
     }
 
-    pub fn set(&mut self, x: i64, y: i64, v: char) -> bool {
+    pub fn set(&mut self, x: i64, y: i64, v: T) -> bool {
         if x < 0 || y < 0 || x >= self.width() || y >= self.height() {
             false
         } else {
-            self.el[y as usize][x as usize] = v;
+            self.el[y as usize * self.width + x as usize] = v;
             true
         }
     }
 
     pub fn height(&self) -> i64 {
-        self.el.len() as i64
+        self.height as i64
     }
 
     pub fn width(&self) -> i64 {
-        if self.el.is_empty() {
-            0
-        } else {
-            self.el[0].len() as i64
-        }
+        self.width as i64
     }
 
-    pub fn neighbors(&self, x: i64, y: i64) -> Vec<Option<char>> {
+    pub fn neighbors(&self, x: i64, y: i64) -> Vec<Option<&T>> {
         vec![
             self.at(x, y - 1),
             self.at(x + 1, y - 1),
@@ -61,24 +78,28 @@ impl Grid2D {
         ]
     }
 
-    pub fn count(&self, v: char) -> usize {
-        self.iter().filter(|&x| x == v).count()
-    }
-
-    pub fn iter(&self) -> Iter {
+    pub fn iter(&self) -> Iter<T> {
         Iter::new(&self)
     }
 
     #[allow(dead_code)]
-    pub fn traverse(&self, d_x: i64, d_y: i64) -> TraverseIter {
-        TraverseIter::new(&self, 0, 0, d_x, d_y, Wrap::None)
+    pub fn coords_iter(&self) -> CoordsIter<T> {
+        CoordsIter::new(&self)
     }
 
-    pub fn traverse_wrap(&self, d_x: i64, d_y: i64, wrap: Wrap) -> TraverseIter {
-        TraverseIter::new(&self, 0, 0, d_x, d_y, wrap)
+    pub fn enumerate(&self) -> Zip<CoordsIter<T>, Iter<T>> {
+        CoordsIter::new(&self).zip(Iter::new(&self))
     }
 
     #[allow(dead_code)]
+    pub fn traverse(&self, d_x: i64, d_y: i64) -> TraverseIter<T> {
+        TraverseIter::new(&self, 0, 0, d_x, d_y, Wrap::None)
+    }
+
+    pub fn traverse_wrap(&self, d_x: i64, d_y: i64, wrap: Wrap) -> TraverseIter<T> {
+        TraverseIter::new(&self, 0, 0, d_x, d_y, wrap)
+    }
+
     pub fn traverse_init_wrap(
         &self,
         init_x: i64,
@@ -86,34 +107,38 @@ impl Grid2D {
         d_x: i64,
         d_y: i64,
         wrap: Wrap,
-    ) -> TraverseIter {
+    ) -> TraverseIter<T> {
         TraverseIter::new(&self, init_x, init_y, d_x, d_y, wrap)
     }
 }
 
-impl Display for Grid2D {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        let ss: Vec<String> = self.el.iter().map(|v| v.iter().collect()).collect();
-        write!(f, "{}", ss.join("\n"))
+impl<T: std::cmp::PartialEq> Grid2D<T> {
+    pub fn count(&self, v: T) -> usize {
+        self.iter().filter(|&x| x == &v).count()
     }
 }
 
-#[allow(dead_code)]
-pub enum Wrap {
-    None,
-    WrapX,
-    WrapY,
-    WrapXY,
+impl Display for Grid2D<char> {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let mut s = String::from("");
+        for (idx, v) in self.el.iter().enumerate() {
+            if idx > 0 && idx % self.width == 0 {
+                s += "\n";
+            }
+            s.push(*v);
+        }
+        write!(f, "{}", s)
+    }
 }
 
-pub struct Iter<'a> {
-    grid: &'a Grid2D,
+pub struct Iter<'a, T> {
+    grid: &'a Grid2D<T>,
     cur_x: i64,
     cur_y: i64,
 }
 
-impl<'a> Iter<'a> {
-    fn new(grid: &'a Grid2D) -> Iter {
+impl<'a, T> Iter<'a, T> {
+    fn new(grid: &'a Grid2D<T>) -> Iter<T> {
         Iter {
             grid,
             cur_x: 0,
@@ -122,10 +147,10 @@ impl<'a> Iter<'a> {
     }
 }
 
-impl<'a> Iterator for Iter<'a> {
-    type Item = char;
+impl<'a, T> Iterator for Iter<'a, T> {
+    type Item = &'a T;
 
-    fn next(&mut self) -> Option<char> {
+    fn next(&mut self) -> Option<&'a T> {
         let ret = self.grid.at(self.cur_x, self.cur_y);
         if self.cur_x + 1 < self.grid.width() {
             self.cur_x += 1;
@@ -137,8 +162,50 @@ impl<'a> Iterator for Iter<'a> {
     }
 }
 
-pub struct TraverseIter<'a> {
-    grid: &'a Grid2D,
+pub struct CoordsIter<'a, T> {
+    grid: &'a Grid2D<T>,
+    cur_x: i64,
+    cur_y: i64,
+}
+
+impl<'a, T> CoordsIter<'a, T> {
+    fn new(grid: &'a Grid2D<T>) -> CoordsIter<T> {
+        CoordsIter {
+            grid,
+            cur_x: 0,
+            cur_y: 0,
+        }
+    }
+}
+
+impl<'a, T> Iterator for CoordsIter<'a, T> {
+    type Item = Coords;
+
+    fn next(&mut self) -> Option<Coords> {
+        let ret = if self.cur_x < 0
+            || self.cur_y < 0
+            || self.cur_x >= self.grid.width()
+            || self.cur_y >= self.grid.height()
+        {
+            None
+        } else {
+            Some(Coords {
+                x: self.cur_x,
+                y: self.cur_y,
+            })
+        };
+        if self.cur_x + 1 < self.grid.width() {
+            self.cur_x += 1;
+        } else {
+            self.cur_x = 0;
+            self.cur_y += 1;
+        }
+        ret
+    }
+}
+
+pub struct TraverseIter<'a, T> {
+    grid: &'a Grid2D<T>,
     cur_x: i64,
     cur_y: i64,
     d_x: i64,
@@ -146,15 +213,15 @@ pub struct TraverseIter<'a> {
     wrap: Wrap,
 }
 
-impl<'a> TraverseIter<'a> {
+impl<'a, T> TraverseIter<'a, T> {
     fn new(
-        grid: &'a Grid2D,
+        grid: &'a Grid2D<T>,
         init_x: i64,
         init_y: i64,
         d_x: i64,
         d_y: i64,
         wrap: Wrap,
-    ) -> TraverseIter<'a> {
+    ) -> TraverseIter<'a, T> {
         TraverseIter {
             grid,
             cur_x: init_x,
@@ -166,10 +233,10 @@ impl<'a> TraverseIter<'a> {
     }
 }
 
-impl<'a> Iterator for TraverseIter<'a> {
-    type Item = char;
+impl<'a, T> Iterator for TraverseIter<'a, T> {
+    type Item = &'a T;
 
-    fn next(&mut self) -> Option<char> {
+    fn next(&mut self) -> Option<&'a T> {
         let ret = self.grid.at(self.cur_x, self.cur_y);
         match self.wrap {
             Wrap::None => {

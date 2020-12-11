@@ -8,7 +8,7 @@ impl Day for Day03 {
         let grid = Grid2D::new(input).unwrap();
         let num_trees = grid
             .traverse_wrap(3, 1, Wrap::WrapX)
-            .filter(|&c| c == '#')
+            .filter(|&&c| c == '#')
             .count();
         format!("{:?}", num_trees)
     }
@@ -20,7 +20,7 @@ impl Day for Day03 {
             .iter()
             .map(|s| {
                 grid.traverse_wrap(s.0, s.1, Wrap::WrapX)
-                    .filter(|&c| c == '#')
+                    .filter(|&&c| c == '#')
                     .count()
             })
             .product();
