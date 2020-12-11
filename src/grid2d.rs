@@ -1,3 +1,6 @@
+use std::fmt::{self, Display, Formatter};
+
+#[derive(Clone)]
 pub struct Grid2D {
     el: Vec<Vec<char>>,
 }
@@ -16,45 +19,82 @@ impl Grid2D {
         }
     }
 
-    pub fn at(&self, x: usize, y: usize) -> Option<char> {
-        if x >= self.width() || y >= self.height() {
+    pub fn at(&self, x: i64, y: i64) -> Option<char> {
+        if x < 0 || y < 0 || x >= self.width() || y >= self.height() {
             None
         } else {
-            Some(self.el[y][x])
+            Some(self.el[y as usize][x as usize])
         }
     }
 
-    pub fn height(&self) -> usize {
-        self.el.len()
+    pub fn set(&mut self, x: i64, y: i64, v: char) -> bool {
+        if x < 0 || y < 0 || x >= self.width() || y >= self.height() {
+            false
+        } else {
+            self.el[y as usize][x as usize] = v;
+            true
+        }
     }
 
-    pub fn width(&self) -> usize {
+    pub fn height(&self) -> i64 {
+        self.el.len() as i64
+    }
+
+    pub fn width(&self) -> i64 {
         if self.el.is_empty() {
             0
         } else {
-            self.el[0].len()
+            self.el[0].len() as i64
         }
     }
 
+    pub fn neighbors(&self, x: i64, y: i64) -> Vec<Option<char>> {
+        vec![
+            self.at(x, y - 1),
+            self.at(x + 1, y - 1),
+            self.at(x + 1, y),
+            self.at(x + 1, y + 1),
+            self.at(x, y + 1),
+            self.at(x - 1, y + 1),
+            self.at(x - 1, y),
+            self.at(x - 1, y - 1),
+        ]
+    }
+
+    pub fn count(&self, v: char) -> usize {
+        self.iter().filter(|&x| x == v).count()
+    }
+
+    pub fn iter(&self) -> Iter {
+        Iter::new(&self)
+    }
+
     #[allow(dead_code)]
-    pub fn traverse(&self, d_x: usize, d_y: usize) -> TraverseIter {
+    pub fn traverse(&self, d_x: i64, d_y: i64) -> TraverseIter {
         TraverseIter::new(&self, 0, 0, d_x, d_y, Wrap::None)
     }
 
-    pub fn traverse_wrap(&self, d_x: usize, d_y: usize, wrap: Wrap) -> TraverseIter {
+    pub fn traverse_wrap(&self, d_x: i64, d_y: i64, wrap: Wrap) -> TraverseIter {
         TraverseIter::new(&self, 0, 0, d_x, d_y, wrap)
     }
 
     #[allow(dead_code)]
     pub fn traverse_init_wrap(
         &self,
-        init_x: usize,
-        init_y: usize,
-        d_x: usize,
-        d_y: usize,
+        init_x: i64,
+        init_y: i64,
+        d_x: i64,
+        d_y: i64,
         wrap: Wrap,
     ) -> TraverseIter {
         TraverseIter::new(&self, init_x, init_y, d_x, d_y, wrap)
+    }
+}
+
+impl Display for Grid2D {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let ss: Vec<String> = self.el.iter().map(|v| v.iter().collect()).collect();
+        write!(f, "{}", ss.join("\n"))
     }
 }
 
@@ -66,22 +106,53 @@ pub enum Wrap {
     WrapXY,
 }
 
+pub struct Iter<'a> {
+    grid: &'a Grid2D,
+    cur_x: i64,
+    cur_y: i64,
+}
+
+impl<'a> Iter<'a> {
+    fn new(grid: &'a Grid2D) -> Iter {
+        Iter {
+            grid,
+            cur_x: 0,
+            cur_y: 0,
+        }
+    }
+}
+
+impl<'a> Iterator for Iter<'a> {
+    type Item = char;
+
+    fn next(&mut self) -> Option<char> {
+        let ret = self.grid.at(self.cur_x, self.cur_y);
+        if self.cur_x + 1 < self.grid.width() {
+            self.cur_x += 1;
+        } else {
+            self.cur_x = 0;
+            self.cur_y += 1;
+        }
+        ret
+    }
+}
+
 pub struct TraverseIter<'a> {
     grid: &'a Grid2D,
-    cur_x: usize,
-    cur_y: usize,
-    d_x: usize,
-    d_y: usize,
+    cur_x: i64,
+    cur_y: i64,
+    d_x: i64,
+    d_y: i64,
     wrap: Wrap,
 }
 
 impl<'a> TraverseIter<'a> {
     fn new(
         grid: &'a Grid2D,
-        init_x: usize,
-        init_y: usize,
-        d_x: usize,
-        d_y: usize,
+        init_x: i64,
+        init_y: i64,
+        d_x: i64,
+        d_y: i64,
         wrap: Wrap,
     ) -> TraverseIter<'a> {
         TraverseIter {
