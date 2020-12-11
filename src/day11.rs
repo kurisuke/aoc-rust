@@ -1,5 +1,5 @@
 use crate::day::Day;
-use crate::grid2d::{Grid2D, Wrap};
+use crate::grid2d::{Coords, Grid2D, Wrap};
 
 pub struct Day11 {}
 
@@ -26,7 +26,7 @@ impl Day for Day11 {
 
 fn iterate<F>(input: &str, max_occupied: usize, nb_fn: F) -> usize
 where
-    F: Fn(&Grid2D<char>, i64, i64) -> Vec<&char>,
+    F: Fn(&Grid2D<char>, Coords) -> Vec<&char>,
 {
     let mut grid = Grid2D::new(input).unwrap();
 
@@ -35,12 +35,12 @@ where
         let mut grid_new = grid.clone();
         for (pos, pos_val) in grid.enumerate() {
             if *pos_val != '.' {
-                let nb: Vec<_> = nb_fn(&grid, pos.x, pos.y);
+                let nb: Vec<_> = nb_fn(&grid, pos.clone());
                 let num_occupied = nb.into_iter().filter(|&&v| v == '#').count();
                 if *pos_val == 'L' && num_occupied == 0 {
-                    grid_new.set(pos.x, pos.y, '#');
+                    grid_new.set(&pos, '#');
                 } else if *pos_val == '#' && num_occupied >= max_occupied {
-                    grid_new.set(pos.x, pos.y, 'L');
+                    grid_new.set(&pos, 'L');
                 }
             }
         }
@@ -57,14 +57,17 @@ where
     all_occupied
 }
 
-fn direct_neighbors(grid: &Grid2D<char>, x: i64, y: i64) -> Vec<&char> {
-    grid.neighbors(x, y).into_iter().filter_map(|v| v).collect()
+fn direct_neighbors(grid: &Grid2D<char>, coords: Coords) -> Vec<&char> {
+    grid.neighbors(&coords)
+        .into_iter()
+        .filter_map(|v| v)
+        .collect()
 }
 
-fn visible_neighbors(grid: &Grid2D<char>, x: i64, y: i64) -> Vec<&char> {
+fn visible_neighbors(grid: &Grid2D<char>, coords: Coords) -> Vec<&char> {
     DIRS.iter()
         .map(|d| {
-            grid.traverse_init_wrap(x, y, d.0, d.1, Wrap::None)
+            grid.traverse_init_wrap(&coords, &Coords { x: d.0, y: d.1 }, Wrap::None)
                 .skip(1)
                 .find(|&&v| v != '.')
         })

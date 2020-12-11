@@ -20,6 +20,7 @@ pub enum Wrap {
     WrapXY,
 }
 
+#[derive(Clone)]
 pub struct Coords {
     pub x: i64,
     pub y: i64,
@@ -40,19 +41,19 @@ impl Grid2D<char> {
 }
 
 impl<T> Grid2D<T> {
-    pub fn at(&self, x: i64, y: i64) -> Option<&T> {
-        if x < 0 || y < 0 || x >= self.width() || y >= self.height() {
+    pub fn at(&self, c: &Coords) -> Option<&T> {
+        if c.x < 0 || c.y < 0 || c.x >= self.width() || c.y >= self.height() {
             None
         } else {
-            Some(&self.el[y as usize * self.width + x as usize])
+            Some(&self.el[c.y as usize * self.width + c.x as usize])
         }
     }
 
-    pub fn set(&mut self, x: i64, y: i64, v: T) -> bool {
-        if x < 0 || y < 0 || x >= self.width() || y >= self.height() {
+    pub fn set(&mut self, c: &Coords, v: T) -> bool {
+        if c.x < 0 || c.y < 0 || c.x >= self.width() || c.y >= self.height() {
             false
         } else {
-            self.el[y as usize * self.width + x as usize] = v;
+            self.el[c.y as usize * self.width + c.x as usize] = v;
             true
         }
     }
@@ -65,16 +66,28 @@ impl<T> Grid2D<T> {
         self.width as i64
     }
 
-    pub fn neighbors(&self, x: i64, y: i64) -> Vec<Option<&T>> {
+    pub fn neighbors(&self, c: &Coords) -> Vec<Option<&T>> {
         vec![
-            self.at(x, y - 1),
-            self.at(x + 1, y - 1),
-            self.at(x + 1, y),
-            self.at(x + 1, y + 1),
-            self.at(x, y + 1),
-            self.at(x - 1, y + 1),
-            self.at(x - 1, y),
-            self.at(x - 1, y - 1),
+            self.at(&Coords { x: c.x, y: c.y - 1 }),
+            self.at(&Coords {
+                x: c.x + 1,
+                y: c.y - 1,
+            }),
+            self.at(&Coords { x: c.x + 1, y: c.y }),
+            self.at(&Coords {
+                x: c.x + 1,
+                y: c.y + 1,
+            }),
+            self.at(&Coords { x: c.x, y: c.y + 1 }),
+            self.at(&Coords {
+                x: c.x - 1,
+                y: c.y + 1,
+            }),
+            self.at(&Coords { x: c.x - 1, y: c.y }),
+            self.at(&Coords {
+                x: c.x - 1,
+                y: c.y - 1,
+            }),
         ]
     }
 
@@ -92,23 +105,16 @@ impl<T> Grid2D<T> {
     }
 
     #[allow(dead_code)]
-    pub fn traverse(&self, d_x: i64, d_y: i64) -> TraverseIter<T> {
-        TraverseIter::new(&self, 0, 0, d_x, d_y, Wrap::None)
+    pub fn traverse(&self, d: &Coords) -> TraverseIter<T> {
+        TraverseIter::new(&self, &Coords { x: 0, y: 0 }, d, Wrap::None)
     }
 
-    pub fn traverse_wrap(&self, d_x: i64, d_y: i64, wrap: Wrap) -> TraverseIter<T> {
-        TraverseIter::new(&self, 0, 0, d_x, d_y, wrap)
+    pub fn traverse_wrap(&self, d: &Coords, wrap: Wrap) -> TraverseIter<T> {
+        TraverseIter::new(&self, &Coords { x: 0, y: 0 }, d, wrap)
     }
 
-    pub fn traverse_init_wrap(
-        &self,
-        init_x: i64,
-        init_y: i64,
-        d_x: i64,
-        d_y: i64,
-        wrap: Wrap,
-    ) -> TraverseIter<T> {
-        TraverseIter::new(&self, init_x, init_y, d_x, d_y, wrap)
+    pub fn traverse_init_wrap(&self, init: &Coords, d: &Coords, wrap: Wrap) -> TraverseIter<T> {
+        TraverseIter::new(&self, init, d, wrap)
     }
 }
 
@@ -133,16 +139,14 @@ impl Display for Grid2D<char> {
 
 pub struct Iter<'a, T> {
     grid: &'a Grid2D<T>,
-    cur_x: i64,
-    cur_y: i64,
+    cur: Coords,
 }
 
 impl<'a, T> Iter<'a, T> {
     fn new(grid: &'a Grid2D<T>) -> Iter<T> {
         Iter {
             grid,
-            cur_x: 0,
-            cur_y: 0,
+            cur: Coords { x: 0, y: 0 },
         }
     }
 }
@@ -151,12 +155,12 @@ impl<'a, T> Iterator for Iter<'a, T> {
     type Item = &'a T;
 
     fn next(&mut self) -> Option<&'a T> {
-        let ret = self.grid.at(self.cur_x, self.cur_y);
-        if self.cur_x + 1 < self.grid.width() {
-            self.cur_x += 1;
+        let ret = self.grid.at(&self.cur);
+        if self.cur.x + 1 < self.grid.width() {
+            self.cur.x += 1;
         } else {
-            self.cur_x = 0;
-            self.cur_y += 1;
+            self.cur.x = 0;
+            self.cur.y += 1;
         }
         ret
     }
@@ -164,16 +168,14 @@ impl<'a, T> Iterator for Iter<'a, T> {
 
 pub struct CoordsIter<'a, T> {
     grid: &'a Grid2D<T>,
-    cur_x: i64,
-    cur_y: i64,
+    cur: Coords,
 }
 
 impl<'a, T> CoordsIter<'a, T> {
     fn new(grid: &'a Grid2D<T>) -> CoordsIter<T> {
         CoordsIter {
             grid,
-            cur_x: 0,
-            cur_y: 0,
+            cur: Coords { x: 0, y: 0 },
         }
     }
 }
@@ -182,23 +184,20 @@ impl<'a, T> Iterator for CoordsIter<'a, T> {
     type Item = Coords;
 
     fn next(&mut self) -> Option<Coords> {
-        let ret = if self.cur_x < 0
-            || self.cur_y < 0
-            || self.cur_x >= self.grid.width()
-            || self.cur_y >= self.grid.height()
+        let ret = if self.cur.x < 0
+            || self.cur.y < 0
+            || self.cur.x >= self.grid.width()
+            || self.cur.y >= self.grid.height()
         {
             None
         } else {
-            Some(Coords {
-                x: self.cur_x,
-                y: self.cur_y,
-            })
+            Some(self.cur.clone())
         };
-        if self.cur_x + 1 < self.grid.width() {
-            self.cur_x += 1;
+        if self.cur.x + 1 < self.grid.width() {
+            self.cur.x += 1;
         } else {
-            self.cur_x = 0;
-            self.cur_y += 1;
+            self.cur.x = 0;
+            self.cur.y += 1;
         }
         ret
     }
@@ -206,28 +205,17 @@ impl<'a, T> Iterator for CoordsIter<'a, T> {
 
 pub struct TraverseIter<'a, T> {
     grid: &'a Grid2D<T>,
-    cur_x: i64,
-    cur_y: i64,
-    d_x: i64,
-    d_y: i64,
+    cur: Coords,
+    d: Coords,
     wrap: Wrap,
 }
 
 impl<'a, T> TraverseIter<'a, T> {
-    fn new(
-        grid: &'a Grid2D<T>,
-        init_x: i64,
-        init_y: i64,
-        d_x: i64,
-        d_y: i64,
-        wrap: Wrap,
-    ) -> TraverseIter<'a, T> {
+    fn new(grid: &'a Grid2D<T>, init: &Coords, d: &Coords, wrap: Wrap) -> TraverseIter<'a, T> {
         TraverseIter {
             grid,
-            cur_x: init_x,
-            cur_y: init_y,
-            d_x,
-            d_y,
+            cur: init.clone(),
+            d: d.clone(),
             wrap,
         }
     }
@@ -237,23 +225,23 @@ impl<'a, T> Iterator for TraverseIter<'a, T> {
     type Item = &'a T;
 
     fn next(&mut self) -> Option<&'a T> {
-        let ret = self.grid.at(self.cur_x, self.cur_y);
+        let ret = self.grid.at(&self.cur);
         match self.wrap {
             Wrap::None => {
-                self.cur_x += self.d_x;
-                self.cur_y += self.d_y;
+                self.cur.x += self.d.x;
+                self.cur.y += self.d.y;
             }
             Wrap::WrapX => {
-                self.cur_x = (self.cur_x + self.d_x) % self.grid.width();
-                self.cur_y += self.d_y;
+                self.cur.x = (self.cur.x + self.d.x) % self.grid.width();
+                self.cur.y += self.d.y;
             }
             Wrap::WrapY => {
-                self.cur_x += self.d_x;
-                self.cur_y = (self.cur_y + self.d_y) % self.grid.height();
+                self.cur.x += self.d.x;
+                self.cur.y = (self.cur.y + self.d.y) % self.grid.height();
             }
             Wrap::WrapXY => {
-                self.cur_x = (self.cur_x + self.d_x) % self.grid.width();
-                self.cur_y = (self.cur_y + self.d_y) % self.grid.height();
+                self.cur.x = (self.cur.x + self.d.x) % self.grid.width();
+                self.cur.y = (self.cur.y + self.d.y) % self.grid.height();
             }
         }
         ret
