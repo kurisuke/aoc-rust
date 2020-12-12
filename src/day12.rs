@@ -43,18 +43,10 @@ fn move_ship(cmds: Vec<Cmd>, init_vec: Coords, direct: bool) -> Coords {
         let mv = if direct { &mut pos } else { &mut vec };
 
         match cmd {
-            Cmd::N(v) => {
-                mv.y += v;
-            }
-            Cmd::S(v) => {
-                mv.y -= v;
-            }
-            Cmd::E(v) => {
-                mv.x += v;
-            }
-            Cmd::W(v) => {
-                mv.x -= v;
-            }
+            Cmd::N(v) => mv.y += v,
+            Cmd::S(v) => mv.y -= v,
+            Cmd::E(v) => mv.x += v,
+            Cmd::W(v) => mv.x -= v,
             Cmd::L(rot) => vec = rot_l(&vec, rot),
             Cmd::R(rot) => vec = rot_r(&vec, rot),
             Cmd::F(n) => {
