@@ -10,6 +10,7 @@ mod day08;
 mod day09;
 mod day10;
 mod day11;
+mod day12;
 mod grid2d;
 
 use day::Day;
@@ -29,6 +30,7 @@ fn get_day(day_no: usize) -> Option<Box<dyn Day>> {
         9 => Some(Box::new(day09::Day09 {})),
         10 => Some(Box::new(day10::Day10 {})),
         11 => Some(Box::new(day11::Day11 {})),
+        12 => Some(Box::new(day12::Day12 {})),
         _ => None,
     }
 }
