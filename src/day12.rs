@@ -1,7 +1,5 @@
 use crate::day::Day;
 use crate::grid2d::Coords;
-use num_enum::{IntoPrimitive, TryFromPrimitive};
-use std::convert::TryFrom;
 
 pub struct Day12 {}
 
@@ -15,138 +13,71 @@ enum Cmd {
     F(i64),
 }
 
-#[derive(IntoPrimitive)]
-#[repr(i64)]
 enum Rotate {
     Rot90,
     Rot180,
     Rot270,
 }
 
-#[derive(IntoPrimitive, TryFromPrimitive)]
-#[repr(i64)]
-enum Dir {
-    N,
-    E,
-    S,
-    W,
+fn rot_l(c: &Coords, r: Rotate) -> Coords {
+    match r {
+        Rotate::Rot90 => Coords { x: -c.y, y: c.x },
+        Rotate::Rot180 => Coords { x: -c.x, y: -c.y },
+        Rotate::Rot270 => Coords { x: c.y, y: -c.x },
+    }
+}
+
+fn rot_r(c: &Coords, r: Rotate) -> Coords {
+    match r {
+        Rotate::Rot90 => Coords { x: c.y, y: -c.x },
+        Rotate::Rot180 => Coords { x: -c.x, y: -c.y },
+        Rotate::Rot270 => Coords { x: -c.y, y: c.x },
+    }
+}
+
+fn move_ship(cmds: Vec<Cmd>, init_vec: Coords, direct: bool) -> Coords {
+    let mut pos = Coords { x: 0, y: 0 };
+    let mut vec = init_vec;
+
+    for cmd in cmds {
+        let mv = if direct { &mut pos } else { &mut vec };
+
+        match cmd {
+            Cmd::N(v) => {
+                mv.y += v;
+            }
+            Cmd::S(v) => {
+                mv.y -= v;
+            }
+            Cmd::E(v) => {
+                mv.x += v;
+            }
+            Cmd::W(v) => {
+                mv.x -= v;
+            }
+            Cmd::L(rot) => vec = rot_l(&vec, rot),
+            Cmd::R(rot) => vec = rot_r(&vec, rot),
+            Cmd::F(n) => {
+                pos.x += n * vec.x;
+                pos.y += n * vec.y;
+            }
+        };
+    }
+
+    pos
 }
 
 impl Day for Day12 {
     fn star1(&self, input: &str) -> String {
         let cmds = parse_input(input);
-        let mut pos = Coords { x: 0, y: 0 };
-        let mut dir = Dir::E;
-
-        for cmd in cmds {
-            match cmd {
-                Cmd::N(v) => {
-                    pos.y += v;
-                }
-                Cmd::S(v) => {
-                    pos.y -= v;
-                }
-                Cmd::E(v) => {
-                    pos.x += v;
-                }
-                Cmd::W(v) => {
-                    pos.x -= v;
-                }
-                Cmd::L(r) => {
-                    let cur_dir: i64 = dir.into();
-                    let r_val: i64 = r.into();
-                    dir = Dir::try_from((cur_dir - r_val - 1 + 4) % 4).unwrap();
-                }
-                Cmd::R(r) => {
-                    let cur_dir: i64 = dir.into();
-                    let r_val: i64 = r.into();
-                    dir = Dir::try_from((cur_dir + r_val + 1 + 4) % 4).unwrap();
-                }
-                Cmd::F(v) => match dir {
-                    Dir::N => {
-                        pos.y += v;
-                    }
-                    Dir::S => {
-                        pos.y -= v;
-                    }
-                    Dir::E => {
-                        pos.x += v;
-                    }
-                    Dir::W => {
-                        pos.x -= v;
-                    }
-                },
-            };
-        }
+        let pos = move_ship(cmds, Coords { x: 1, y: 0 }, true);
 
         format!("{}", pos.x.abs() + pos.y.abs())
     }
 
     fn star2(&self, input: &str) -> String {
         let cmds = parse_input(input);
-        let mut pos = Coords { x: 0, y: 0 };
-        let mut vec = Coords { x: 10, y: 1 };
-
-        for cmd in cmds {
-            match cmd {
-                Cmd::N(v) => {
-                    vec.y += v;
-                }
-                Cmd::S(v) => {
-                    vec.y -= v;
-                }
-                Cmd::E(v) => {
-                    vec.x += v;
-                }
-                Cmd::W(v) => {
-                    vec.x -= v;
-                }
-                Cmd::L(rot) => match rot {
-                    Rotate::Rot90 => {
-                        vec = Coords {
-                            x: -vec.y,
-                            y: vec.x,
-                        };
-                    }
-                    Rotate::Rot180 => {
-                        vec = Coords {
-                            x: -vec.x,
-                            y: -vec.y,
-                        };
-                    }
-                    Rotate::Rot270 => {
-                        vec = Coords {
-                            x: vec.y,
-                            y: -vec.x,
-                        };
-                    }
-                },
-                Cmd::R(rot) => match rot {
-                    Rotate::Rot90 => {
-                        vec = Coords {
-                            x: vec.y,
-                            y: -vec.x,
-                        };
-                    }
-                    Rotate::Rot180 => {
-                        vec = Coords {
-                            x: -vec.x,
-                            y: -vec.y,
-                        };
-                    }
-                    Rotate::Rot270 => {
-                        vec = Coords {
-                            x: -vec.y,
-                            y: vec.x,
-                        };
-                    }
-                },
-                Cmd::F(n) => {
-                    pos.x += n * vec.x;
-                    pos.y += n * vec.y;
-                }
-            }
-        }
+        let pos = move_ship(cmds, Coords { x: 10, y: 1 }, false);
 
         format!("{}", pos.x.abs() + pos.y.abs())
     }
