@@ -9,9 +9,8 @@ fn find_num(start_nums: &[usize], n: usize) -> usize {
         prev_turn[*n] = i + 1;
     }
     let mut last_spoken = *start_nums.last().unwrap();
-    let mut turn = start_nums.len();
 
-    while turn < n {
+    for turn in start_nums.len()..n {
         let next_spoken = if prev_turn[last_spoken] == 0 {
             0
         } else {
@@ -22,7 +21,6 @@ fn find_num(start_nums: &[usize], n: usize) -> usize {
 
         // next turn
         last_spoken = next_spoken;
-        turn += 1;
     }
 
     last_spoken
