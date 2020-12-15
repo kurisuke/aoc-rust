@@ -1,24 +1,24 @@
 use crate::day::Day;
-use std::collections::HashMap;
 
 pub struct Day15 {}
 
-fn find_num(start_nums: &[u64], n: usize) -> u64 {
-    let mut prev_turn = HashMap::new();
+fn find_num(start_nums: &[usize], n: usize) -> usize {
+    let mut prev_turn = vec![0; n];
 
     for (i, n) in start_nums.iter().enumerate().take(start_nums.len() - 1) {
-        prev_turn.insert(*n, i as usize);
+        prev_turn[*n] = i + 1;
     }
     let mut last_spoken = *start_nums.last().unwrap();
-    let mut turn = start_nums.len() - 1;
+    let mut turn = start_nums.len();
 
-    while turn < n - 1 {
-        let next_spoken = match prev_turn.get(&last_spoken) {
-            None => 0u64,
-            Some(t) => (turn - t) as u64,
+    while turn < n {
+        let next_spoken = if prev_turn[last_spoken] == 0 {
+            0
+        } else {
+            turn - prev_turn[last_spoken]
         };
-        let e = prev_turn.entry(last_spoken).or_insert(0);
-        *e = turn;
+
+        prev_turn[last_spoken] = turn;
 
         // next turn
         last_spoken = next_spoken;
@@ -32,7 +32,7 @@ impl Day for Day15 {
     fn star1(&self, input: &str) -> String {
         let start_nums: Vec<_> = input
             .split(',')
-            .map(|x| x.parse::<u64>().unwrap())
+            .map(|x| x.parse::<usize>().unwrap())
             .collect();
         format!("{}", find_num(&start_nums, 2020))
     }
@@ -40,7 +40,7 @@ impl Day for Day15 {
     fn star2(&self, input: &str) -> String {
         let start_nums: Vec<_> = input
             .split(',')
-            .map(|x| x.parse::<u64>().unwrap())
+            .map(|x| x.parse::<usize>().unwrap())
             .collect();
         format!("{}", find_num(&start_nums, 30000000))
     }
