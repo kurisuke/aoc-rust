@@ -1,5 +1,6 @@
 use crate::day::Day;
 use crate::grid2d::Grid2D;
+use itertools::iproduct;
 use std::collections::HashSet;
 use std::hash::Hash;
 use std::ops::Add;
@@ -33,10 +34,7 @@ impl Add for Coords4D {
     }
 }
 
-type Cube = HashSet<Coords3D>;
-type Hypercube = HashSet<Coords4D>;
-
-fn parse_input_3d(input: &str) -> Cube {
+fn parse_input_3d(input: &str) -> HashSet<Coords3D> {
     let init_grid = Grid2D::new(input).unwrap();
     init_grid
         .enumerate()
@@ -45,7 +43,7 @@ fn parse_input_3d(input: &str) -> Cube {
         .collect()
 }
 
-fn parse_input_4d(input: &str) -> Hypercube {
+fn parse_input_4d(input: &str) -> HashSet<Coords4D> {
     let init_grid = Grid2D::new(input).unwrap();
     init_grid
         .enumerate()
@@ -60,14 +58,7 @@ where
 {
     neighbors
         .iter()
-        .filter(|diff| {
-            if diff == &zero_el {
-                false
-            } else {
-                let new_coords = pos + **diff;
-                cube.contains(&new_coords)
-            }
-        })
+        .filter(|diff| diff != &zero_el && cube.contains(&(pos + **diff)))
         .count()
 }
 
@@ -77,10 +68,11 @@ where
 {
     for _ in 0..n {
         let mut new_cube: HashSet<T> = HashSet::new();
+        let mut checked_pos: HashSet<T> = HashSet::new();
         for pos in cube.iter() {
             for diff in neighbors.iter() {
                 let new_coords = *pos + *diff;
-                if !new_cube.contains(&new_coords) {
+                if !checked_pos.contains(&new_coords) {
                     let is_active = match active_neighbors(&cube, new_coords, &neighbors, &zero_el)
                     {
                         0..=1 => false,
@@ -91,6 +83,7 @@ where
                     if is_active {
                         new_cube.insert(new_coords);
                     }
+                    checked_pos.insert(new_coords);
                 }
             }
         }
@@ -102,35 +95,19 @@ where
 impl Day for Day17 {
     fn star1(&self, input: &str) -> String {
         let cube = parse_input_3d(input);
-
-        let mut neighbors = vec![];
-        for x in -1..=1 {
-            for y in -1..=1 {
-                for z in -1..=1 {
-                    neighbors.push(Coords3D(x, y, z));
-                }
-            }
-        }
+        let neighbors: Vec<_> = iproduct!(-1..=1, -1..=1, -1..=1)
+            .map(|c| Coords3D(c.0, c.1, c.2))
+            .collect();
         let zero_el = Coords3D(0, 0, 0);
-
         format!("{}", iterate(cube, 6, &neighbors, &zero_el))
     }
 
     fn star2(&self, input: &str) -> String {
         let hypercube = parse_input_4d(input);
-
-        let mut neighbors = vec![];
-        for x in -1..=1 {
-            for y in -1..=1 {
-                for z in -1..=1 {
-                    for w in -1..=1 {
-                        neighbors.push(Coords4D(x, y, z, w));
-                    }
-                }
-            }
-        }
+        let neighbors: Vec<_> = iproduct!(-1..=1, -1..=1, -1..=1, -1..=1)
+            .map(|c| Coords4D(c.0, c.1, c.2, c.3))
+            .collect();
         let zero_el = Coords4D(0, 0, 0, 0);
-
         format!("{}", iterate(hypercube, 6, &neighbors, &zero_el))
     }
 }
