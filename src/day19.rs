@@ -57,56 +57,50 @@ fn parse_input(input: &str) -> InputInfo {
     InputInfo { ruleset, msgs }
 }
 
-fn match_concat<'a>(ruleset: &Ruleset, rule_ids: &[usize], msg: &'a str) -> &'a str {
-    let mut rest = msg;
-    let mut match_ok = true;
-
-    for rule_id in rule_ids {
-        let new_rest = match_msg(ruleset, *rule_id, rest);
-        if new_rest.len() < rest.len() {
-            rest = new_rest;
-        } else {
-            match_ok = false;
-            break;
-        }
-    }
-
-    if match_ok {
-        rest
+fn match_seq<'a>(ruleset: &Ruleset, seq: &[usize], msg: &'a str) -> Vec<&'a str> {
+    if seq.is_empty() {
+        vec![msg]
     } else {
-        msg
+        let mut ret = vec![];
+        let mut first = seq.to_vec();
+        let remain = if first.len() > 1 {
+            first.drain(1..).collect()
+        } else {
+            vec![]
+        };
+        for rest in match_msg(ruleset, first[0], msg) {
+            ret.extend(match_seq(ruleset, &remain, rest));
+        }
+        ret
     }
 }
 
-fn match_msg<'a>(ruleset: &Ruleset, rule_id: usize, msg: &'a str) -> &'a str {
-    if msg.is_empty() {
-        return msg;
+fn match_alt<'a>(
+    ruleset: &Ruleset,
+    alt1: &[usize],
+    alt2: &Option<Vec<usize>>,
+    msg: &'a str,
+) -> Vec<&'a str> {
+    let mut ret = match_seq(ruleset, alt1, msg);
+    if let Some(alt2) = alt2 {
+        ret.extend(match_seq(ruleset, alt2, msg));
     }
+    ret
+}
 
-    let rule = ruleset.get(&rule_id).unwrap();
+fn match_msg<'a>(ruleset: &Ruleset, rule_id: usize, msg: &'a str) -> Vec<&'a str> {
+    let rule = ruleset
+        .get(&rule_id)
+        .unwrap_or_else(|| panic!("unknown rule: {}", rule_id));
     match &rule {
         Rule::Literal(c) => {
-            if *c == msg.chars().next().unwrap() {
-                &msg[1..]
+            if !msg.is_empty() && *c == msg.chars().next().unwrap() {
+                vec![&msg[1..]]
             } else {
-                msg
+                vec![]
             }
         }
-        Rule::Sub(first, second) => {
-            let rest = match_concat(ruleset, &first, msg);
-            if rest.len() < msg.len() {
-                rest
-            } else if let Some(second) = second {
-                let rest = match_concat(ruleset, &second, msg);
-                if rest.len() < msg.len() {
-                    rest
-                } else {
-                    msg
-                }
-            } else {
-                msg
-            }
-        }
+        Rule::Sub(alt1, alt2) => match_alt(ruleset, alt1, alt2, msg),
     }
 }
 
@@ -117,15 +111,58 @@ impl Day for Day19 {
             .msgs
             .iter()
             .filter(|msg| {
-                let rest = match_msg(&input_info.ruleset, 0, msg);
-                rest.is_empty()
+                let ms = match_msg(&input_info.ruleset, 0, msg);
+                ms.iter().any(|x| x.is_empty())
             })
             .count();
         format!("{}", res)
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let mut input_info = parse_input(input);
+        let max_len = input_info.msgs.iter().map(|x| x.len()).max().unwrap();
+
+        let base_8 = 10000;
+        input_info
+            .ruleset
+            .entry(8)
+            .and_modify(|e| *e = Rule::Sub(vec![42], Some(vec![42, base_8])));
+        for i in 0..max_len {
+            input_info
+                .ruleset
+                .entry(base_8 + i)
+                .or_insert_with(|| Rule::Sub(vec![42], Some(vec![42, base_8 + i + 1])));
+        }
+        input_info
+            .ruleset
+            .entry(base_8 + max_len)
+            .or_insert_with(|| Rule::Sub(vec![42], None));
+
+        let base_11 = 20000;
+        input_info
+            .ruleset
+            .entry(11)
+            .and_modify(|e| *e = Rule::Sub(vec![42, 31], Some(vec![42, base_11, 31])));
+        for i in 0..max_len {
+            input_info
+                .ruleset
+                .entry(base_11 + i)
+                .or_insert_with(|| Rule::Sub(vec![42, 31], Some(vec![42, base_11 + i + 1, 31])));
+        }
+        input_info
+            .ruleset
+            .entry(base_11 + max_len)
+            .or_insert_with(|| Rule::Sub(vec![42, 31], None));
+
+        let res = input_info
+            .msgs
+            .iter()
+            .filter(|msg| {
+                let ms = match_msg(&input_info.ruleset, 0, msg);
+                ms.iter().any(|x| x.len() == 0)
+            })
+            .count();
+        format!("{}", res)
     }
 }
 
@@ -149,5 +186,59 @@ aaabbb
 aaaabbb"#;
         let d = Day19 {};
         assert_eq!(d.star1(input), "2");
+    }
+
+    #[test]
+    fn ex2() {
+        let input = r#"42: 9 14 | 10 1
+9: 14 27 | 1 26
+10: 23 14 | 28 1
+1: "a"
+11: 42 31
+5: 1 14 | 15 1
+19: 14 1 | 14 14
+12: 24 14 | 19 1
+16: 15 1 | 14 14
+31: 14 17 | 1 13
+6: 14 14 | 1 14
+2: 1 24 | 14 4
+0: 8 11
+13: 14 3 | 1 12
+15: 1 | 14
+17: 14 2 | 1 7
+23: 25 1 | 22 14
+28: 16 1
+4: 1 1
+20: 14 14 | 1 15
+3: 5 14 | 16 1
+27: 1 6 | 14 18
+14: "b"
+21: 14 1 | 1 14
+25: 1 1 | 1 14
+22: 14 14
+8: 42
+26: 14 22 | 1 20
+18: 15 15
+7: 14 5 | 1 21
+24: 14 1
+
+abbbbbabbbaaaababbaabbbbabababbbabbbbbbabaaaa
+bbabbbbaabaabba
+babbbbaabbbbbabbbbbbaabaaabaaa
+aaabbbbbbaaaabaababaabababbabaaabbababababaaa
+bbbbbbbaaaabbbbaaabbabaaa
+bbbababbbbaaaaaaaabbababaaababaabab
+ababaaaaaabaaab
+ababaaaaabbbaba
+baabbaaaabbaaaababbaababb
+abbbbabbbbaaaababbbbbbaaaababb
+aaaaabbaabaaaaababaa
+aaaabbaaaabbaaa
+aaaabbaabbaaaaaaabbbabbbaaabbaabaaa
+babaaabbbaaabaababbaabababaaab
+aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"#;
+        let d = Day19 {};
+        assert_eq!(d.star1(input), "3");
+        assert_eq!(d.star2(input), "12");
     }
 }
