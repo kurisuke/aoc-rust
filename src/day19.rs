@@ -61,17 +61,11 @@ fn match_seq<'a>(ruleset: &Ruleset, seq: &[usize], msg: &'a str) -> Vec<&'a str>
     if seq.is_empty() {
         vec![msg]
     } else {
-        let mut ret = vec![];
-        let mut first = seq.to_vec();
-        let remain = if first.len() > 1 {
-            first.drain(1..).collect()
-        } else {
-            vec![]
-        };
-        for rest in match_msg(ruleset, first[0], msg) {
-            ret.extend(match_seq(ruleset, &remain, rest));
-        }
-        ret
+        match_msg(ruleset, seq[0], msg)
+            .iter()
+            .map(|rest| match_seq(ruleset, &seq[1..], rest))
+            .flatten()
+            .collect()
     }
 }
 
@@ -104,65 +98,33 @@ fn match_msg<'a>(ruleset: &Ruleset, rule_id: usize, msg: &'a str) -> Vec<&'a str
     }
 }
 
+fn get_result(input_info: InputInfo) -> usize {
+    input_info
+        .msgs
+        .iter()
+        .filter(|msg| {
+            let ms = match_msg(&input_info.ruleset, 0, msg);
+            ms.iter().any(|x| x.is_empty())
+        })
+        .count()
+}
+
 impl Day for Day19 {
     fn star1(&self, input: &str) -> String {
-        let input_info = parse_input(input);
-        let res = input_info
-            .msgs
-            .iter()
-            .filter(|msg| {
-                let ms = match_msg(&input_info.ruleset, 0, msg);
-                ms.iter().any(|x| x.is_empty())
-            })
-            .count();
-        format!("{}", res)
+        format!("{}", get_result(parse_input(input)))
     }
 
     fn star2(&self, input: &str) -> String {
         let mut input_info = parse_input(input);
-        let max_len = input_info.msgs.iter().map(|x| x.len()).max().unwrap();
-
-        let base_8 = 10000;
         input_info
             .ruleset
             .entry(8)
-            .and_modify(|e| *e = Rule::Sub(vec![42], Some(vec![42, base_8])));
-        for i in 0..max_len {
-            input_info
-                .ruleset
-                .entry(base_8 + i)
-                .or_insert_with(|| Rule::Sub(vec![42], Some(vec![42, base_8 + i + 1])));
-        }
-        input_info
-            .ruleset
-            .entry(base_8 + max_len)
-            .or_insert_with(|| Rule::Sub(vec![42], None));
-
-        let base_11 = 20000;
+            .and_modify(|e| *e = Rule::Sub(vec![42], Some(vec![42, 8])));
         input_info
             .ruleset
             .entry(11)
-            .and_modify(|e| *e = Rule::Sub(vec![42, 31], Some(vec![42, base_11, 31])));
-        for i in 0..max_len {
-            input_info
-                .ruleset
-                .entry(base_11 + i)
-                .or_insert_with(|| Rule::Sub(vec![42, 31], Some(vec![42, base_11 + i + 1, 31])));
-        }
-        input_info
-            .ruleset
-            .entry(base_11 + max_len)
-            .or_insert_with(|| Rule::Sub(vec![42, 31], None));
-
-        let res = input_info
-            .msgs
-            .iter()
-            .filter(|msg| {
-                let ms = match_msg(&input_info.ruleset, 0, msg);
-                ms.iter().any(|x| x.len() == 0)
-            })
-            .count();
-        format!("{}", res)
+            .and_modify(|e| *e = Rule::Sub(vec![42, 31], Some(vec![42, 11, 31])));
+        format!("{}", get_result(input_info))
     }
 }
 
