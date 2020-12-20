@@ -297,14 +297,8 @@ fn match_pattern(grid: &mut Grid2D<char>, pattern: &[Coords]) -> usize {
 impl Day for Day20 {
     fn star1(&self, input: &str) -> String {
         let tiles = parse_input(input);
-        let full_placement = assemble(&tiles);
-
-        let length = (full_placement.len() as f64).sqrt() as usize;
-        let top_left = full_placement[0].tile_id;
-        let top_right = full_placement[length - 1].tile_id;
-        let bottom_left = full_placement[(length - 1) * length].tile_id;
-        let bottom_right = full_placement[length * length - 1].tile_id;
-        format!("{}", top_left * top_right * bottom_left * bottom_right)
+        let (corner_tiles, _) = find_corners_borders(&tiles);
+        format!("{}", corner_tiles.iter().product::<usize>())
     }
 
     fn star2(&self, input: &str) -> String {
