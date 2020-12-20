@@ -17,6 +17,31 @@ struct PlacedTile {
     bottom_border: String,
 }
 
+#[derive(Clone)]
+struct Unplaced {
+    corners: HashSet<usize>,
+    edges: HashSet<usize>,
+    rest: HashSet<usize>,
+}
+
+enum Position {
+    Corner,
+    Edge,
+    Rest,
+}
+
+fn get_position(pos: usize, length: usize) -> Position {
+    let row = pos / length;
+    let col = pos % length;
+    if (row == 0 || row == length - 1) && (col == 0 || col == length - 1) {
+        Position::Corner
+    } else if row == 0 || row == length - 1 || col == 0 || col == length - 1 {
+        Position::Edge
+    } else {
+        Position::Rest
+    }
+}
+
 fn fits_with_neighbors(length: usize, placed: &[PlacedTile], new_tile: &Grid2D<char>) -> bool {
     let next_idx = placed.len();
     let left_neighbor_idx = if next_idx % length == 0 {
@@ -51,12 +76,17 @@ fn place_next(
     tiles: &Tiles,
     length: usize,
     placed: Vec<PlacedTile>,
-    unplaced: HashSet<usize>,
+    unplaced: Unplaced,
 ) -> Option<Vec<PlacedTile>> {
-    if unplaced.is_empty() {
+    if unplaced.corners.is_empty() {
         Some(placed)
     } else {
-        for tile_id in unplaced.iter() {
+        let unplaced_type = match get_position(placed.len(), length) {
+            Position::Corner => unplaced.corners.clone(),
+            Position::Edge => unplaced.edges.clone(),
+            Position::Rest => unplaced.rest.clone(),
+        };
+        for tile_id in unplaced_type.iter() {
             let grid = tiles.get(tile_id).unwrap();
             for flip in [Flip::FlipNone, Flip::FlipH, Flip::FlipV].iter() {
                 let mut flipped = grid.flip(*flip);
@@ -81,7 +111,17 @@ fn place_next(
                         new_placed.push(new_tile);
 
                         let mut new_unplaced = unplaced.clone();
-                        new_unplaced.remove(tile_id);
+                        match get_position(placed.len(), length) {
+                            Position::Corner => {
+                                new_unplaced.corners.remove(tile_id);
+                            }
+                            Position::Edge => {
+                                new_unplaced.edges.remove(tile_id);
+                            }
+                            Position::Rest => {
+                                new_unplaced.rest.remove(tile_id);
+                            }
+                        }
 
                         if let Some(x) = place_next(tiles, length, new_placed, new_unplaced) {
                             return Some(x);
@@ -101,7 +141,7 @@ fn parse_input(input: &str) -> Tiles {
         .map(|sec| {
             let mut it = sec.lines();
             if let Some(first_line) = it.next() {
-                if first_line.len() > 0 {
+                if !first_line.is_empty() {
                     let tile_id = scan_fmt!(first_line, "Tile {}:", usize).unwrap();
                     let grid_str: String = it.join("\n");
                     let grid = Grid2D::new(&grid_str).unwrap();
@@ -117,12 +157,69 @@ fn parse_input(input: &str) -> Tiles {
         .collect()
 }
 
+fn get_borders(grid: &Grid2D<char>) -> Vec<String> {
+    let t: String = grid.row(0).unwrap().into_iter().collect();
+    let b: String = grid.row(grid.height() - 1).unwrap().into_iter().collect();
+    let l: String = grid.col(0).unwrap().into_iter().collect();
+    let r: String = grid.col(grid.width() - 1).unwrap().into_iter().collect();
+    let t_rev = t.chars().rev().collect::<String>();
+    let b_rev = b.chars().rev().collect::<String>();
+    let l_rev = l.chars().rev().collect::<String>();
+    let r_rev = r.chars().rev().collect::<String>();
+    vec![t, b, l, r, t_rev, b_rev, l_rev, r_rev]
+}
+
+fn find_corners_borders(tiles: &Tiles) -> (HashSet<usize>, HashSet<usize>) {
+    // initialize map: border strings to tile_ids
+    let mut border_to_tiles = HashMap::new();
+    for (tile_id, grid) in tiles {
+        for border in get_borders(grid) {
+            let e = border_to_tiles.entry(border).or_insert(vec![]);
+            e.push(tile_id);
+        }
+    }
+
+    let mut corner_tiles = HashSet::new();
+    let mut edge_tiles = HashSet::new();
+    for (tile_id, grid) in tiles {
+        let mut match_cnt = 0;
+        for border in get_borders(grid) {
+            let e = border_to_tiles.get(&border).unwrap();
+            if e.len() > 1 {
+                match_cnt += 1;
+            }
+        }
+        if match_cnt == 4 {
+            // connections only for 2 sides
+            corner_tiles.insert(*tile_id);
+        } else if match_cnt == 6 {
+            // connections for 3 sides
+            edge_tiles.insert(*tile_id);
+        }
+    }
+
+    (corner_tiles, edge_tiles)
+}
+
 impl Day for Day20 {
     fn star1(&self, input: &str) -> String {
         let tiles = parse_input(input);
         let length = (tiles.len() as f64).sqrt() as usize;
         let placed = vec![];
+
         let unplaced: HashSet<_> = tiles.keys().copied().collect();
+        let (corner_tiles, edge_tiles) = find_corners_borders(&tiles);
+        assert_eq!(corner_tiles.len(), 4);
+        assert_eq!(edge_tiles.len(), 4 * length - 8);
+        let rest_tiles: HashSet<_> = unplaced.difference(&corner_tiles).cloned().collect();
+        let rest_tiles: HashSet<_> = rest_tiles.difference(&edge_tiles).cloned().collect();
+        assert_eq!(rest_tiles.len(), (length - 2) * (length - 2));
+        let unplaced = Unplaced {
+            corners: corner_tiles,
+            edges: edge_tiles,
+            rest: rest_tiles,
+        };
+
         let full_placement = place_next(&tiles, length, placed, unplaced).unwrap();
         let top_left = full_placement[0].tile_id;
         let top_right = full_placement[length - 1].tile_id;
