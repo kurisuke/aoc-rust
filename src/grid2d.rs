@@ -20,7 +20,8 @@ pub enum Wrap {
     WrapXY,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[allow(dead_code)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Flip {
     FlipNone,
     FlipH,
@@ -144,6 +145,52 @@ impl<T: std::cmp::PartialEq> Grid2D<T> {
 }
 
 impl<T: Copy> Grid2D<T> {
+    pub fn with_default(dims: Coords, def: &T) -> Grid2D<T> {
+        let el = vec![def; dims.x as usize * dims.y as usize];
+        Grid2D {
+            el: el.into_iter().cloned().collect(),
+            width: dims.x as usize,
+            height: dims.y as usize,
+        }
+    }
+
+    pub fn clip(&self, c1: Coords, c2: Coords) -> Option<Grid2D<T>> {
+        if c1.x < 0
+            || c1.y < 0
+            || c2.x < c1.x
+            || c2.y < c1.y
+            || c2.x > self.width()
+            || c2.y > self.height()
+        {
+            None
+        } else {
+            let width = (c2.x - c1.x) as usize;
+            let height = (c2.y - c1.y) as usize;
+            let mut el = vec![];
+            for y in c1.y..c2.y {
+                for x in c1.x..c2.x {
+                    el.push(self.el[y as usize * self.width + x as usize]);
+                }
+            }
+            Some(Grid2D { el, width, height })
+        }
+    }
+
+    pub fn paste(&mut self, c: Coords, other: &Grid2D<T>) -> bool {
+        if c.x < 0
+            || c.y < 0
+            || c.x + other.width() > self.width()
+            || c.y + other.width() > self.height()
+        {
+            false
+        } else {
+            for (co, v) in other.enumerate() {
+                self.el[(c.y + co.y) as usize * self.width + (c.x + co.x) as usize] = *v;
+            }
+            true
+        }
+    }
+
     pub fn rotate90(&self) -> Grid2D<T> {
         let mut new_el = self.el.clone();
         for y in 0..self.height {
@@ -159,6 +206,10 @@ impl<T: Copy> Grid2D<T> {
     }
 
     pub fn flip(&self, flip_param: Flip) -> Grid2D<T> {
+        if flip_param == Flip::FlipNone {
+            return self.clone();
+        }
+
         let mut new_el = self.el.clone();
         for y in 0..self.height {
             for x in 0..self.width {
@@ -179,6 +230,19 @@ impl<T: Copy> Grid2D<T> {
             width: self.height,
             height: self.width,
         }
+    }
+
+    pub fn transformations(&self) -> Vec<Grid2D<T>> {
+        let mut trans = vec![];
+        let mut orig = self.clone();
+        let mut flipped = self.flip(Flip::FlipH);
+        for _ in 0..4 {
+            trans.push(orig.clone());
+            trans.push(flipped.clone());
+            orig = orig.rotate90();
+            flipped = flipped.rotate90();
+        }
+        trans
     }
 }
 
@@ -388,5 +452,41 @@ ghi"#,
         assert_eq!(s, "adg");
         let s: String = example.col(2).unwrap().into_iter().collect();
         assert_eq!(s, "cfi");
+    }
+
+    #[test]
+    fn test_clip() {
+        let example = Grid2D::new(
+            r#"abcd
+efgh
+ijkl
+mnop"#,
+        )
+        .unwrap();
+        let clip = example
+            .clip(Coords { x: 1, y: 1 }, Coords { x: 3, y: 3 })
+            .unwrap();
+        assert_eq!(format!("{}", clip), "fg\njk");
+    }
+
+    #[test]
+    fn test_paste() {
+        let mut example = Grid2D::new(
+            r#"abcd
+efgh
+ijkl
+mnop"#,
+        )
+        .unwrap();
+
+        let other = Grid2D::new("rs\ntu").unwrap();
+        assert_eq!(example.paste(Coords { x: 1, y: 1 }, &other), true);
+        assert_eq!(
+            format!("{}", example),
+            r#"abcd
+ersh
+itul
+mnop"#
+        );
     }
 }

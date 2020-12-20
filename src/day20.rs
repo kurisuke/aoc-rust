@@ -1,5 +1,5 @@
 use crate::day::Day;
-use crate::grid2d::{Flip, Grid2D};
+use crate::grid2d::{Coords, Flip, Grid2D};
 use itertools::Itertools;
 use scan_fmt::scan_fmt;
 use std::collections::{HashMap, HashSet};
@@ -88,7 +88,7 @@ fn place_next(
         };
         for tile_id in unplaced_type.iter() {
             let grid = tiles.get(tile_id).unwrap();
-            for flip in [Flip::FlipNone, Flip::FlipH, Flip::FlipV].iter() {
+            for flip in [Flip::FlipNone, Flip::FlipH].iter() {
                 let mut flipped = grid.flip(*flip);
                 for rotation in 0..4 {
                     if fits_with_neighbors(length, &placed, &flipped) {
@@ -201,26 +201,105 @@ fn find_corners_borders(tiles: &Tiles) -> (HashSet<usize>, HashSet<usize>) {
     (corner_tiles, edge_tiles)
 }
 
+fn assemble(tiles: &Tiles) -> Vec<PlacedTile> {
+    let length = (tiles.len() as f64).sqrt() as usize;
+    let placed = vec![];
+
+    let unplaced: HashSet<_> = tiles.keys().copied().collect();
+    let (corner_tiles, edge_tiles) = find_corners_borders(&tiles);
+    assert_eq!(corner_tiles.len(), 4);
+    assert_eq!(edge_tiles.len(), 4 * length - 8);
+    let rest_tiles: HashSet<_> = unplaced.difference(&corner_tiles).cloned().collect();
+    let rest_tiles: HashSet<_> = rest_tiles.difference(&edge_tiles).cloned().collect();
+    assert_eq!(rest_tiles.len(), (length - 2) * (length - 2));
+    let unplaced = Unplaced {
+        corners: corner_tiles,
+        edges: edge_tiles,
+        rest: rest_tiles,
+    };
+
+    place_next(&tiles, length, placed, unplaced).unwrap()
+}
+
+fn merge(tiles: &Tiles, placement: Vec<PlacedTile>) -> Grid2D<char> {
+    let tile_length = (placement.len() as f64).sqrt() as i64;
+    let grid_length = tiles.values().next().unwrap().width();
+    let big_length = tile_length * (grid_length - 2);
+
+    let mut big_pic = Grid2D::with_default(
+        Coords {
+            x: big_length,
+            y: big_length,
+        },
+        &' ',
+    );
+    for (idx, placed_tile) in placement.iter().enumerate() {
+        let row = idx as i64 / tile_length * (grid_length - 2);
+        let col = idx as i64 % tile_length * (grid_length - 2);
+
+        let grid = tiles.get(&placed_tile.tile_id).unwrap();
+        let clipped = grid
+            .clip(
+                Coords { x: 1, y: 1 },
+                Coords {
+                    x: grid_length - 1,
+                    y: grid_length - 1,
+                },
+            )
+            .unwrap();
+
+        let flipped = clipped.flip(placed_tile.flip);
+        let times_rot = placed_tile.rotation / 90;
+        let mut rotated = flipped;
+        for _ in 0..times_rot {
+            rotated = rotated.rotate90();
+        }
+        big_pic.paste(Coords { x: col, y: row }, &rotated);
+    }
+
+    big_pic
+}
+
+fn match_pattern(grid: &mut Grid2D<char>, pattern: &[Coords]) -> usize {
+    let pattern_x_max = pattern.iter().map(|c| c.x).max().unwrap();
+    let pattern_y_max = pattern.iter().map(|c| c.y).max().unwrap();
+
+    let mut num_found = 0;
+
+    for y in 0..(grid.width() - pattern_y_max) {
+        for x in 0..(grid.width() - pattern_x_max) {
+            let is_match = pattern.iter().all(|c| {
+                grid.at(&Coords {
+                    x: x + c.x,
+                    y: y + c.y,
+                })
+                .unwrap()
+                    == &'#'
+            });
+            if is_match {
+                num_found += 1;
+                for c in pattern {
+                    grid.set(
+                        &Coords {
+                            x: x + c.x,
+                            y: y + c.y,
+                        },
+                        'O',
+                    );
+                }
+            }
+        }
+    }
+
+    num_found
+}
+
 impl Day for Day20 {
     fn star1(&self, input: &str) -> String {
         let tiles = parse_input(input);
-        let length = (tiles.len() as f64).sqrt() as usize;
-        let placed = vec![];
+        let full_placement = assemble(&tiles);
 
-        let unplaced: HashSet<_> = tiles.keys().copied().collect();
-        let (corner_tiles, edge_tiles) = find_corners_borders(&tiles);
-        assert_eq!(corner_tiles.len(), 4);
-        assert_eq!(edge_tiles.len(), 4 * length - 8);
-        let rest_tiles: HashSet<_> = unplaced.difference(&corner_tiles).cloned().collect();
-        let rest_tiles: HashSet<_> = rest_tiles.difference(&edge_tiles).cloned().collect();
-        assert_eq!(rest_tiles.len(), (length - 2) * (length - 2));
-        let unplaced = Unplaced {
-            corners: corner_tiles,
-            edges: edge_tiles,
-            rest: rest_tiles,
-        };
-
-        let full_placement = place_next(&tiles, length, placed, unplaced).unwrap();
+        let length = (full_placement.len() as f64).sqrt() as usize;
         let top_left = full_placement[0].tile_id;
         let top_right = full_placement[length - 1].tile_id;
         let bottom_left = full_placement[(length - 1) * length].tile_id;
@@ -228,8 +307,35 @@ impl Day for Day20 {
         format!("{}", top_left * top_right * bottom_left * bottom_right)
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let tiles = parse_input(input);
+        let full_placement = assemble(&tiles);
+        let merged = merge(&tiles, full_placement);
+
+        let pattern = vec![
+            Coords { y: 0, x: 18 },
+            Coords { y: 1, x: 0 },
+            Coords { y: 1, x: 5 },
+            Coords { y: 1, x: 6 },
+            Coords { y: 1, x: 11 },
+            Coords { y: 1, x: 12 },
+            Coords { y: 1, x: 17 },
+            Coords { y: 1, x: 18 },
+            Coords { y: 1, x: 19 },
+            Coords { y: 2, x: 1 },
+            Coords { y: 2, x: 4 },
+            Coords { y: 2, x: 7 },
+            Coords { y: 2, x: 10 },
+            Coords { y: 2, x: 13 },
+            Coords { y: 2, x: 16 },
+        ];
+
+        for mut t in merged.transformations() {
+            if match_pattern(&mut t, &pattern) > 0 {
+                return format!("{}", t.count('#'));
+            }
+        }
+        String::from("err")
     }
 }
 
@@ -349,5 +455,6 @@ Tile 3079:
 "#;
         let d = Day20 {};
         assert_eq!(d.star1(input), "20899048083289");
+        assert_eq!(d.star2(input), "273");
     }
 }
