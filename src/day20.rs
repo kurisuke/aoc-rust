@@ -44,31 +44,18 @@ fn get_position(pos: usize, length: usize) -> Position {
 
 fn fits_with_neighbors(length: usize, placed: &[PlacedTile], new_tile: &Grid2D<char>) -> bool {
     let next_idx = placed.len();
-    let left_neighbor_idx = if next_idx % length == 0 {
-        None
+    let top_ok = if next_idx < length {
+        true
     } else {
-        Some(next_idx - 1)
-    };
-    let top_neighbor_idx = if next_idx < length {
-        None
-    } else {
-        Some(next_idx - length)
-    };
-
-    let top_ok = if let Some(top_neighbor_idx) = top_neighbor_idx {
         let top_border: String = new_tile.row(0).unwrap().into_iter().collect();
-        placed[top_neighbor_idx].bottom_border == top_border
-    } else {
-        true
+        placed[next_idx - length].bottom_border == top_border
     };
-
-    let left_ok = if let Some(left_neighbor_idx) = left_neighbor_idx {
+    let left_ok = if next_idx % length == 0 {
+        true
+    } else {
         let left_border: String = new_tile.col(0).unwrap().into_iter().collect();
-        placed[left_neighbor_idx].right_border == left_border
-    } else {
-        true
+        placed[next_idx - 1].right_border == left_border
     };
-
     top_ok && left_ok
 }
 
