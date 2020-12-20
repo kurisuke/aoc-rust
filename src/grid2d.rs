@@ -20,6 +20,7 @@ pub enum Wrap {
     WrapXY,
 }
 
+#[derive(Copy, Clone, Debug)]
 pub enum Flip {
     FlipNone,
     FlipH,
@@ -70,6 +71,18 @@ impl<T> Grid2D<T> {
 
     pub fn width(&self) -> i64 {
         self.width as i64
+    }
+
+    pub fn col(&self, x: i64) -> Option<Vec<&T>> {
+        (0..self.height)
+            .map(|y| self.at(&Coords { x, y: y as i64 }))
+            .collect()
+    }
+
+    pub fn row(&self, y: i64) -> Option<Vec<&T>> {
+        (0..self.width)
+            .map(|x| self.at(&Coords { x: x as i64, y }))
+            .collect()
     }
 
     pub fn neighbors(&self, c: &Coords) -> Vec<Option<&T>> {
@@ -347,5 +360,33 @@ abc"#
         );
         let flipv2 = flipv.flip(Flip::FlipV);
         assert_eq!(format!("{}", example), format!("{}", flipv2));
+    }
+
+    #[test]
+    fn test_row() {
+        let example = Grid2D::new(
+            r#"abc
+def
+ghi"#,
+        )
+        .unwrap();
+        let s: String = example.row(0).unwrap().into_iter().collect();
+        assert_eq!(s, "abc");
+        let s: String = example.row(2).unwrap().into_iter().collect();
+        assert_eq!(s, "ghi");
+    }
+
+    #[test]
+    fn test_col() {
+        let example = Grid2D::new(
+            r#"abc
+def
+ghi"#,
+        )
+        .unwrap();
+        let s: String = example.col(0).unwrap().into_iter().collect();
+        assert_eq!(s, "adg");
+        let s: String = example.col(2).unwrap().into_iter().collect();
+        assert_eq!(s, "cfi");
     }
 }
