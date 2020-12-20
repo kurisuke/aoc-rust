@@ -20,6 +20,12 @@ pub enum Wrap {
     WrapXY,
 }
 
+pub enum Flip {
+    FlipNone,
+    FlipH,
+    FlipV,
+}
+
 #[derive(Clone)]
 pub struct Coords {
     pub x: i64,
@@ -121,6 +127,45 @@ impl<T> Grid2D<T> {
 impl<T: std::cmp::PartialEq> Grid2D<T> {
     pub fn count(&self, v: T) -> usize {
         self.iter().filter(|&x| x == &v).count()
+    }
+}
+
+impl<T: Copy> Grid2D<T> {
+    pub fn rotate90(&self) -> Grid2D<T> {
+        let mut new_el = self.el.clone();
+        for y in 0..self.height {
+            for x in 0..self.width {
+                new_el[y * self.width + x] = self.el[(self.height - 1 - x) * self.width + y];
+            }
+        }
+        Grid2D {
+            el: new_el,
+            width: self.height,
+            height: self.width,
+        }
+    }
+
+    pub fn flip(&self, flip_param: Flip) -> Grid2D<T> {
+        let mut new_el = self.el.clone();
+        for y in 0..self.height {
+            for x in 0..self.width {
+                match flip_param {
+                    Flip::FlipNone => {}
+                    Flip::FlipH => {
+                        new_el[y * self.width + x] = self.el[y * self.width + (self.width - 1 - x)];
+                    }
+                    Flip::FlipV => {
+                        new_el[y * self.width + x] =
+                            self.el[(self.height - 1 - y) * self.width + x];
+                    }
+                }
+            }
+        }
+        Grid2D {
+            el: new_el,
+            width: self.height,
+            height: self.width,
+        }
     }
 }
 
@@ -245,5 +290,62 @@ impl<'a, T> Iterator for TraverseIter<'a, T> {
             }
         }
         ret
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_rotate() {
+        let example = Grid2D::new(
+            r#"abc
+def
+ghi"#,
+        )
+        .unwrap();
+        let rot90 = example.rotate90();
+        assert_eq!(
+            format!("{}", rot90),
+            r#"gda
+heb
+ifc"#
+        );
+
+        let rot180 = rot90.rotate90();
+        let rot270 = rot180.rotate90();
+        let rot360 = rot270.rotate90();
+        assert_eq!(format!("{}", example), format!("{}", rot360));
+    }
+
+    #[test]
+    fn test_flip() {
+        let example = Grid2D::new(
+            r#"abc
+def
+ghi"#,
+        )
+        .unwrap();
+
+        let fliph = example.flip(Flip::FlipH);
+        assert_eq!(
+            format!("{}", fliph),
+            r#"cba
+fed
+ihg"#
+        );
+        let fliph2 = fliph.flip(Flip::FlipH);
+        assert_eq!(format!("{}", example), format!("{}", fliph2));
+
+        let flipv = example.flip(Flip::FlipV);
+        assert_eq!(
+            format!("{}", flipv),
+            r#"ghi
+def
+abc"#
+        );
+        let flipv2 = flipv.flip(Flip::FlipV);
+        assert_eq!(format!("{}", example), format!("{}", flipv2));
     }
 }
