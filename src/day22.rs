@@ -62,11 +62,9 @@ fn play_recurse(
 ) -> (Winner, VecDeque<usize>, VecDeque<usize>) {
     let mut played_games = HashSet::new();
     while !p1.is_empty() && !p2.is_empty() {
-        let state = hash_state(&p1, &p2);
-        if played_games.contains(&state) {
+        if !played_games.insert(hash_state(&p1, &p2)) {
             return (Winner::P1, p1, p2);
         }
-        played_games.insert(state);
 
         let played_p1 = p1.pop_front().unwrap();
         let played_p2 = p2.pop_front().unwrap();
