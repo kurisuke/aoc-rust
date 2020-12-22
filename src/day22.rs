@@ -1,6 +1,7 @@
 use crate::day::Day;
-use itertools::Itertools;
+use std::collections::hash_map::DefaultHasher;
 use std::collections::{HashSet, VecDeque};
+use std::hash::{Hash, Hasher};
 
 pub struct Day22 {}
 
@@ -48,10 +49,11 @@ fn play(
     }
 }
 
-fn played_state(p1: &VecDeque<usize>, p2: &VecDeque<usize>) -> String {
-    let p1s = p1.iter().map(|x| x.to_string()).join(",");
-    let p2s = p2.iter().map(|x| x.to_string()).join(",");
-    format!("{}:{}", p1s, p2s)
+fn hash_state(p1: &VecDeque<usize>, p2: &VecDeque<usize>) -> u64 {
+    let mut h = DefaultHasher::new();
+    p1.hash(&mut h);
+    p2.hash(&mut h);
+    h.finish()
 }
 
 fn play_recurse(
@@ -60,7 +62,7 @@ fn play_recurse(
 ) -> (Winner, VecDeque<usize>, VecDeque<usize>) {
     let mut played_games = HashSet::new();
     while !p1.is_empty() && !p2.is_empty() {
-        let state = played_state(&p1, &p2);
+        let state = hash_state(&p1, &p2);
         if played_games.contains(&state) {
             return (Winner::P1, p1, p2);
         }
