@@ -23,7 +23,6 @@ fn mv_cups_ll(cups_linked: &mut Vec<usize>, cur_cup: &mut usize) {
     let mv1 = cups_linked[*cur_cup];
     let mv2 = cups_linked[mv1];
     let mv3 = cups_linked[mv2];
-    let mv_vec = vec![mv1, mv2, mv3];
 
     // find the destination cup after which to insert the moved cups
     let mut dest_cup = if *cur_cup == 1 {
@@ -31,7 +30,7 @@ fn mv_cups_ll(cups_linked: &mut Vec<usize>, cur_cup: &mut usize) {
     } else {
         *cur_cup - 1
     };
-    while mv_vec.contains(&dest_cup) {
+    while dest_cup == mv1 || dest_cup == mv2 || dest_cup == mv3 {
         dest_cup = if dest_cup == 1 {
             cups_linked.len() - 1
         } else {
