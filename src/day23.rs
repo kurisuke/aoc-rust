@@ -44,9 +44,9 @@ fn mv_cups_ll(cups_linked: &mut Vec<usize>, cur_cup: &mut usize) {
     // insert the grabbed cups after the destination cup
     let after_insert = cups_linked[dest_cup];
     cups_linked[dest_cup] = mv1;
-    cups_linked[mv1] = mv2;
-    cups_linked[mv2] = mv3;
     cups_linked[mv3] = after_insert;
+
+    // advance the current cup for the next round
     *cur_cup = cups_linked[*cur_cup];
 }
 
