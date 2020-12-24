@@ -69,16 +69,9 @@ fn evolve(tiles: HashSet<HexCoord>) -> HashSet<HexCoord> {
                     .iter()
                     .filter(|n| tiles.contains(&(active.0 + n.0, active.1 + n.1)))
                     .count();
-                if tiles.contains(&active) {
-                    // black
-                    if num_black_neighbors == 1 || num_black_neighbors == 2 {
-                        new_tiles.insert(active);
-                    }
-                } else {
-                    // white
-                    if num_black_neighbors == 2 {
-                        new_tiles.insert(active);
-                    }
+                if num_black_neighbors == 2 || (num_black_neighbors == 1 && tiles.contains(&active))
+                {
+                    new_tiles.insert(active);
                 }
             }
         }
