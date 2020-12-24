@@ -3,9 +3,23 @@ mod util;
 mod year;
 mod year2020;
 
+use std::time::Instant;
 use year::Year;
 
-use std::time::Instant;
+const YEAR_MAX: usize = 2020;
+
+fn parse_year(args: &[String]) -> Option<impl Year> {
+    match args.len() {
+        1..=2 => get_year(YEAR_MAX),
+        3 => {
+            let year_no = args[1]
+                .parse::<usize>()
+                .unwrap_or_else(|_| panic!("Invalid year argument: {}", args[1]));
+            get_year(year_no)
+        }
+        _ => panic!("Invalid number of arguments!"),
+    }
+}
 
 fn get_year(year_no: usize) -> Option<impl Year> {
     match year_no {
@@ -56,22 +70,24 @@ fn run_all(year: &impl Year) {
 
 fn main() {
     let args: Vec<_> = std::env::args().collect();
-    let year = get_year(2020).unwrap();
-
-    if args.len() == 1 {
-        run_day(&year, get_day_no_max(&year));
-    } else {
-        match args[1].parse::<usize>() {
-            Ok(d) => run_day(&year, d),
-            Err(_) => match args[1].as_ref() {
-                "all" => {
-                    run_all(&year);
-                }
-                _ => {
-                    println!("Invalid parameter: {}", args[1]);
-                }
-            },
+    if let Some(year) = parse_year(&args) {
+        if args.len() == 1 {
+            run_day(&year, get_day_no_max(&year));
+        } else {
+            match args[args.len() - 1].parse::<usize>() {
+                Ok(d) => run_day(&year, d),
+                Err(_) => match args[args.len() - 1].as_ref() {
+                    "all" => {
+                        run_all(&year);
+                    }
+                    _ => {
+                        println!("Invalid parameter: {}", args[1]);
+                    }
+                },
+            }
         }
+    } else {
+        println!("Year {} not implemented!", args[1]);
     }
 }
 
