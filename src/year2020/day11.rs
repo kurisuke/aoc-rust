@@ -1,5 +1,5 @@
 use crate::day::Day;
-use crate::grid2d::{Coords, Grid2D, Wrap};
+use crate::util::grid2d::{Coords, Grid2D, Wrap};
 
 pub struct Day11 {}
 

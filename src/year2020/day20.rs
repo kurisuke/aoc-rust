@@ -1,5 +1,5 @@
 use crate::day::Day;
-use crate::grid2d::{Coords, Flip, Grid2D};
+use crate::util::grid2d::{Coords, Flip, Grid2D};
 use itertools::Itertools;
 use scan_fmt::scan_fmt;
 use std::collections::{HashMap, HashSet};

@@ -1,5 +1,5 @@
 use crate::day::Day;
-use crate::grid2d::Grid2D;
+use crate::util::grid2d::Grid2D;
 use itertools::iproduct;
 use std::collections::HashSet;
 use std::hash::Hash;
