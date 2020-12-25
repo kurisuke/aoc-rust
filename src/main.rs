@@ -30,6 +30,7 @@ fn get_year(year_no: usize) -> Option<Box<dyn Year>> {
     }
 }
 
+#[allow(clippy::borrowed_box)]
 fn get_day_no_max(year: &Box<dyn Year>) -> usize {
     let mut day_no = 0;
     while year.get_day(day_no + 1).is_some() {
@@ -38,6 +39,7 @@ fn get_day_no_max(year: &Box<dyn Year>) -> usize {
     day_no
 }
 
+#[allow(clippy::borrowed_box)]
 fn run_day(year: &Box<dyn Year>, day_no: usize) {
     if let Some(day) = year.get_day(day_no) {
         println!("Year: {:04}, Day: {:02}", year.year_no(), day_no);
@@ -62,6 +64,7 @@ fn run_day(year: &Box<dyn Year>, day_no: usize) {
     }
 }
 
+#[allow(clippy::borrowed_box)]
 fn run_all(year: &Box<dyn Year>) {
     let start_all = Instant::now();
     for day_no in 0..get_day_no_max(year) {

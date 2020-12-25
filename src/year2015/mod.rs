@@ -4,6 +4,7 @@ use crate::year::Year;
 mod day01;
 mod day02;
 mod day03;
+mod day04;
 
 pub struct Year2015 {}
 
@@ -13,6 +14,7 @@ impl Year for Year2015 {
             1 => Some(Box::new(day01::Day01 {})),
             2 => Some(Box::new(day02::Day02 {})),
             3 => Some(Box::new(day03::Day03 {})),
+            4 => Some(Box::new(day04::Day04 {})),
             _ => None,
         }
     }
