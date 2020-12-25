@@ -46,11 +46,11 @@ fn next_valid_pw(pw: &str) -> String {
 
 impl Day for Day11 {
     fn star1(&self, input: &str) -> String {
-        next_valid_pw(&input).to_string()
+        next_valid_pw(&input)
     }
 
     fn star2(&self, input: &str) -> String {
-        next_valid_pw(&next_valid_pw(&input)).to_string()
+        next_valid_pw(&next_valid_pw(&input))
     }
 }
 
