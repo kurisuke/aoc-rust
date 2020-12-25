@@ -7,7 +7,7 @@ fn step(input: &str) -> String {
     let mut it = input.chars();
     let mut last_char = it.next().unwrap();
     let mut count = 1;
-    while let Some(c) = it.next() {
+    for c in it {
         if c == last_char {
             count += 1;
         } else {
