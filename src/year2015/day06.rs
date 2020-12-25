@@ -132,8 +132,17 @@ mod tests {
     use super::*;
 
     #[test]
-    fn ex1() {
+    fn star1() {
         let d = Day06 {};
-        assert_eq!(d.star1(""), "not implemented");
+        assert_eq!(d.star1("turn on 0,0 through 999,999"), "1000000");
+        assert_eq!(d.star1("toggle 0,0 through 999,0"), "1000");
+        assert_eq!(d.star1("turn off 499,499 through 500,500"), "0");
+    }
+
+    #[test]
+    fn star2() {
+        let d = Day06 {};
+        assert_eq!(d.star2("turn on 0,0 through 0,0"), "1");
+        assert_eq!(d.star2("toggle 0,0 through 999,999"), "2000000");
     }
 }
