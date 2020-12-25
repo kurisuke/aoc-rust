@@ -10,7 +10,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "aoc2020"
+name = "aoc-rust"
 version = "0.1.0"
 dependencies = [
  "itertools",

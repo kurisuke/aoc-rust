@@ -1,5 +1,5 @@
 [package]
-name = "aoc2020"
+name = "aoc-rust"
 version = "0.1.0"
 authors = ["Peter Helbing <peter@abulafia.org>"]
 edition = "2018"
