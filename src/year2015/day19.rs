@@ -1,5 +1,6 @@
 use crate::day::Day;
 use std::collections::{HashMap, HashSet};
+use regex::Regex;
 
 pub struct Day19 {}
 
@@ -7,7 +8,7 @@ type Replacements<'a> = HashMap<&'a str, Vec<&'a str>>;
 
 struct InputInfo<'a> {
     replacements: Replacements<'a>,
-    start: &'a str,
+    els: Vec<&'a str>,
 }
 
 fn parse_input(input: &str) -> InputInfo {
@@ -24,27 +25,24 @@ fn parse_input(input: &str) -> InputInfo {
         e.push(target);
     }
 
-    let start = secs.next().unwrap();
+    let el_re = Regex::new(r"[A-Z][a-z]*").unwrap();
+    let els: Vec<_> = el_re.find_iter(secs.next().unwrap()).map(|x| x.as_str()).collect();
 
     InputInfo {
         replacements,
-        start,
+        els,
     }
 }
 
 fn one_replacement(input_info: &InputInfo) -> usize {
     let mut results = HashSet::new();
-    for i in 0..input_info.start.len() {
-        let prefix = &input_info.start[0..i];
-        let slice = &input_info.start[i..];
-        for (source, targets) in input_info.replacements.iter() {
-            if slice.starts_with(source) {
-                let suffix_offset = i + source.len();
-                let suffix = &input_info.start[suffix_offset..];
-                for target in targets {
-                    let repl_str = format!("{}{}{}", prefix, target, suffix);
-                    results.insert(repl_str);
-                }
+    for (i, el) in input_info.els.iter().enumerate() {
+        let prefix = input_info.els[..i].iter().fold(String::new(), |a, b| a + b);
+        let suffix: String = input_info.els[i + 1..].iter().fold(String::new(), |a, b| a + b);
+        if let Some(targets) = input_info.replacements.get(el) {
+            for target in targets {
+                let repl_str = format!("{}{}{}", prefix, target, suffix);
+                results.insert(repl_str);
             }
         }
     }
@@ -57,8 +55,11 @@ impl Day for Day19 {
         format!("{}", one_replacement(&input_info))
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let input_info = parse_input(input);        
+        let count_rn = input_info.els.iter().filter(|x| **x == "Rn").count();
+        let count_y = input_info.els.iter().filter(|x| **x == "Y").count();
+        format!("{}", input_info.els.len() - 2 * count_rn - 2 * count_y - 1)
     }
 }
 

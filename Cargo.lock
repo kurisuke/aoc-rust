@@ -15,6 +15,7 @@ version = "0.1.0"
 dependencies = [
  "itertools",
  "md5",
+ "regex",
  "scan_fmt",
  "serde_json",
 ]
