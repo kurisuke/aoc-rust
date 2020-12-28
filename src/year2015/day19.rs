@@ -1,6 +1,6 @@
 use crate::day::Day;
-use std::collections::{HashMap, HashSet};
 use regex::Regex;
+use std::collections::{HashMap, HashSet};
 
 pub struct Day19 {}
 
@@ -26,19 +26,21 @@ fn parse_input(input: &str) -> InputInfo {
     }
 
     let el_re = Regex::new(r"[A-Z][a-z]*").unwrap();
-    let els: Vec<_> = el_re.find_iter(secs.next().unwrap()).map(|x| x.as_str()).collect();
+    let els: Vec<_> = el_re
+        .find_iter(secs.next().unwrap())
+        .map(|x| x.as_str())
+        .collect();
 
-    InputInfo {
-        replacements,
-        els,
-    }
+    InputInfo { replacements, els }
 }
 
 fn one_replacement(input_info: &InputInfo) -> usize {
     let mut results = HashSet::new();
     for (i, el) in input_info.els.iter().enumerate() {
         let prefix = input_info.els[..i].iter().fold(String::new(), |a, b| a + b);
-        let suffix: String = input_info.els[i + 1..].iter().fold(String::new(), |a, b| a + b);
+        let suffix: String = input_info.els[i + 1..]
+            .iter()
+            .fold(String::new(), |a, b| a + b);
         if let Some(targets) = input_info.replacements.get(el) {
             for target in targets {
                 let repl_str = format!("{}{}{}", prefix, target, suffix);
@@ -56,7 +58,7 @@ impl Day for Day19 {
     }
 
     fn star2(&self, input: &str) -> String {
-        let input_info = parse_input(input);        
+        let input_info = parse_input(input);
         let count_rn = input_info.els.iter().filter(|x| **x == "Rn").count();
         let count_y = input_info.els.iter().filter(|x| **x == "Y").count();
         format!("{}", input_info.els.len() - 2 * count_rn - 2 * count_y - 1)
