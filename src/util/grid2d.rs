@@ -86,6 +86,28 @@ impl<T> Grid2D<T> {
             .collect()
     }
 
+    pub fn set_col(&mut self, x: i64, vals: Vec<T>) -> bool {
+        if x < 0 || x >= self.width() || vals.len() != self.height {
+            false
+        } else {
+            for (y, val) in vals.into_iter().enumerate() {
+                self.set(&Coords { x, y: y as i64 }, val);
+            }
+            true
+        }
+    }
+
+    pub fn set_row(&mut self, y: i64, vals: Vec<T>) -> bool {
+        if y < 0 || y >= self.height() || vals.len() != self.width {
+            false
+        } else {
+            for (x, val) in vals.into_iter().enumerate() {
+                self.set(&Coords { x: x as i64, y }, val);
+            }
+            true
+        }
+    }
+
     pub fn neighbors(&self, c: &Coords) -> Vec<Option<&T>> {
         vec![
             self.at(&Coords { x: c.x, y: c.y - 1 }),

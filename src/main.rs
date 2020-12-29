@@ -54,6 +54,11 @@ fn run_day(year: &Box<dyn Year>, day_no: usize) {
                 2 => day.star2(&input),
                 _ => format!("invalid star_no: {}", star_no),
             };
+            let res = if res.find('\n').is_some() {
+                format!("\n{}", res)
+            } else {
+                res
+            };
             println!(
                 "star {}  time: {:>10} µs    res: {}",
                 star_no,
