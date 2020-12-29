@@ -128,7 +128,14 @@ mod tests {
 
     #[test]
     fn ex1() {
-        let d = Day20 {};
-        assert_eq!(d.star1(""), "not implemented");
+        assert_eq!(presents(1), 10);
+        assert_eq!(presents(2), 30);
+        assert_eq!(presents(3), 40);
+        assert_eq!(presents(4), 70);
+        assert_eq!(presents(5), 60);
+        assert_eq!(presents(6), 120);
+        assert_eq!(presents(7), 80);
+        assert_eq!(presents(8), 150);
+        assert_eq!(presents(9), 130);
     }
 }
