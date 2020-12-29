@@ -50,6 +50,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore]
     fn ex1() {
         let d = Day04 {};
         assert_eq!(d.star1("abcdef"), "609043");
