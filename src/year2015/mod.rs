@@ -21,6 +21,8 @@ mod day17;
 mod day18;
 mod day19;
 mod day20;
+mod day21;
+mod day22;
 
 pub struct Year2015 {}
 
@@ -47,6 +49,8 @@ impl Year for Year2015 {
             18 => Some(Box::new(day18::Day18 {})),
             19 => Some(Box::new(day19::Day19 {})),
             20 => Some(Box::new(day20::Day20 {})),
+            21 => Some(Box::new(day21::Day21 {})),
+            22 => Some(Box::new(day22::Day22 {})),
             _ => None,
         }
     }
