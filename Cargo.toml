@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 itertools = "0.9.0"
-md5 = "0.7.0"
+md-5 = "0.9.1"
 num-complex = "0.3.1"
 regex = "1.4.2"
 scan_fmt = "0.2.5"

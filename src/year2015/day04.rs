@@ -1,13 +1,33 @@
 use crate::day::Day;
+use md5::{Md5, Digest};
 
 pub struct Day04 {}
 
-fn find_hash_with_start(input: &str, start: &str) -> usize {
+fn find_hash_star1(input: &str) -> usize {
     let mut i = 1;
+    let mut hasher = Md5::new();
     loop {
-        let md5_input = format!("{}{}", input, i);
-        let digest = md5::compute(md5_input);
-        if format!("{:32x}", digest).starts_with(start) {
+        hasher.update(input.as_bytes());
+        hasher.update(i.to_string().as_bytes());
+        let result = hasher.finalize_reset();
+        let start = result[0] as usize + result[1] as usize + (result[2] >> 4) as usize;
+        if start == 0 {
+            break;
+        }
+        i += 1
+    }
+    i
+}
+
+fn find_hash_star2(input: &str) -> usize {
+    let mut i = 1;
+    let mut hasher = Md5::new();
+    loop {
+        hasher.update(input.as_bytes());
+        hasher.update(i.to_string().as_bytes());
+        let result = hasher.finalize_reset();
+        let start = result[0] as usize + result[1] as usize + result[2] as usize;
+        if start == 0 {
             break;
         }
         i += 1
@@ -17,11 +37,11 @@ fn find_hash_with_start(input: &str, start: &str) -> usize {
 
 impl Day for Day04 {
     fn star1(&self, input: &str) -> String {
-        format!("{}", find_hash_with_start(input, &"00000"))
+        format!("{}", find_hash_star1(input))
     }
 
     fn star2(&self, input: &str) -> String {
-        format!("{}", find_hash_with_start(input, &"000000"))
+        format!("{}", find_hash_star2(input))
     }
 }
 
