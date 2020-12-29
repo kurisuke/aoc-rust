@@ -221,7 +221,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_combat() {
+    fn ex1() {
         let player_stats = Stats {
             hp: 8,
             dmg: 5,
@@ -232,6 +232,6 @@ mod tests {
             dmg: 7,
             arm: 2,
         };
-        assert_eq!(combat(&player_stats, &boss_stats), false);
+        assert_eq!(combat(&player_stats, &boss_stats), true);
     }
 }
