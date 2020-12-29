@@ -2,6 +2,7 @@ mod day;
 mod util;
 mod year;
 mod year2015;
+mod year2016;
 mod year2020;
 
 use std::time::Instant;
@@ -25,6 +26,7 @@ fn parse_year(args: &[String]) -> Option<Box<dyn Year>> {
 fn get_year(year_no: usize) -> Option<Box<dyn Year>> {
     match year_no {
         2015 => Some(Box::new(year2015::Year2015 {})),
+        2016 => Some(Box::new(year2016::Year2016 {})),
         2020 => Some(Box::new(year2020::Year2020 {})),
         _ => None,
     }
