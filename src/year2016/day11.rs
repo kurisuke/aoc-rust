@@ -1,7 +1,8 @@
 use crate::day::Day;
 use itertools::Itertools;
 use regex::Regex;
-use std::collections::{BTreeMap, HashSet};
+use std::cmp::Ordering;
+use std::collections::{BTreeMap, BinaryHeap, HashMap, HashSet};
 
 pub struct Day11 {}
 
@@ -22,6 +23,131 @@ struct State<'a> {
     equipment: BTreeMap<Equipment<'a>, usize>,
     elevator: usize,
 }
+
+#[derive(PartialEq, Eq, Hash, Clone, Debug)]
+struct StateSearch<'a> {
+    state: State<'a>,
+    cost: usize,
+    target_dist: usize,
+}
+
+impl<'a> Ord for StateSearch<'a> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        (other.cost + other.target_dist)
+            .cmp(&(self.cost + self.target_dist))
+            .then_with(|| other.state.elevator.cmp(&self.state.elevator))
+            .then_with(|| other.state.equipment.cmp(&self.state.equipment))
+    }
+}
+
+impl<'a> PartialOrd for StateSearch<'a> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+fn dist(a: &State, b: &State) -> usize {
+    ((b.equipment.values().sum::<usize>() + a.elevator) as isize
+        - (b.equipment.values().sum::<usize>() + b.elevator) as isize)
+        .abs() as usize
+}
+
+fn neighbors<'a>(state: &State<'a>) -> Vec<State<'a>> {
+    // possible move directions for elevator
+    let mut neighbors = vec![];
+    let mut target_floors = vec![];
+    if state.elevator < 4 {
+        // move up if not on top floor
+        target_floors.push(state.elevator + 1);
+    }
+    if state.elevator > 1 {
+        // move down if not on bottom floor
+        target_floors.push(state.elevator - 1);
+    }
+    for target_floor in target_floors {
+        let cur_floor_equipment = state
+            .equipment
+            .iter()
+            .filter(|(_, f)| **f == state.elevator)
+            .map(|(k, _)| k);
+        for take_two in cur_floor_equipment.combinations(2) {
+            let mut new_state = state.clone();
+            new_state
+                .equipment
+                .entry(take_two[0].clone())
+                .and_modify(|f| *f = target_floor);
+            new_state
+                .equipment
+                .entry(take_two[1].clone())
+                .and_modify(|f| *f = target_floor);
+            new_state.elevator = target_floor;
+            if is_valid(&new_state) {
+                neighbors.push(new_state);
+            }
+        }
+
+        let cur_floor_equipment = state
+            .equipment
+            .iter()
+            .filter(|(_, f)| **f == state.elevator)
+            .map(|(k, _)| k);
+        for take_one in cur_floor_equipment {
+            let mut new_state = state.clone();
+            new_state
+                .equipment
+                .entry(take_one.clone())
+                .and_modify(|f| *f = target_floor);
+            new_state.elevator = target_floor;
+            if is_valid(&new_state) {
+                neighbors.push(new_state);
+            }
+        }
+    }
+    neighbors
+}
+
+fn search(init_state: State, target_state: State) -> Option<usize> {
+    let mut frontier = BinaryHeap::new();
+    let start = StateSearch {
+        state: init_state.clone(),
+        cost: 0,
+        target_dist: dist(&init_state, &target_state),
+    };
+    frontier.push(start);
+    let mut equiv = HashSet::new();
+    equiv.insert(to_equiv(&init_state));
+    let mut cost_so_far = HashMap::new();
+    cost_so_far.insert(init_state, 0);
+
+    while !frontier.is_empty() {
+        let current = frontier.pop().unwrap();
+
+        if current.state == target_state {
+            return Some(current.cost);
+        }
+
+        for next in neighbors(&current.state) {
+            let new_cost = cost_so_far.get(&current.state).unwrap() + 1;
+            let new_equiv = to_equiv(&next);
+            if !equiv.contains(&new_equiv)
+                && (!cost_so_far.contains_key(&next) || new_cost < *cost_so_far.get(&next).unwrap())
+            {
+                equiv.insert(new_equiv);
+                let e = cost_so_far.entry(next.clone()).or_insert(0);
+                *e = new_cost;
+                let target_dist = new_cost + dist(&next, &target_state);
+                frontier.push(StateSearch {
+                    state: next,
+                    cost: new_cost,
+                    target_dist,
+                });
+            }
+        }
+    }
+    None
+}
+
+////////////////////////// old
 
 #[derive(PartialEq, Eq, Hash, Clone, Debug)]
 struct EquivState {
@@ -84,92 +210,6 @@ fn is_valid(state: &State) -> bool {
         }
     }
     true
-}
-
-fn next_states<'a>(
-    border: &HashSet<State<'a>>,
-    inside: &HashSet<EquivState>,
-) -> HashSet<State<'a>> {
-    let mut next_border = HashSet::new();
-    for state in border {
-        // possible move directions for elevator
-        let mut target_floors = vec![];
-        if state.elevator < 4 {
-            // move up if not on top floor
-            target_floors.push(state.elevator + 1);
-        }
-        if state.elevator > 1 {
-            // move down if not on bottom floor
-            target_floors.push(state.elevator - 1);
-        }
-        for target_floor in target_floors {
-            let cur_floor_equipment = state
-                .equipment
-                .iter()
-                .filter(|(_, f)| **f == state.elevator)
-                .map(|(k, _)| k);
-            for take_two in cur_floor_equipment.combinations(2) {
-                let mut new_state = state.clone();
-                new_state
-                    .equipment
-                    .entry(take_two[0].clone())
-                    .and_modify(|f| *f = target_floor);
-                new_state
-                    .equipment
-                    .entry(take_two[1].clone())
-                    .and_modify(|f| *f = target_floor);
-                new_state.elevator = target_floor;
-                if !next_border.contains(&new_state)
-                    && !border.contains(&new_state)
-                    && !inside.contains(&to_equiv(&new_state))
-                    && is_valid(&new_state)
-                {
-                    next_border.insert(new_state);
-                }
-            }
-
-            let cur_floor_equipment = state
-                .equipment
-                .iter()
-                .filter(|(_, f)| **f == state.elevator)
-                .map(|(k, _)| k);
-            for take_one in cur_floor_equipment {
-                let mut new_state = state.clone();
-                new_state
-                    .equipment
-                    .entry(take_one.clone())
-                    .and_modify(|f| *f = target_floor);
-                new_state.elevator = target_floor;
-                if !next_border.contains(&new_state)
-                    && !border.contains(&new_state)
-                    && !inside.contains(&to_equiv(&new_state))
-                    && is_valid(&new_state)
-                {
-                    next_border.insert(new_state);
-                }
-            }
-        }
-    }
-    next_border
-}
-
-fn search(init_state: State, target_state: State) -> Option<usize> {
-    let mut inside = HashSet::new();
-    let mut border = HashSet::new();
-    border.insert(init_state);
-    let mut steps = 0;
-    while !border.is_empty() && !border.contains(&target_state) {
-        let next_border = next_states(&border, &inside);
-        let border_equiv: HashSet<_> = border.iter().map(|x| to_equiv(x)).collect();
-        inside.extend(border_equiv);
-        border = next_border;
-        steps += 1
-    }
-    if border.is_empty() {
-        None
-    } else {
-        Some(steps)
-    }
 }
 
 fn parse_input(input: &str) -> (State, State) {
