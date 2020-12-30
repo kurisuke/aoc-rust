@@ -1,5 +1,6 @@
 use crate::day::Day;
 use itertools::Itertools;
+use regex::Regex;
 use std::collections::{BTreeMap, HashSet};
 
 pub struct Day11 {}
@@ -173,29 +174,26 @@ fn search(init_state: State, target_state: State) -> Option<usize> {
 
 fn parse_input(input: &str) -> (State, State) {
     let mut init_equipment = BTreeMap::new();
+    let re_gen = Regex::new(r"(\w+)\s+generator").unwrap();
+    let re_chip = Regex::new(r"(\w+)-compatible\s+microchip").unwrap();
     for (floor, line) in input.lines().enumerate() {
-        if !line.is_empty() {
-            let parts = line.split(" contains ").nth(1).unwrap();
-            for part in parts.split(", ") {
-                let words: Vec<_> = part.split(|c| c == ' ' || c == '-').collect();
-                if words[words.len() - 1].starts_with("generator") {
-                    init_equipment.insert(
-                        Equipment {
-                            typ: Typ::Gen,
-                            elem: words[words.len() - 2],
-                        },
-                        floor + 1,
-                    );
-                } else if words[words.len() - 1].starts_with("microchip") {
-                    init_equipment.insert(
-                        Equipment {
-                            typ: Typ::Chip,
-                            elem: words[words.len() - 3],
-                        },
-                        floor + 1,
-                    );
-                }
-            }
+        for caps in re_gen.captures_iter(line) {
+            init_equipment.insert(
+                Equipment {
+                    typ: Typ::Gen,
+                    elem: caps.get(1).unwrap().as_str(),
+                },
+                floor + 1,
+            );
+        }
+        for caps in re_chip.captures_iter(line) {
+            init_equipment.insert(
+                Equipment {
+                    typ: Typ::Chip,
+                    elem: caps.get(1).unwrap().as_str(),
+                },
+                floor + 1,
+            );
         }
     }
     let mut target_equipment = init_equipment.clone();
