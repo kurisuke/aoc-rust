@@ -14,10 +14,12 @@ pub enum Val {
 
 #[derive(Copy, Clone)]
 pub enum Op {
+    Nop,
     Cpy(Val, RegId),
     Inc(RegId),
     Dec(RegId),
     Jnz(Val, Val),
+    Tgl(Val),
 }
 
 pub struct Computer {
@@ -45,6 +47,9 @@ impl Computer {
     pub fn exec(&mut self) {
         while self.pc >= 0 && self.pc < self.program.len() as i64 {
             match self.program[self.pc as usize] {
+                Op::Nop => {
+                    self.pc += 1;
+                }
                 Op::Cpy(x, y) => {
                     self.set_reg(y, self.eval(&x));
                     self.pc += 1;
@@ -63,6 +68,10 @@ impl Computer {
                     } else {
                         self.pc += 1;
                     }
+                }
+                Op::Tgl(x) => {
+                    self.toggle(self.pc + self.eval(&x));
+                    self.pc += 1;
                 }
             }
         }
@@ -100,6 +109,26 @@ impl Computer {
             Val::Reg(r) => self.get_reg(*r),
         }
     }
+
+    fn toggle(&mut self, pos: i64) {
+        if pos >= 0 && pos < self.program.len() as i64 {
+            let new_op = match self.program[pos as usize] {
+                Op::Nop => Op::Nop,
+                Op::Cpy(x, y) => Op::Jnz(x, Val::Reg(y)),
+                Op::Inc(x) => Op::Dec(x),
+                Op::Dec(x) => Op::Inc(x),
+                Op::Jnz(x, y) => match y {
+                    Val::Imm(_) => Op::Nop,
+                    Val::Reg(r) => Op::Cpy(x, r),
+                },
+                Op::Tgl(x) => match x {
+                    Val::Imm(_) => Op::Nop,
+                    Val::Reg(r) => Op::Inc(r),
+                },
+            };
+            self.program[pos as usize] = new_op;
+        }
+    }
 }
 
 fn to_regid(s: &str) -> Option<RegId> {
@@ -130,6 +159,7 @@ fn parse_input(input: &str) -> Vec<Op> {
                 "inc" => Some(Op::Inc(to_regid(words[1]).unwrap())),
                 "dec" => Some(Op::Dec(to_regid(words[1]).unwrap())),
                 "jnz" => Some(Op::Jnz(parse_val(words[1]), parse_val(words[2]))),
+                "tgl" => Some(Op::Tgl(parse_val(words[1]))),
                 _ => None,
             }
         })
