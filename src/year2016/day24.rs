@@ -59,13 +59,23 @@ impl Day for Day24 {
     fn star1(&self, input: &str) -> String {
         let grid = Grid2D::new(input).unwrap();
         let start_pos = grid.find('0').unwrap();
-        format!("{}", search(&grid, &start_pos, 7, true).unwrap())
+        let max_num: usize = ('1'..='9')
+            .filter(|n| grid.find(*n).is_some())
+            .max()
+            .map(|c| c.to_digit(10).unwrap() as usize)
+            .unwrap();
+        format!("{}", search(&grid, &start_pos, max_num, true).unwrap())
     }
 
     fn star2(&self, input: &str) -> String {
         let grid = Grid2D::new(input).unwrap();
         let start_pos = grid.find('0').unwrap();
-        format!("{}", search(&grid, &start_pos, 7, false).unwrap())
+        let max_num: usize = ('1'..='9')
+            .filter(|n| grid.find(*n).is_some())
+            .max()
+            .map(|c| c.to_digit(10).unwrap() as usize)
+            .unwrap();
+        format!("{}", search(&grid, &start_pos, max_num, false).unwrap())
     }
 }
 
