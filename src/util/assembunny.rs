@@ -20,6 +20,7 @@ pub enum Op {
     Dec(RegId),
     Jnz(Val, Val),
     Tgl(Val),
+    Out(Val),
 }
 
 pub struct Computer {
@@ -44,8 +45,15 @@ impl Computer {
         }
     }
 
-    pub fn exec(&mut self) {
-        while self.pc >= 0 && self.pc < self.program.len() as i64 {
+    pub fn exec(&mut self, max_out: Option<usize>, max_op: Option<usize>) -> String {
+        let mut op_count = 0;
+        let mut out_buf = String::new();
+        while self.pc >= 0
+            && self.pc < self.program.len() as i64
+            && (max_op.is_none() || op_count < max_op.unwrap())
+            && (max_out.is_none() || out_buf.len() < max_out.unwrap())
+        {
+            op_count += 1;
             match self.program[self.pc as usize] {
                 Op::Nop => {
                     self.pc += 1;
@@ -73,8 +81,13 @@ impl Computer {
                     self.toggle(self.pc + self.eval(&x));
                     self.pc += 1;
                 }
+                Op::Out(x) => {
+                    out_buf.push_str(&self.eval(&x).to_string());
+                    self.pc += 1;
+                }
             }
         }
+        out_buf
     }
 
     pub fn get_reg(&self, id: RegId) -> i64 {
@@ -125,6 +138,10 @@ impl Computer {
                     Val::Imm(_) => Op::Nop,
                     Val::Reg(r) => Op::Inc(r),
                 },
+                Op::Out(x) => match x {
+                    Val::Imm(_) => Op::Nop,
+                    Val::Reg(r) => Op::Inc(r),
+                },
             };
             self.program[pos as usize] = new_op;
         }
@@ -160,6 +177,7 @@ fn parse_input(input: &str) -> Vec<Op> {
                 "dec" => Some(Op::Dec(to_regid(words[1]).unwrap())),
                 "jnz" => Some(Op::Jnz(parse_val(words[1]), parse_val(words[2]))),
                 "tgl" => Some(Op::Tgl(parse_val(words[1]))),
+                "out" => Some(Op::Out(parse_val(words[1]))),
                 _ => None,
             }
         })

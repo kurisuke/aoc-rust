@@ -7,14 +7,14 @@ impl Day for Day23 {
     fn star1(&self, input: &str) -> String {
         let mut computer = Computer::new(input);
         computer.set_reg(RegId::A, 7);
-        computer.exec();
+        computer.exec(None, None);
         format!("{}", computer.get_reg(RegId::A))
     }
 
     fn star2(&self, input: &str) -> String {
         let mut computer = Computer::new(input);
         computer.set_reg(RegId::A, 12);
-        computer.exec();
+        computer.exec(None, None);
         format!("{}", computer.get_reg(RegId::A))
     }
 }

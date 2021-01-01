@@ -6,14 +6,14 @@ pub struct Day12 {}
 impl Day for Day12 {
     fn star1(&self, input: &str) -> String {
         let mut computer = Computer::new(input);
-        computer.exec();
+        computer.exec(None, None);
         format!("{}", computer.get_reg(RegId::A))
     }
 
     fn star2(&self, input: &str) -> String {
         let mut computer = Computer::new(input);
         computer.set_reg(RegId::C, 1);
-        computer.exec();
+        computer.exec(None, None);
         format!("{}", computer.get_reg(RegId::A))
     }
 }
