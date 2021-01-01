@@ -161,7 +161,7 @@ fn find_corners_borders(tiles: &Tiles) -> (HashSet<usize>, HashSet<usize>) {
     let mut border_to_tiles = HashMap::new();
     for (tile_id, grid) in tiles {
         for border in get_borders(grid) {
-            let e = border_to_tiles.entry(border).or_insert(vec![]);
+            let e = border_to_tiles.entry(border).or_insert_with(Vec::new);
             e.push(tile_id);
         }
     }

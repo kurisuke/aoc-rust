@@ -68,8 +68,8 @@ fn check_hgt(hgt_str: &str) -> bool {
             let val = &hgt_str[..hgt_str.len() - 2];
             if let Ok(val) = val.parse::<u16>() {
                 match unit {
-                    "cm" => val >= 150 && val <= 193,
-                    "in" => val >= 59 && val <= 76,
+                    "cm" => (150..=193).contains(&val),
+                    "in" => (59..=76).contains(&val),
                     _ => false,
                 }
             } else {
@@ -85,11 +85,9 @@ fn check_hcl(hcl_str: &str) -> bool {
     if hcl_str.len() != 7 || !hcl_str.starts_with('#') {
         false
     } else {
-        hcl_str[1..].chars().all(|c| match c {
-            'a'..='f' => true,
-            '0'..='9' => true,
-            _ => false,
-        })
+        hcl_str[1..]
+            .chars()
+            .all(|c| matches!(c, 'a'..='f' | '0'..='9'))
     }
 }
 

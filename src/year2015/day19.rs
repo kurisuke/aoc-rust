@@ -21,7 +21,7 @@ fn parse_input(input: &str) -> InputInfo {
         let source = spl.next().unwrap();
         let target = spl.next().unwrap();
 
-        let e = replacements.entry(source).or_insert(vec![]);
+        let e = replacements.entry(source).or_insert_with(Vec::new);
         e.push(target);
     }
 
