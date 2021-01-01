@@ -28,7 +28,7 @@ pub enum Flip {
     FlipV,
 }
 
-#[derive(Clone)]
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 pub struct Coords {
     pub x: i64,
     pub y: i64,
@@ -108,6 +108,25 @@ impl<T> Grid2D<T> {
         }
     }
 
+    #[allow(dead_code)]
+    pub fn neighbors_cardinal(&self, c: &Coords) -> Vec<Option<&T>> {
+        vec![
+            self.at(&Coords { x: c.x, y: c.y - 1 }),
+            self.at(&Coords { x: c.x + 1, y: c.y }),
+            self.at(&Coords { x: c.x, y: c.y + 1 }),
+            self.at(&Coords { x: c.x - 1, y: c.y }),
+        ]
+    }
+
+    pub fn neighbors_cardinal_coords(&self, c: &Coords) -> Vec<Coords> {
+        vec![
+            Coords { x: c.x, y: c.y - 1 },
+            Coords { x: c.x + 1, y: c.y },
+            Coords { x: c.x, y: c.y + 1 },
+            Coords { x: c.x - 1, y: c.y },
+        ]
+    }
+
     pub fn neighbors(&self, c: &Coords) -> Vec<Option<&T>> {
         vec![
             self.at(&Coords { x: c.x, y: c.y - 1 }),
@@ -130,6 +149,32 @@ impl<T> Grid2D<T> {
                 x: c.x - 1,
                 y: c.y - 1,
             }),
+        ]
+    }
+
+    #[allow(dead_code)]
+    pub fn neighbors_coords(&self, c: &Coords) -> Vec<Coords> {
+        vec![
+            Coords { x: c.x, y: c.y - 1 },
+            Coords {
+                x: c.x + 1,
+                y: c.y - 1,
+            },
+            Coords { x: c.x + 1, y: c.y },
+            Coords {
+                x: c.x + 1,
+                y: c.y + 1,
+            },
+            Coords { x: c.x, y: c.y + 1 },
+            Coords {
+                x: c.x - 1,
+                y: c.y + 1,
+            },
+            Coords { x: c.x - 1, y: c.y },
+            Coords {
+                x: c.x - 1,
+                y: c.y - 1,
+            },
         ]
     }
 
@@ -163,6 +208,10 @@ impl<T> Grid2D<T> {
 impl<T: std::cmp::PartialEq> Grid2D<T> {
     pub fn count(&self, v: T) -> usize {
         self.iter().filter(|&x| x == &v).count()
+    }
+
+    pub fn find(&self, v: T) -> Option<Coords> {
+        self.enumerate().find(|&(_, x)| x == &v).map(|(c, _)| c)
     }
 }
 
@@ -335,7 +384,7 @@ impl<'a, T> Iterator for CoordsIter<'a, T> {
         {
             None
         } else {
-            Some(self.cur.clone())
+            Some(self.cur)
         };
         if self.cur.x + 1 < self.grid.width() {
             self.cur.x += 1;
@@ -358,8 +407,8 @@ impl<'a, T> TraverseIter<'a, T> {
     fn new(grid: &'a Grid2D<T>, init: &Coords, d: &Coords, wrap: Wrap) -> TraverseIter<'a, T> {
         TraverseIter {
             grid,
-            cur: init.clone(),
-            d: d.clone(),
+            cur: *init,
+            d: *d,
             wrap,
         }
     }

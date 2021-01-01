@@ -35,7 +35,7 @@ where
         let mut grid_new = grid.clone();
         for (pos, pos_val) in grid.enumerate() {
             if *pos_val != '.' {
-                let nb: Vec<_> = nb_fn(&grid, pos.clone());
+                let nb: Vec<_> = nb_fn(&grid, pos);
                 let num_occupied = nb.into_iter().filter(|&&v| v == '#').count();
                 if *pos_val == 'L' && num_occupied == 0 {
                     grid_new.set(&pos, '#');
