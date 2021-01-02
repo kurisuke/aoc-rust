@@ -1,10 +1,24 @@
 use crate::day::Day;
-use std::collections::HashSet;
 use crate::util::hex::HexCoord;
+use std::collections::HashSet;
 
-pub const NEIGHBORS_PLUS_SELF: [HexCoord; 7] =
-    [HexCoord (0, 0), HexCoord (1, 0), HexCoord (0, 1), HexCoord (-1, 1), HexCoord (-1, 0), HexCoord (0, -1), HexCoord (1, -1)];
-pub const NEIGHBORS: [HexCoord; 6] = [HexCoord (1, 0), HexCoord (0, 1), HexCoord (-1, 1), HexCoord (-1, 0), HexCoord (0, -1), HexCoord (1, -1)];
+pub const NEIGHBORS_PLUS_SELF: [HexCoord; 7] = [
+    HexCoord(0, 0),
+    HexCoord(1, 0),
+    HexCoord(0, 1),
+    HexCoord(-1, 1),
+    HexCoord(-1, 0),
+    HexCoord(0, -1),
+    HexCoord(1, -1),
+];
+pub const NEIGHBORS: [HexCoord; 6] = [
+    HexCoord(1, 0),
+    HexCoord(0, 1),
+    HexCoord(-1, 1),
+    HexCoord(-1, 0),
+    HexCoord(0, -1),
+    HexCoord(1, -1),
+];
 
 pub struct Day24 {}
 
@@ -31,9 +45,7 @@ fn parse_input(input: &str) -> Vec<Vec<HexCoord>> {
 fn init_layout(paths: Vec<Vec<HexCoord>>) -> HashSet<HexCoord> {
     let mut black_tiles = HashSet::new();
     for path in paths {
-        let dest = path
-            .iter()
-            .fold(HexCoord(0, 0), |acc, x| acc + *x);
+        let dest = path.iter().fold(HexCoord(0, 0), |acc, x| acc + *x);
         if black_tiles.contains(&dest) {
             black_tiles.remove(&dest);
         } else {
@@ -47,10 +59,7 @@ fn evolve(tiles: HashSet<HexCoord>) -> HashSet<HexCoord> {
     let mut new_tiles = HashSet::new();
     let mut checked_tiles = HashSet::new();
     for tile in tiles.iter() {
-        for active in NEIGHBORS_PLUS_SELF
-            .iter()
-            .map(|n| *tile + *n)
-        {
+        for active in NEIGHBORS_PLUS_SELF.iter().map(|n| *tile + *n) {
             if checked_tiles.insert(active) {
                 let num_black_neighbors = NEIGHBORS
                     .iter()

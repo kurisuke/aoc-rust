@@ -8,7 +8,7 @@ impl Day for Day11 {
         let mut pos = HexCoord(0, 0);
         for dir_str in input.trim().split(',') {
             pos += HexCoord::direction_flat(dir_str).unwrap();
-        }        
+        }
         format!("{}", pos.dist(&HexCoord(0, 0)))
     }
 
@@ -18,7 +18,7 @@ impl Day for Day11 {
         for dir_str in input.trim().split(',') {
             pos += HexCoord::direction_flat(dir_str).unwrap();
             max_dist = max_dist.max(pos.dist(&HexCoord(0, 0)));
-        }        
+        }
         format!("{}", max_dist)
     }
 }
