@@ -28,10 +28,62 @@ pub enum Flip {
     FlipV,
 }
 
+#[allow(dead_code)]
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum Direction {
+    N,
+    NE,
+    E,
+    SE,
+    S,
+    SW,
+    W,
+    NW,
+}
+
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 pub struct Coords {
     pub x: i64,
     pub y: i64,
+}
+
+impl Coords {
+    pub fn mov(&self, d: Direction) -> Coords {
+        match d {
+            Direction::N => Coords {
+                x: self.x,
+                y: self.y - 1,
+            },
+            Direction::NE => Coords {
+                x: self.x + 1,
+                y: self.y - 1,
+            },
+            Direction::E => Coords {
+                x: self.x + 1,
+                y: self.y,
+            },
+            Direction::SE => Coords {
+                x: self.x + 1,
+                y: self.y + 1,
+            },
+            Direction::S => Coords {
+                x: self.x,
+                y: self.y + 1,
+            },
+            Direction::SW => Coords {
+                x: self.x - 1,
+                y: self.y + 1,
+            },
+            Direction::W => Coords {
+                x: self.x - 1,
+                y: self.y,
+            },
+            Direction::NW => Coords {
+                x: self.x - 1,
+                y: self.y - 1,
+            },
+        }
+    }
 }
 
 impl Grid2D<char> {
