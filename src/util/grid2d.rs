@@ -2,7 +2,7 @@ use itertools::concat;
 use std::fmt::{self, Display, Formatter};
 use std::iter::Zip;
 
-#[derive(Clone)]
+#[derive(Clone, Eq, PartialEq, Hash)]
 pub struct Grid2D<T> {
     el: Vec<T>,
     width: usize,
