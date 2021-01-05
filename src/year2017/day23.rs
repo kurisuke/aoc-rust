@@ -109,6 +109,17 @@ fn parse_val(s: &str) -> Val {
     }
 }
 
+fn is_prime(n: usize) -> bool {
+    let mut i = 2;
+    while i * i < n {
+        if n % i == 0 {
+            return false;
+        }
+        i += 1;
+    }
+    true
+}
+
 impl Day for Day23 {
     fn star1(&self, input: &str) -> String {
         let program = parse_input(input);
@@ -117,8 +128,15 @@ impl Day for Day23 {
         format!("{}", computer.get_mul_count())
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let first_line = input.lines().next().unwrap();
+        let line_parts: Vec<_> = first_line.split_whitespace().collect();
+        let start = 100 * line_parts[2].parse::<usize>().unwrap() + 100000;
+        let num_primes = (start..=(start + 17000))
+            .step_by(17)
+            .filter(|x| !is_prime(*x))
+            .count();
+        format!("{}", num_primes)
     }
 }
 
