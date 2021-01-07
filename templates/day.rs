@@ -1,4 +1,4 @@
-use crate::day::Day;
+use common::day::Day;
 
 pub struct Day01 {}
 
