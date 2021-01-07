@@ -1,7 +1,7 @@
 use common::day::Day;
 use regex::Regex;
 use std::cmp::Ordering;
-use std::collections::HashMap;
+use util::chardistrib::char_distribution;
 
 pub struct Day04 {}
 
@@ -11,18 +11,8 @@ struct Room<'a> {
     checksum: &'a str,
 }
 
-fn letter_frequency(s: &str) -> HashMap<char, usize> {
-    let s = s.replace("-", "");
-    let mut freq = HashMap::new();
-    for c in s.chars() {
-        let e = freq.entry(c).or_insert(0);
-        *e += 1;
-    }
-    freq
-}
-
 fn calc_checksum(s: &str) -> String {
-    let freq = letter_frequency(s);
+    let freq = char_distribution(&s.replace("-", ""));
     let mut freq: Vec<(_, _)> = freq.iter().collect();
     freq.sort_by(|a, b| match a.1.cmp(&b.1) {
         Ordering::Less => Ordering::Greater,
