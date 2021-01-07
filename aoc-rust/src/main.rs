@@ -21,6 +21,7 @@ fn get_year(year_no: usize) -> Option<Box<dyn Year>> {
         2015 => Some(Box::new(year2015::Year2015 {})),
         2016 => Some(Box::new(year2016::Year2016 {})),
         2017 => Some(Box::new(year2017::Year2017 {})),
+        2018 => Some(Box::new(year2018::Year2018 {})),
         2020 => Some(Box::new(year2020::Year2020 {})),
         _ => None,
     }

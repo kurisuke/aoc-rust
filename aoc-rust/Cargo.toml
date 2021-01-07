@@ -12,4 +12,5 @@ util = { path = "../util" }
 year2015 = { path = "../year2015" }
 year2016 = { path = "../year2016" }
 year2017 = { path = "../year2017" }
+year2018 = { path = "../year2018" }
 year2020 = { path = "../year2020" }
