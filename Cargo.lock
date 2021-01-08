@@ -245,7 +245,7 @@ name = "year2018"
 version = "0.1.0"
 dependencies = [
  "common",
- "itertools",
+ "regex",
  "util",
 ]
 
