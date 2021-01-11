@@ -70,13 +70,13 @@ fn work_time(steps: &Steps, num_workers: usize, base: usize) -> usize {
     let mut time = 0;
 
     while !todo.is_empty() {
-        // handle finished tasks tasks
-        for busy_worker in workers
+        // handle finished tasks
+        for finished_worker in workers
             .iter_mut()
             .filter(|w| w.is_some() && w.as_ref().unwrap().end_time == time)
         {
-            done.insert(busy_worker.as_ref().unwrap().task);
-            *busy_worker = None;
+            done.insert(finished_worker.as_ref().unwrap().task);
+            *finished_worker = None;
         }
 
         // try to distribute tasks to free workers
@@ -84,7 +84,7 @@ fn work_time(steps: &Steps, num_workers: usize, base: usize) -> usize {
             if let Some(next_task) = order.chars().find(|t| {
                 todo.contains_key(&t) && todo.get(&t).unwrap().iter().all(|p| done.contains(p))
             }) {
-                // yes, insert to a free worker
+                // insert to a free worker
                 let free_worker_pos = workers.iter().position(|w| w.is_none()).unwrap();
                 let end_time = time + 1 + base + (next_task as u8 - b'A') as usize;
                 workers[free_worker_pos] = Some(Worker {
@@ -93,6 +93,7 @@ fn work_time(steps: &Steps, num_workers: usize, base: usize) -> usize {
                 });
                 todo.remove(&next_task);
             } else {
+                // break if we can do no more tasks although there might be free workers
                 break;
             }
         }
@@ -105,6 +106,7 @@ fn work_time(steps: &Steps, num_workers: usize, base: usize) -> usize {
             .min()
             .unwrap();
     }
+    // return the highest end time of all workers (time when all work is done)
     workers
         .iter()
         .filter_map(|x| x.as_ref())
