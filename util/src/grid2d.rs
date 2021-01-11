@@ -47,7 +47,17 @@ pub struct Coords {
     pub y: i64,
 }
 
+impl From<(i64, i64)> for Coords {
+    fn from(p: (i64, i64)) -> Self {
+        Coords { x: p.0, y: p.1 }
+    }
+}
+
 impl Coords {
+    pub fn manhattan(&self, other: &Coords) -> u64 {
+        (self.x - other.x).abs() as u64 + (self.y - other.y).abs() as u64
+    }
+
     pub fn mov(&self, d: Direction) -> Coords {
         match d {
             Direction::N => Coords {
