@@ -19,7 +19,7 @@ fn parse_input(input: &str) -> Steps {
         let caps = re.captures(line).unwrap();
         let prev = caps.get(1).unwrap().as_str().chars().next().unwrap();
         let step = caps.get(2).unwrap().as_str().chars().next().unwrap();
-        let e = steps.entry(step).or_insert_with(|| vec![]);
+        let e = steps.entry(step).or_insert_with(Vec::new);
         e.push(prev);
     }
 
