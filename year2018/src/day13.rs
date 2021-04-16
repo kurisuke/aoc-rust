@@ -23,9 +23,7 @@ enum NextTurn {
 }
 
 impl State {
-    fn tick(&mut self) -> Option<Coords> {
-        // self.print();
-
+    fn tick(&mut self, remove: bool) -> Option<Coords> {
         let mut new_carts = BTreeMap::new();
         loop {
             let cart_pos = match self.carts.keys().next() {
@@ -34,7 +32,20 @@ impl State {
             };
             let cart = self.carts.remove(&cart_pos).unwrap();
             let (new_cart_pos, new_cart) = self.move_cart(&cart_pos, &cart);
-            if self.carts.contains_key(&new_cart_pos) || new_carts.contains_key(&new_cart_pos) {
+            if remove {
+                #[allow(clippy::map_entry)]
+                {
+                    if self.carts.contains_key(&new_cart_pos) {
+                        self.carts.remove(&new_cart_pos);
+                    } else if new_carts.contains_key(&new_cart_pos) {
+                        new_carts.remove(&new_cart_pos);
+                    } else {
+                        new_carts.insert(new_cart_pos, new_cart);
+                    }
+                }
+            } else if self.carts.contains_key(&new_cart_pos)
+                || new_carts.contains_key(&new_cart_pos)
+            {
                 return Some(new_cart_pos);
             } else {
                 new_carts.insert(new_cart_pos, new_cart);
@@ -306,15 +317,19 @@ impl Day for Day13 {
     fn star1(&self, input: &str) -> String {
         let mut state = parse_input(input);
         loop {
-            match state.tick() {
+            match state.tick(false) {
                 None => {}
                 Some(crash_coords) => return format!("{}", crash_coords),
             }
         }
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let mut state = parse_input(input);
+        while state.carts.len() > 1 {
+            state.tick(true);
+        }
+        format!("{}", state.carts.keys().next().unwrap())
     }
 }
 
@@ -323,7 +338,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn ex1() {
+    fn star1() {
         let input = r#"/->-\        
 |   |  /----\
 | /-+--+-\  |
@@ -332,5 +347,18 @@ mod tests {
   \------/   "#;
         let d = Day13 {};
         assert_eq!(d.star1(input), "7,3");
+    }
+
+    #[test]
+    fn star2() {
+        let input = r#"/>-<\  
+|   |  
+| /<+-\
+| | | v
+\>+</ |
+  |   ^
+  \<->/"#;
+        let d = Day13 {};
+        assert_eq!(d.star2(input), "6,4");
     }
 }
