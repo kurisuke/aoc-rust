@@ -1,4 +1,5 @@
 use itertools::concat;
+use std::cmp::Ordering;
 use std::fmt::{self, Display, Formatter};
 use std::iter::Zip;
 
@@ -45,6 +46,24 @@ pub enum Direction {
 pub struct Coords {
     pub x: i64,
     pub y: i64,
+}
+
+impl fmt::Display for Coords {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{},{}", self.x, self.y)
+    }
+}
+
+impl Ord for Coords {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.y.cmp(&other.y).then_with(|| self.x.cmp(&other.x))
+    }
+}
+
+impl PartialOrd for Coords {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl From<(i64, i64)> for Coords {
@@ -274,6 +293,13 @@ impl<T: std::cmp::PartialEq> Grid2D<T> {
 
     pub fn find(&self, v: T) -> Option<Coords> {
         self.enumerate().find(|&(_, x)| x == &v).map(|(c, _)| c)
+    }
+
+    pub fn filter(&self, vs: &[T]) -> Vec<Coords> {
+        self.enumerate()
+            .filter(|&(_, x)| vs.contains(x))
+            .map(|(c, _)| c)
+            .collect()
     }
 }
 
