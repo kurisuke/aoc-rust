@@ -48,7 +48,7 @@ fn find_adjacent(grid: &Grid2D<Field>, targets: &BTreeSet<Coords>) -> BTreeSet<C
     for target in targets {
         for neighbor in grid.neighbors_cardinal_coords(target) {
             if let Some(Field::Open) = grid.at(&neighbor) {
-                    adjacents.insert(neighbor);
+                adjacents.insert(neighbor);
             }
         }
     }
@@ -242,10 +242,13 @@ fn do_move(grid: &mut Grid2D<Field>, unit_pos: &Coords, new_unit_pos: &Coords) {
     grid.set(unit_pos, Field::Open);
 }
 
-fn parse_input(input: &str) -> Grid2D<Field> {
+fn parse_input(input: &str, elf_power: u32) -> Grid2D<Field> {
     Grid2D::new_by(input, |c| match c {
         'G' => Field::Goblin(Unit { power: 3, hp: 200 }),
-        'E' => Field::Elf(Unit { power: 3, hp: 200 }),
+        'E' => Field::Elf(Unit {
+            power: elf_power,
+            hp: 200,
+        }),
         '.' => Field::Open,
         '#' => Field::Wall,
         _ => {
@@ -274,12 +277,23 @@ fn grid_to_str(grid: &Grid2D<Field>) -> String {
 
 impl Day for Day15 {
     fn star1(&self, input: &str) -> String {
-        let mut grid = parse_input(input);
+        let mut grid = parse_input(input, 3);
         format!("{}", run(&mut grid))
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let mut elf_power = 4;
+        loop {
+            let mut grid = parse_input(input, elf_power);
+            let initial_elves = grid.iter().filter(|f| matches!(f, Field::Elf(_))).count();
+            let result = run(&mut grid);
+            let final_elves = grid.iter().filter(|f| matches!(f, Field::Elf(_))).count();
+            if final_elves == initial_elves {
+                return format!("{}", result);
+            } else {
+                elf_power += 1;
+            }
+        }
     }
 }
 
@@ -288,7 +302,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn ex1() {
+    fn star1() {
         let d = Day15 {};
 
         let input1 = r#"#######
@@ -346,5 +360,57 @@ mod tests {
 #.....G.#
 #########"#;
         assert_eq!(d.star1(input6), "18740");
+    }
+
+    #[test]
+    fn star2() {
+        let d = Day15 {};
+
+        let input1 = r#"#######
+#.G...#
+#...EG#
+#.#.#G#
+#..G#E#
+#.....#
+#######"#;
+        assert_eq!(d.star2(input1), "4988");
+
+        let input3 = r#"#######
+#E..EG#
+#.#G.E#
+#E.##E#
+#G..#.#
+#..E#.#
+#######"#;
+        assert_eq!(d.star2(input3), "31284");
+
+        let input4 = r#"#######
+#E.G#.#
+#.#G..#
+#G.#.G#
+#G..#.#
+#...E.#
+#######"#;
+        assert_eq!(d.star2(input4), "3478");
+
+        let input5 = r#"#######
+#.E...#
+#.#..G#
+#.###.#
+#E#G#G#
+#...#G#
+#######"#;
+        assert_eq!(d.star2(input5), "6474");
+
+        let input6 = r#"#########
+#G......#
+#.E.#...#
+#..##..G#
+#...##..#
+#...#...#
+#.G...G.#
+#.....G.#
+#########"#;
+        assert_eq!(d.star2(input6), "1140");
     }
 }
