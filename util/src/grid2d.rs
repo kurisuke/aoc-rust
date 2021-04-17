@@ -130,6 +130,19 @@ impl Grid2D<char> {
 }
 
 impl<T> Grid2D<T> {
+    pub fn new_by<F>(input: &str, convert: F) -> Result<Grid2D<T>, Grid2DError>
+    where
+        F: Fn(char) -> T,
+    {
+        let grid_ch = Grid2D::new(input)?;
+        let el: Vec<T> = grid_ch.iter().map(|c| convert(*c)).collect();
+        Ok(Grid2D {
+            el,
+            width: grid_ch.width() as usize,
+            height: grid_ch.height() as usize,
+        })
+    }
+
     pub fn at(&self, c: &Coords) -> Option<&T> {
         if c.x < 0 || c.y < 0 || c.x >= self.width() || c.y >= self.height() {
             None
