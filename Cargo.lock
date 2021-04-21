@@ -19,6 +19,7 @@ dependencies = [
  "year2016",
  "year2017",
  "year2018",
+ "year2019",
  "year2020",
 ]
 
@@ -242,6 +243,16 @@ dependencies = [
 
 [[package]]
 name = "year2018"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+ "regex",
+ "util",
+]
+
+[[package]]
+name = "year2019"
 version = "0.1.0"
 dependencies = [
  "common",

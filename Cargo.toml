@@ -8,5 +8,6 @@ members = [
     "year2016",
     "year2017",
     "year2018",
+    "year2019",
     "year2020",
 ]
