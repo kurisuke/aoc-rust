@@ -1,7 +1,7 @@
 use common::year::Year;
 use std::time::Instant;
 
-const YEAR_MAX: usize = 2020;
+const YEAR_MAX: usize = 2021;
 
 fn parse_year(args: &[String]) -> Option<Box<dyn Year>> {
     match args.len() {
@@ -24,6 +24,7 @@ fn get_year(year_no: usize) -> Option<Box<dyn Year>> {
         2018 => Some(Box::new(year2018::Year2018 {})),
         2019 => Some(Box::new(year2019::Year2019 {})),
         2020 => Some(Box::new(year2020::Year2020 {})),
+        2021 => Some(Box::new(year2021::Year2021 {})),
         _ => None,
     }
 }
