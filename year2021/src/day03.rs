@@ -5,32 +5,71 @@ pub struct Day03 {}
 impl Day for Day03 {
     fn star1(&self, input: &str) -> String {
         let (numbers, width) = parse_input(input);
-        let mut sums = vec![0; width];
-
-        for n in numbers.iter() {
-            for (w, sum) in sums.iter_mut().enumerate() {
-                if n & (1 << w) > 0 {
-                    *sum += 1;
-                }
-            }
-        }
-
-        let mut gamma = 0;
-        let mut epsilon = 0;
-        for (w, sum) in sums.iter().enumerate() {
-            if *sum > numbers.len() / 2 {
-                gamma += 1 << w;
-            } else {
-                epsilon += 1 << w;
-            }
-        }
+        let (gamma, epsilon) = gamma_epsilon(&numbers, width);
 
         format!("{}", gamma * epsilon)
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let (numbers, width) = parse_input(input);
+
+        let o2 = filter_numbers(&numbers, width, true).unwrap();
+        let co2 = filter_numbers(&numbers, width, false).unwrap();
+
+        format!("{}", o2 * co2)
     }
+}
+
+fn most_common_at_pos(numbers: &[u64], w: usize) -> u64 {
+    let sum_ones = numbers.iter().filter(|n| *n & (1 << w) > 0).count();
+    if sum_ones * 2 >= numbers.len() {
+        1
+    } else {
+        0
+    }
+}
+
+fn gamma_epsilon(numbers: &[u64], width: usize) -> (u64, u64) {
+    let mut gamma = 0;
+    let mut epsilon = 0;
+
+    for w in 0..width {
+        if most_common_at_pos(numbers, w) == 1 {
+            gamma += 1 << w;
+        } else {
+            epsilon += 1 << w;
+        }
+    }
+
+    (gamma, epsilon)
+}
+
+fn filter_numbers(numbers: &[u64], width: usize, most_common: bool) -> Option<u64> {
+    let mut numbers = numbers.to_vec();
+    for w in (0..width).rev() {
+        let c = most_common_at_pos(&numbers, w);
+        if most_common {
+            numbers = numbers
+                .into_iter()
+                .filter(|n| {
+                    let n_bit = (*n & (1 << w)) >> w;
+                    n_bit == c
+                })
+                .collect();
+        } else {
+            numbers = numbers
+                .into_iter()
+                .filter(|n| {
+                    let n_bit = (*n & (1 << w)) >> w;
+                    n_bit != c
+                })
+                .collect();
+        }
+        if numbers.len() == 1 {
+            return Some(numbers[0]);
+        }
+    }
+    None
 }
 
 fn parse_input(input: &str) -> (Vec<u64>, usize) {
@@ -68,5 +107,6 @@ mod tests {
 
         let d = Day03 {};
         assert_eq!(d.star1(input), "198");
+        assert_eq!(d.star2(input), "230");
     }
 }
