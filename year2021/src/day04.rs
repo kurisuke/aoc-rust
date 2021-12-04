@@ -43,6 +43,22 @@ fn play_bingo(numbers: &[u64], mut boards: Vec<BingoBoard>) -> Option<(u64, Bing
     None
 }
 
+fn play_bingo_part2(numbers: &[u64], mut boards: Vec<BingoBoard>) -> Option<(u64, BingoBoard)> {
+    let mut board_won = vec![false; boards.len()];
+
+    for new_number in numbers {
+        for (i, board) in boards.iter_mut().enumerate() {
+            if !board_won[i] && check_board(board, *new_number) {
+                board_won[i] = true;
+                if board_won.iter().all(|&x| x) {
+                    return Some((*new_number, *board));
+                }
+            }
+        }
+    }
+    None
+}
+
 fn check_board(board: &mut BingoBoard, new_number: u64) -> bool {
     let mut result = false;
     for x in 0..BINGO_SIZE {
@@ -71,6 +87,7 @@ fn check_row(board: &mut BingoBoard, new_number: u64, x: usize) -> bool {
 
 fn check_col(board: &mut BingoBoard, new_number: u64, y: usize) -> bool {
     let mut result = true;
+    #[allow(clippy::needless_range_loop)]
     for x in 0..BINGO_SIZE {
         if !(board[x][y].marked) {
             if board[x][y].number == new_number {
@@ -85,6 +102,7 @@ fn check_col(board: &mut BingoBoard, new_number: u64, y: usize) -> bool {
 
 fn calc_score(win_number: u64, board: &BingoBoard) -> u64 {
     let mut sum = 0;
+    #[allow(clippy::needless_range_loop)]
     for x in 0..BINGO_SIZE {
         for y in 0..BINGO_SIZE {
             if !(board[x][y].marked) {
@@ -103,8 +121,11 @@ impl Day for Day04 {
         format!("{}", score)
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let (numbers, boards) = parse_input(input);
+        let (win_number, board) = play_bingo_part2(&numbers, boards).unwrap();
+        let score = calc_score(win_number, &board);
+        format!("{}", score)
     }
 }
 
@@ -136,5 +157,6 @@ mod tests {
 
         let d = Day04 {};
         assert_eq!(d.star1(input), "4512");
+        assert_eq!(d.star2(input), "1924");
     }
 }
