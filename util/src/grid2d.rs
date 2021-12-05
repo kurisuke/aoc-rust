@@ -2,6 +2,7 @@ use itertools::concat;
 use std::cmp::Ordering;
 use std::fmt::{self, Display, Formatter};
 use std::iter::Zip;
+use std::ops::{Add, AddAssign, Sub, SubAssign};
 
 #[derive(Clone, Eq, PartialEq, Hash)]
 pub struct Grid2D<T> {
@@ -69,6 +70,46 @@ impl PartialOrd for Coords {
 impl From<(i64, i64)> for Coords {
     fn from(p: (i64, i64)) -> Self {
         Coords { x: p.0, y: p.1 }
+    }
+}
+
+impl Add for Coords {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+}
+
+impl AddAssign for Coords {
+    fn add_assign(&mut self, other: Self) {
+        *self = Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        };
+    }
+}
+
+impl Sub for Coords {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        Self {
+            x: self.x - other.x,
+            y: self.y - other.y,
+        }
+    }
+}
+
+impl SubAssign for Coords {
+    fn sub_assign(&mut self, other: Self) {
+        *self = Self {
+            x: self.x - other.x,
+            y: self.y - other.y,
+        };
     }
 }
 
