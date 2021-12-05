@@ -74,8 +74,11 @@ impl Day for Day05 {
         format!("{}", overlap_points)
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let lines = parse_input(input);
+        let floor = draw_lines(lines);
+        let overlap_points = floor.iter().filter(|&(_, v)| *v > 1).count();
+        format!("{}", overlap_points)
     }
 }
 
@@ -98,5 +101,6 @@ mod tests {
 
         let d = Day05 {};
         assert_eq!(d.star1(input), "5");
+        assert_eq!(d.star2(input), "12");
     }
 }
