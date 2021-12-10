@@ -6,13 +6,13 @@ pub struct Day06 {}
 impl Day for Day06 {
     fn star1(&self, input: &str) -> String {
         let groups = input.split("\n\n");
-        let sum_counts: usize = groups.map(|g| any_questions_per_group(g)).sum();
+        let sum_counts: usize = groups.map(any_questions_per_group).sum();
         format!("{}", sum_counts)
     }
 
     fn star2(&self, input: &str) -> String {
         let groups = input.split("\n\n");
-        let sum_counts: usize = groups.map(|g| all_questions_per_group(g)).sum();
+        let sum_counts: usize = groups.map(all_questions_per_group).sum();
         format!("{}", sum_counts)
     }
 }
@@ -31,8 +31,7 @@ fn all_questions_per_group(group_str: &str) -> usize {
             *counter += 1;
         }
     }
-    let all_answers: Vec<_> = answers.values().filter(|&v| *v == lines.len()).collect();
-    all_answers.len()
+    answers.values().filter(|&v| *v == lines.len()).count()
 }
 
 #[cfg(test)]

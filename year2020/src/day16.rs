@@ -18,16 +18,16 @@ fn parse_input(input: &str) -> InputInfo {
     let mut sections = input.split("\n\n");
 
     let fields_str = sections.next().unwrap();
-    let field_defs = parse_field_defs(&fields_str);
+    let field_defs = parse_field_defs(fields_str);
 
     let your_ticket_str = sections.next().unwrap();
-    let your_ticket = parse_ticket(&your_ticket_str.lines().nth(1).unwrap());
+    let your_ticket = parse_ticket(your_ticket_str.lines().nth(1).unwrap());
 
     let nearby_tickets_str = sections.next().unwrap();
     let nearby_tickets: Vec<_> = nearby_tickets_str
         .lines()
         .skip(1)
-        .map(|l| parse_ticket(l))
+        .map(parse_ticket)
         .collect();
 
     InputInfo {
@@ -97,7 +97,7 @@ fn match_rows(
     for (row_id, row_values) in rows.iter() {
         let possible_fields: Vec<_> = field_defs
             .iter()
-            .filter(|f| check_row(&row_values, f.1))
+            .filter(|f| check_row(row_values, f.1))
             .collect();
         if possible_fields.len() == 1 {
             let field_name = possible_fields[0].0;

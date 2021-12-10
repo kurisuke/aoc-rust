@@ -140,7 +140,7 @@ fn parse_input(input: &str) -> Tiles {
                 None
             }
         })
-        .filter_map(|x| x)
+        .flatten()
         .collect()
 }
 
@@ -193,7 +193,7 @@ fn assemble(tiles: &Tiles) -> Vec<PlacedTile> {
     let placed = vec![];
 
     let unplaced: HashSet<_> = tiles.keys().copied().collect();
-    let (corner_tiles, edge_tiles) = find_corners_borders(&tiles);
+    let (corner_tiles, edge_tiles) = find_corners_borders(tiles);
     assert_eq!(corner_tiles.len(), 4);
     assert_eq!(edge_tiles.len(), 4 * length - 8);
     let rest_tiles: HashSet<_> = unplaced.difference(&corner_tiles).cloned().collect();
@@ -205,7 +205,7 @@ fn assemble(tiles: &Tiles) -> Vec<PlacedTile> {
         rest: rest_tiles,
     };
 
-    place_next(&tiles, length, placed, unplaced).unwrap()
+    place_next(tiles, length, placed, unplaced).unwrap()
 }
 
 fn merge(tiles: &Tiles, placement: Vec<PlacedTile>) -> Grid2D<char> {

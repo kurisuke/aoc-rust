@@ -4,12 +4,12 @@ pub struct Day05 {}
 
 impl Day for Day05 {
     fn star1(&self, input: &str) -> String {
-        let seat_ids: Vec<u16> = input.lines().map(|l| seat_str_to_id(l)).collect();
+        let seat_ids: Vec<u16> = input.lines().map(seat_str_to_id).collect();
         format!("{}", seat_ids.iter().max().unwrap())
     }
 
     fn star2(&self, input: &str) -> String {
-        let mut seat_ids: Vec<u16> = input.lines().map(|l| seat_str_to_id(l)).collect();
+        let mut seat_ids: Vec<u16> = input.lines().map(seat_str_to_id).collect();
         seat_ids.sort_unstable();
         let my_seat_id = seat_ids
             .windows(2)

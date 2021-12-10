@@ -67,7 +67,7 @@ where
                             break;
                         }
                         Token::Op(top_op) => {
-                            if precedence_fn(top_op) < precedence_fn(&op) {
+                            if precedence_fn(top_op) < precedence_fn(op) {
                                 break;
                             }
                         }
@@ -140,13 +140,13 @@ where
 
 impl Day for Day18 {
     fn star1(&self, input: &str) -> String {
-        let exprs = parse_input(&input, &precedence_part1);
+        let exprs = parse_input(input, &precedence_part1);
         let sum: i64 = exprs.iter().map(|e| eval_rpn(e)).sum();
         format!("{}", sum)
     }
 
     fn star2(&self, input: &str) -> String {
-        let exprs = parse_input(&input, &precedence_part2);
+        let exprs = parse_input(input, &precedence_part2);
         let sum: i64 = exprs.iter().map(|e| eval_rpn(e)).sum();
         format!("{}", sum)
     }

@@ -35,18 +35,18 @@ fn has_valid_fields(passport: &HashMap<&str, &str>) -> bool {
 }
 
 fn field_format_correct(passport: &HashMap<&str, &str>) -> bool {
-    let byr_ok = check_yr(&passport["byr"], 1920, 2002);
-    let iyr_ok = check_yr(&passport["iyr"], 2010, 2020);
-    let eyr_ok = check_yr(&passport["eyr"], 2020, 2030);
-    let hgt_ok = check_hgt(&passport["hgt"]);
-    let hcl_ok = check_hcl(&passport["hcl"]);
+    let byr_ok = check_yr(passport["byr"], 1920, 2002);
+    let iyr_ok = check_yr(passport["iyr"], 2010, 2020);
+    let eyr_ok = check_yr(passport["eyr"], 2020, 2030);
+    let hgt_ok = check_hgt(passport["hgt"]);
+    let hcl_ok = check_hcl(passport["hcl"]);
 
     let valid_ecl: HashSet<_> = vec!["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
         .into_iter()
         .collect();
     let ecl_ok = valid_ecl.contains(&passport["ecl"]);
 
-    let pid_ok = check_pid(&passport["pid"]);
+    let pid_ok = check_pid(passport["pid"]);
 
     byr_ok && iyr_ok && eyr_ok && hgt_ok && hcl_ok && ecl_ok && pid_ok
 }

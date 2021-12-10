@@ -27,7 +27,7 @@ impl Day for Day09 {
 fn find_cipher_weakness(nums: &[i64], n: usize) -> i64 {
     for i in n..nums.len() {
         let sums = get_sums(&nums[i - n..i]);
-        if sums.iter().find(|&&v| v == nums[i]).is_none() {
+        if !sums.iter().any(|&v| v == nums[i]) {
             return nums[i];
         }
     }

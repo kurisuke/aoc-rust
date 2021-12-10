@@ -73,7 +73,7 @@ where
             for diff in neighbors.iter() {
                 let new_coords = *pos + *diff;
                 if !checked_pos.contains(&new_coords) {
-                    let is_active = match active_neighbors(&cube, new_coords, &neighbors, &zero_el)
+                    let is_active = match active_neighbors(&cube, new_coords, neighbors, zero_el)
                     {
                         0..=1 => false,
                         2 => cube.contains(&new_coords),

@@ -60,7 +60,7 @@ where
 fn direct_neighbors(grid: &Grid2D<char>, coords: Coords) -> Vec<&char> {
     grid.neighbors(&coords)
         .into_iter()
-        .filter_map(|v| v)
+        .flatten()
         .collect()
 }
 
@@ -71,7 +71,7 @@ fn visible_neighbors(grid: &Grid2D<char>, coords: Coords) -> Vec<&char> {
                 .skip(1)
                 .find(|&&v| v != '.')
         })
-        .filter_map(|v| v)
+        .flatten()
         .collect()
 }
 

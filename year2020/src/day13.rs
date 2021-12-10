@@ -14,7 +14,7 @@ struct BusInfo {
 
 impl Day for Day13 {
     fn star1(&self, input: &str) -> String {
-        let input_info = parse_input(&input);
+        let input_info = parse_input(input);
         let ts = input_info.ts;
         let first_bus = input_info
             .bus_infos
@@ -26,7 +26,7 @@ impl Day for Day13 {
     }
 
     fn star2(&self, input: &str) -> String {
-        let input_info = parse_input(&input);
+        let input_info = parse_input(input);
 
         let mut mul = input_info.bus_infos[0].id;
         let mut off = input_info.bus_infos[0].dep_diff;
