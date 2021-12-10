@@ -66,8 +66,8 @@ impl Day for Day14 {
         let regions = all_coords
             .iter()
             .filter(|c| {
-                if grid.at(&c).unwrap() == &'#' {
-                    fill_region(&mut grid, &c);
+                if grid.at(c).unwrap() == &'#' {
+                    fill_region(&mut grid, c);
                     true
                 } else {
                     false

@@ -95,7 +95,7 @@ fn eval(regs: &mut HashMap<String, isize>, instr: &Instr) {
 
 impl Day for Day08 {
     fn star1(&self, input: &str) -> String {
-        let instrs: Vec<_> = input.lines().map(|line| parse_instr(line)).collect();
+        let instrs: Vec<_> = input.lines().map(parse_instr).collect();
         let mut regs = HashMap::new();
         for instr in instrs.iter() {
             eval(&mut regs, instr);
@@ -105,7 +105,7 @@ impl Day for Day08 {
     }
 
     fn star2(&self, input: &str) -> String {
-        let instrs: Vec<_> = input.lines().map(|line| parse_instr(line)).collect();
+        let instrs: Vec<_> = input.lines().map(parse_instr).collect();
         let mut regs = HashMap::new();
         let mut largest_ever = std::isize::MIN;
         for instr in instrs.iter() {

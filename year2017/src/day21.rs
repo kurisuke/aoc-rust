@@ -24,7 +24,7 @@ fn cut(grid: &Grid2D<char>, cut_size: i64) -> Vec<Grid2D<char>> {
 fn replace(tiles: &[Grid2D<char>], replacements: &Replacements) -> Vec<Grid2D<char>> {
     tiles
         .iter()
-        .map(|tile| replacements.get(&tile).unwrap().clone())
+        .map(|tile| replacements.get(tile).unwrap().clone())
         .collect()
 }
 
@@ -59,7 +59,7 @@ fn evolve(grid: Grid2D<char>, replacements: &Replacements) -> Grid2D<char> {
     };
 
     let tiles = cut(&grid, cut_size);
-    let replaced_tiles = replace(&tiles, &replacements);
+    let replaced_tiles = replace(&tiles, replacements);
     merge(replaced_tiles)
 }
 

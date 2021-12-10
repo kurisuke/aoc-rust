@@ -13,7 +13,7 @@ fn sum_equal(digits: &[char], off: usize) -> u32 {
                 None
             }
         })
-        .filter_map(|x| x)
+        .flatten()
         .sum::<u32>()
 }
 

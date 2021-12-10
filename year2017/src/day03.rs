@@ -81,7 +81,7 @@ impl Day for Day03 {
             last_written = neighbors(&pos)
                 .iter()
                 .map(|c| vals.get(c))
-                .filter_map(|x| x)
+                .flatten()
                 .sum::<usize>();
             vals.insert(pos, last_written);
         }

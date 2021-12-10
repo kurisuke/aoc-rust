@@ -89,7 +89,7 @@ fn tick(particles: &mut HashMap<usize, Particle>) {
 fn remove_collisions(particles: &mut HashMap<usize, Particle>) {
     let mut to_remove = HashSet::new();
     for c in particles.keys().combinations(2) {
-        if particles.get(&c[0]).unwrap().pos == particles.get(&c[1]).unwrap().pos {
+        if particles.get(c[0]).unwrap().pos == particles.get(c[1]).unwrap().pos {
             to_remove.insert(*c[0]);
             to_remove.insert(*c[1]);
         }
