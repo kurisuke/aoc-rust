@@ -33,8 +33,7 @@ fn parse_input(input: &str) -> Node {
 }
 
 fn sum_metadata(node: &Node) -> usize {
-    node.metadata.iter().sum::<usize>()
-        + node.children.iter().map(sum_metadata).sum::<usize>()
+    node.metadata.iter().sum::<usize>() + node.children.iter().map(sum_metadata).sum::<usize>()
 }
 
 fn value(node: &Node) -> usize {

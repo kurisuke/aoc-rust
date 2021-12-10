@@ -26,9 +26,11 @@ fn parse_rule(input: &str) -> Rule {
             .split_whitespace()
             .map(|x| x.parse::<usize>().unwrap())
             .collect();
-        let second = spl.next().map(|s| s.split_whitespace()
-                    .map(|x| x.parse::<usize>().unwrap())
-                    .collect());
+        let second = spl.next().map(|s| {
+            s.split_whitespace()
+                .map(|x| x.parse::<usize>().unwrap())
+                .collect()
+        });
         Rule::Sub(first, second)
     }
 }

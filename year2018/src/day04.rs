@@ -92,10 +92,7 @@ fn find_guard_star2(nights: &[Night]) -> u32 {
             (guard, max_minute.0, max_minute.1)
         })
         .collect();
-    let result_guard = guard_max_minute
-        .iter()
-        .max_by(|a, b| a.2.cmp(b.2))
-        .unwrap();
+    let result_guard = guard_max_minute.iter().max_by(|a, b| a.2.cmp(b.2)).unwrap();
     result_guard.0 * (result_guard.1 as u32)
 }
 
