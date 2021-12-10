@@ -181,6 +181,6 @@ fn parse_input(input: &str) -> Vec<Op> {
                 _ => None,
             }
         })
-        .filter_map(|x| x)
+        .flatten()
         .collect()
 }

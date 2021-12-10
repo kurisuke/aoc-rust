@@ -314,29 +314,29 @@ impl<T> Grid2D<T> {
     }
 
     pub fn iter(&self) -> Iter<T> {
-        Iter::new(&self)
+        Iter::new(self)
     }
 
     #[allow(dead_code)]
     pub fn coords_iter(&self) -> CoordsIter<T> {
-        CoordsIter::new(&self)
+        CoordsIter::new(self)
     }
 
     pub fn enumerate(&self) -> Zip<CoordsIter<T>, Iter<T>> {
-        CoordsIter::new(&self).zip(Iter::new(&self))
+        CoordsIter::new(self).zip(Iter::new(self))
     }
 
     #[allow(dead_code)]
     pub fn traverse(&self, d: &Coords) -> TraverseIter<T> {
-        TraverseIter::new(&self, &Coords { x: 0, y: 0 }, d, Wrap::None)
+        TraverseIter::new(self, &Coords { x: 0, y: 0 }, d, Wrap::None)
     }
 
     pub fn traverse_wrap(&self, d: &Coords, wrap: Wrap) -> TraverseIter<T> {
-        TraverseIter::new(&self, &Coords { x: 0, y: 0 }, d, wrap)
+        TraverseIter::new(self, &Coords { x: 0, y: 0 }, d, wrap)
     }
 
     pub fn traverse_init_wrap(&self, init: &Coords, d: &Coords, wrap: Wrap) -> TraverseIter<T> {
-        TraverseIter::new(&self, init, d, wrap)
+        TraverseIter::new(self, init, d, wrap)
     }
 }
 
