@@ -177,7 +177,7 @@ fn turn(grid: &mut Grid2D<Field>, unit_pos: &Coords) -> bool {
     };
 
     // check if in attack range == adjacent to an enemy unit
-    if let Some(attack_target) = find_in_range(grid, &unit_pos, target_type) {
+    if let Some(attack_target) = find_in_range(grid, unit_pos, target_type) {
         do_attack(grid, &attack_target, power);
     } else {
         // try to move

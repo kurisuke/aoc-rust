@@ -3,9 +3,8 @@ use common::day::Day;
 pub struct Day05 {}
 
 fn reduce(s: &str) -> String {
-    let input: Vec<_> = s.chars().collect();
     let mut output = vec![];
-    for c in input.into_iter() {
+    for c in s.chars() {
         if output.is_empty() {
             output.push(c);
         } else {

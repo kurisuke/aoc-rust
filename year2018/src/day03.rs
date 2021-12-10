@@ -56,7 +56,7 @@ fn overlapping(rectangles: &[Rectangle]) -> HashSet<Coords> {
 fn non_overlap(rectangles: &[Rectangle], overlapping: &HashSet<Coords>) -> Option<usize> {
     rectangles.iter().position(|rectangle| {
         let claim: HashSet<_> = rectangle.inside_coords().collect();
-        claim.intersection(&overlapping).count() == 0
+        claim.intersection(overlapping).count() == 0
     })
 }
 

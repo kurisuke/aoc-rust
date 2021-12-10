@@ -66,13 +66,13 @@ fn guards_frequency(nights: &[Night]) -> HashMap<u32, Vec<u32>> {
 }
 
 fn find_guard_star1(nights: &[Night]) -> u32 {
-    let guards = guards_frequency(&nights);
+    let guards = guards_frequency(nights);
     let max_guard = most_asleep(&guards);
     let max_guard_minutes = guards.get(&max_guard).unwrap();
     let max_minute = max_guard_minutes
         .iter()
         .enumerate()
-        .max_by(|a, b| a.1.cmp(&b.1))
+        .max_by(|a, b| a.1.cmp(b.1))
         .unwrap()
         .0;
 
@@ -80,21 +80,21 @@ fn find_guard_star1(nights: &[Night]) -> u32 {
 }
 
 fn find_guard_star2(nights: &[Night]) -> u32 {
-    let guards = guards_frequency(&nights);
+    let guards = guards_frequency(nights);
     let guard_max_minute: Vec<_> = guards
         .iter()
         .map(|(guard, minutes)| {
             let max_minute = minutes
                 .iter()
                 .enumerate()
-                .max_by(|a, b| a.1.cmp(&b.1))
+                .max_by(|a, b| a.1.cmp(b.1))
                 .unwrap();
             (guard, max_minute.0, max_minute.1)
         })
         .collect();
     let result_guard = guard_max_minute
         .iter()
-        .max_by(|a, b| a.2.cmp(&b.2))
+        .max_by(|a, b| a.2.cmp(b.2))
         .unwrap();
     result_guard.0 * (result_guard.1 as u32)
 }

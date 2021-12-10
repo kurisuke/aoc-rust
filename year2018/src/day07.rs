@@ -62,7 +62,7 @@ fn sort_steps(steps: &Steps) -> String {
 }
 
 fn work_time(steps: &Steps, num_workers: usize, base: usize) -> usize {
-    let order = sort_steps(&steps);
+    let order = sort_steps(steps);
     let mut todo = steps.clone();
     let mut done = HashSet::new();
 
@@ -82,7 +82,7 @@ fn work_time(steps: &Steps, num_workers: usize, base: usize) -> usize {
         // try to distribute tasks to free workers
         while workers.iter().any(|x| x.is_none()) {
             if let Some(next_task) = order.chars().find(|t| {
-                todo.contains_key(&t) && todo.get(&t).unwrap().iter().all(|p| done.contains(p))
+                todo.contains_key(t) && todo.get(t).unwrap().iter().all(|p| done.contains(p))
             }) {
                 // insert to a free worker
                 let free_worker_pos = workers.iter().position(|w| w.is_none()).unwrap();
