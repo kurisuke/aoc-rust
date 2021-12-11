@@ -1,5 +1,10 @@
+mod dl_input;
+
 use common::year::Year;
+use std::io::ErrorKind;
 use std::time::Instant;
+
+use dotenv::dotenv;
 
 const YEAR_MAX: usize = 2021;
 
@@ -78,6 +83,8 @@ fn run_all(year: &Box<dyn Year>) {
 }
 
 fn main() {
+    dotenv().ok();
+
     let args: Vec<_> = std::env::args().collect();
     if let Some(year) = parse_year(&args) {
         if args.len() == 1 {
@@ -102,5 +109,15 @@ fn main() {
 
 fn load_input(year_no: usize, day_no: usize) -> String {
     let filename = format!("input/year{:04}/day{:02}.input", year_no, day_no);
-    std::fs::read_to_string(filename).unwrap()
+    match std::fs::read_to_string(&filename) {
+        Ok(s) => s,
+        Err(e) => {
+            if e.kind() == ErrorKind::NotFound {
+                dl_input::download(year_no, day_no);
+                std::fs::read_to_string(&filename).unwrap()
+            } else {
+                panic!("Error: {}", e);
+            }
+        }
+    }
 }
