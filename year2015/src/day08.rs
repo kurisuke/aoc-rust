@@ -39,11 +39,7 @@ fn encode_diff(s: &str) -> usize {
 
 impl Day for Day08 {
     fn star1(&self, input: &str) -> String {
-        let total: usize = input
-            .lines()
-            .filter(|l| !l.is_empty())
-            .map(mem_diff)
-            .sum();
+        let total: usize = input.lines().filter(|l| !l.is_empty()).map(mem_diff).sum();
         format!("{}", total)
     }
 
