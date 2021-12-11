@@ -21,7 +21,7 @@ fn parse_input(input: &str) -> (usize, usize) {
 
 impl Day for Day25 {
     fn star1(&self, input: &str) -> String {
-        let (row, col) = parse_input(&input);
+        let (row, col) = parse_input(input);
         let num_iter = index_of(row - 1, col - 1);
         let mut v = 20151125u64;
         for _ in 0..num_iter {

@@ -36,7 +36,7 @@ fn eval(gates: &Gates, results: &mut Results, id: &str) -> u16 {
         .iter()
         .map(|i| match i {
             Input::Value(x) => *x,
-            Input::Gate(id) => eval(&gates, results, id),
+            Input::Gate(id) => eval(gates, results, id),
         })
         .collect();
 

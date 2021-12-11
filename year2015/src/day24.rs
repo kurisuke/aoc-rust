@@ -5,7 +5,7 @@ pub struct Day24 {}
 
 fn min_qe(packages: &[usize], divisor: usize) -> usize {
     let target = packages.iter().sum::<usize>() / divisor;
-    let combos = get_combos(target, &packages);
+    let combos = get_combos(target, packages);
     let min_len = combos.iter().map(|combo| combo.len()).min().unwrap();
     let combos_min_len: Vec<_> = combos
         .iter()

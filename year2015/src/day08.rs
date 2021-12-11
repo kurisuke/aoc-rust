@@ -42,7 +42,7 @@ impl Day for Day08 {
         let total: usize = input
             .lines()
             .filter(|l| !l.is_empty())
-            .map(|l| mem_diff(l))
+            .map(mem_diff)
             .sum();
         format!("{}", total)
     }
@@ -51,7 +51,7 @@ impl Day for Day08 {
         let total: usize = input
             .lines()
             .filter(|l| !l.is_empty())
-            .map(|l| encode_diff(l))
+            .map(encode_diff)
             .sum();
         format!("{}", total)
     }

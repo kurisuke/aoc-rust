@@ -6,8 +6,8 @@ pub struct Day12 {}
 fn visit_star1(value: &Value) -> i64 {
     match value {
         Value::Number(num) => num.as_i64().unwrap(),
-        Value::Array(arr) => arr.iter().map(|v| visit_star1(v)).sum(),
-        Value::Object(arr) => arr.values().map(|v| visit_star1(v)).sum(),
+        Value::Array(arr) => arr.iter().map(visit_star1).sum(),
+        Value::Object(arr) => arr.values().map(visit_star1).sum(),
         _ => 0,
     }
 }
@@ -15,7 +15,7 @@ fn visit_star1(value: &Value) -> i64 {
 fn visit_star2(value: &Value) -> i64 {
     match value {
         Value::Number(num) => num.as_i64().unwrap(),
-        Value::Array(arr) => arr.iter().map(|v| visit_star2(v)).sum(),
+        Value::Array(arr) => arr.iter().map(visit_star2).sum(),
         Value::Object(arr) => {
             if arr
                 .values()
@@ -23,7 +23,7 @@ fn visit_star2(value: &Value) -> i64 {
             {
                 0
             } else {
-                arr.values().map(|v| visit_star2(v)).sum()
+                arr.values().map(visit_star2).sum()
             }
         }
         _ => 0,

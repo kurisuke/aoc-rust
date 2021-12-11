@@ -146,7 +146,7 @@ fn min_cost_to_win(boss_stats: &Stats) -> i64 {
                     arm: a.arm + rs[0].arm + rs[1].arm,
                 };
                 let cost = w.cost + a.cost + rs[0].cost + rs[1].cost;
-                if combat(&player_stats, &boss_stats) {
+                if combat(&player_stats, boss_stats) {
                     min_cost = min_cost.min(cost);
                 }
             }
@@ -166,7 +166,7 @@ fn max_cost_to_lose(boss_stats: &Stats) -> i64 {
                     arm: a.arm + rs[0].arm + rs[1].arm,
                 };
                 let cost = w.cost + a.cost + rs[0].cost + rs[1].cost;
-                if !combat(&player_stats, &boss_stats) {
+                if !combat(&player_stats, boss_stats) {
                     max_cost = max_cost.max(cost);
                 }
             }

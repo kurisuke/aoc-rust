@@ -14,7 +14,7 @@ fn is_nice_star1(s: &str) -> bool {
     let has_double = chars.windows(2).any(|w| w[0] == w[1]);
 
     let forbidden = vec!["ab", "cd", "pq", "xy"];
-    let has_forbidden = forbidden.iter().any(|f| s.find(f).is_some());
+    let has_forbidden = forbidden.iter().any(|f| s.contains(f));
     (num_vowels >= 3) && has_double && !has_forbidden
 }
 
@@ -22,7 +22,7 @@ fn is_nice_star2(s: &str) -> bool {
     let chars: Vec<_> = s.chars().collect();
     let cond1 = chars.windows(2).enumerate().any(|(i, w)| {
         let find_str: String = w.iter().collect();
-        (&s[i + 2..]).find(&find_str).is_some()
+        (&s[i + 2..]).contains(&find_str)
     });
     let cond2 = chars.windows(3).any(|w| w[0] == w[2]);
     cond1 && cond2

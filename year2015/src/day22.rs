@@ -166,8 +166,8 @@ fn possible_actions(active_effects: &[(Action, usize)], state: &GameState) -> Ve
 }
 
 fn early_exit(prev_actions: &[Action], state: &GameState, win_seqs: &mut Vec<Vec<Action>>) -> bool {
-    if combat_finished(&state) != CombatState::Ongoing {
-        if combat_finished(&state) == CombatState::Won {
+    if combat_finished(state) != CombatState::Ongoing {
+        if combat_finished(state) == CombatState::Won {
             win_seqs.push(prev_actions.to_vec());
         }
         true

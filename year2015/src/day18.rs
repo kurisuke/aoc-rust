@@ -9,7 +9,7 @@ fn step(grid: &Grid2D<char>) -> Grid2D<char> {
         let active_neighbors = grid
             .neighbors(&pos)
             .into_iter()
-            .filter_map(|x| x)
+            .flatten()
             .filter(|x| **x == '#')
             .count();
         if active_neighbors == 3 || (active_neighbors == 2 && *value == '#') {
