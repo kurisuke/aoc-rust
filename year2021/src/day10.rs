@@ -105,7 +105,6 @@ impl Day for Day10 {
             .flatten()
             .collect();
         scores.sort_unstable();
-        println!("len: {}", scores.len());
         let middle_score = scores[scores.len() / 2];
         format!("{}", middle_score)
     }
