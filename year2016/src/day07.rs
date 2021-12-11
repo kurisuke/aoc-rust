@@ -49,7 +49,7 @@ fn find_aba(s: &str) -> Vec<(char, char)> {
                 None
             }
         })
-        .filter_map(|x| x)
+        .flatten()
         .collect()
 }
 

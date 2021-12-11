@@ -77,7 +77,7 @@ fn parse_input(input: &str) -> Vec<Cmd> {
                 None
             }
         })
-        .filter_map(|x| x)
+        .flatten()
         .collect()
 }
 

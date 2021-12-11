@@ -66,7 +66,7 @@ fn fill(init_pos: (usize, usize), max_steps: usize, magic: usize) -> usize {
     for _ in 0..=max_steps {
         let mut new_frontier = HashSet::new();
         for current in frontier.iter() {
-            for next in neighbors(&current, magic) {
+            for next in neighbors(current, magic) {
                 if !frontier.contains(&next) && !reached.contains(&next) {
                     new_frontier.insert(next);
                 }

@@ -27,7 +27,7 @@ fn parse_input(input: &str) -> Vec<(LR, isize)> {
                 Some((lr, n))
             }
         })
-        .filter_map(|x| x)
+        .flatten()
         .collect()
 }
 

@@ -15,7 +15,7 @@ fn neighbors(grid: &Grid2D<char>, pos: &Coords) -> Vec<Coords> {
     grid.neighbors_cardinal_coords(pos)
         .into_iter()
         .filter(|c| {
-            let v = grid.at(&c);
+            let v = grid.at(c);
             v.is_some() && v.unwrap() != &'#'
         })
         .collect()

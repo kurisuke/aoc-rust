@@ -32,7 +32,7 @@ fn parse_input(input: &str) -> Vec<Disc> {
 
 fn press_time(discs: &[Disc]) -> usize {
     let mut t = 0;
-    while !check_fall(&discs, t) {
+    while !check_fall(discs, t) {
         t += 1;
     }
     t

@@ -71,7 +71,7 @@ fn print_grid(grid: &Grid) -> String {
                 s.push('█');
             } else if neighbors((x, y), (x_max, y_max))
                 .iter()
-                .any(|n| can_move(&node, grid.get(n).unwrap()))
+                .any(|n| can_move(node, grid.get(n).unwrap()))
             {
                 s.push('.');
             } else {

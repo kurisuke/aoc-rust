@@ -5,8 +5,7 @@ pub struct Day16 {}
 fn fill_disk(input: &[bool], req_size: usize) -> Vec<bool> {
     let mut output: Vec<_> = input.iter().copied().collect();
     while output.len() < req_size {
-        let rev: Vec<_> = output.iter().rev().copied().collect();
-        let inv: Vec<_> = rev.into_iter().map(|x| !x).collect();
+        let inv: Vec<_> = output.iter().rev().copied().map(|x| !x).collect();
         output.push(false);
         output.extend(inv);
     }

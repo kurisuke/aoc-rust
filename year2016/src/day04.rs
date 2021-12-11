@@ -14,10 +14,10 @@ struct Room<'a> {
 fn calc_checksum(s: &str) -> String {
     let freq = char_distribution(&s.replace("-", ""));
     let mut freq: Vec<(_, _)> = freq.iter().collect();
-    freq.sort_by(|a, b| match a.1.cmp(&b.1) {
+    freq.sort_by(|a, b| match a.1.cmp(b.1) {
         Ordering::Less => Ordering::Greater,
         Ordering::Greater => Ordering::Less,
-        Ordering::Equal => a.0.cmp(&b.0),
+        Ordering::Equal => a.0.cmp(b.0),
     });
     freq[0..5].iter().map(|x| x.0).collect()
 }
@@ -78,7 +78,7 @@ impl Day for Day04 {
             .collect();
         let mut northpole_rooms = valid_rooms
             .iter()
-            .filter(|room| decrypt_name(room).find("northpole").is_some());
+            .filter(|room| decrypt_name(room).contains("northpole"));
         format!("{}", northpole_rooms.next().unwrap().sector_id)
     }
 }

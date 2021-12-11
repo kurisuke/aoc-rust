@@ -26,7 +26,7 @@ impl Day for Day06 {
         let mut s = String::new();
         for col in 0..msgs[0].len() {
             let freq = letter_frequency(&msg_col(&msgs, col));
-            let most_common = freq.iter().max_by(|(_, a), (_, b)| a.cmp(&b)).unwrap().0;
+            let most_common = freq.iter().max_by(|(_, a), (_, b)| a.cmp(b)).unwrap().0;
             s.push(*most_common);
         }
         s
@@ -37,7 +37,7 @@ impl Day for Day06 {
         let mut s = String::new();
         for col in 0..msgs[0].len() {
             let freq = letter_frequency(&msg_col(&msgs, col));
-            let most_common = freq.iter().min_by(|(_, a), (_, b)| a.cmp(&b)).unwrap().0;
+            let most_common = freq.iter().min_by(|(_, a), (_, b)| a.cmp(b)).unwrap().0;
             s.push(*most_common);
         }
         s
