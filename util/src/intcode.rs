@@ -35,7 +35,7 @@ pub struct Intcode {
     rel_base: IntSize,
 }
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum RunState {
     Halted,
     Running,
@@ -91,6 +91,15 @@ impl Intcode {
         self.outp.clear();
         self.state = RunState::Halted;
         self.rel_base = 0;
+    }
+
+    pub fn reset_from_str(&mut self, input: &str) {
+        let init: Vec<_> = input
+            .trim()
+            .split(',')
+            .map(|x| x.parse::<IntSize>().unwrap())
+            .collect();
+        self.reset(&init);
     }
 
     pub fn write_inp(&mut self, n: IntSize) {
