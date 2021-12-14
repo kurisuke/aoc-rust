@@ -14,8 +14,7 @@ fn parse_input(input: &str) -> (State, Rules) {
     let init_str = input.split("\n\n").next().unwrap();
     let mut pairs = HashMap::new();
     for w in init_str.chars().collect::<Vec<_>>().windows(2) {
-        let e = pairs.entry((w[0], w[1])).or_insert(0);
-        *e += 1;
+        *pairs.entry((w[0], w[1])).or_insert(0) += 1;
     }
     let distrib = chardistrib::char_distribution(init_str);
     let init = State { pairs, distrib };
@@ -36,15 +35,11 @@ fn step(state: &State, rules: &Rules) -> State {
 
     for (k, v) in state.pairs.iter() {
         if let Some(new_char) = rules.get(k) {
-            let e = new_pairs.entry((k.0, *new_char)).or_insert(0);
-            *e += v;
-            let e = new_pairs.entry((*new_char, k.1)).or_insert(0);
-            *e += v;
-            let e = new_distrib.entry(*new_char).or_insert(0);
-            *e += v;
+            *new_pairs.entry((k.0, *new_char)).or_insert(0) += v;
+            *new_pairs.entry((*new_char, k.1)).or_insert(0) += v;
+            *new_distrib.entry(*new_char).or_insert(0) += v;
         } else {
-            let e = new_pairs.entry(*k).or_insert(0);
-            *e += v;
+            *new_pairs.entry(*k).or_insert(0) += v;
         }
     }
     State {
