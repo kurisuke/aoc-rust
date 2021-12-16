@@ -3,76 +3,88 @@ use common::day::Day;
 
 pub struct Day16 {}
 
-fn parse_input(input: &str) -> BitVec {
-    let len = input.trim().len();
-    let mut i = 0;
-    let mut nums = vec![];
-    while i < len {
-        nums.push(u8::from_str_radix(&input[i..i + 2], 16).unwrap());
-        i += 2;
+struct PacketEval {
+    version_sum: usize,
+    val: usize,
+}
+
+struct BitReader {
+    bits: BitVec<Msb0, u8>,
+    pos: usize,
+}
+
+impl BitReader {
+    fn slice(&mut self, k: usize) -> &BitSlice<Msb0, u8> {
+        let r = &self.bits[self.pos..self.pos + k];
+        self.pos += k;
+        r
     }
-    nums.view_bits::<Msb0>().iter().collect()
+    fn bit(&mut self) -> bool {
+        let r = self.bits[self.pos];
+        self.pos += 1;
+        r
+    }
+    fn load(&mut self, k: usize) -> usize {
+        self.slice(k).load_be()
+    }
 }
 
-fn to_value(bits: &BitSlice) -> usize {
-    let v: BitVec = bits.iter().rev().collect();
-    v.load::<usize>()
+fn parse_input(input: &str) -> BitReader {
+    let len = input.trim().len();
+    let nums = (0..len)
+        .step_by(2)
+        .map(|i| u8::from_str_radix(&input[i..i + 2], 16).unwrap())
+        .collect();
+    BitReader {
+        bits: BitVec::from_vec(nums),
+        pos: 0,
+    }
 }
 
-fn parse_packet(bits: &BitSlice) -> (usize, usize, usize) {
-    let mut version = to_value(&bits[0..3]);
-    let typ = to_value(&bits[3..6]);
-    let mut cursor = 0;
+fn parse_packet(r: &mut BitReader) -> PacketEval {
+    let mut version_sum = r.load(3);
+    let typ = r.load(3);
 
     let val = match typ {
-        4 => {
-            let (literal, bits_read) = parse_number(&bits[6..]);
-            cursor += 6 + bits_read;
-            literal
-        }
+        4 => parse_literal(r),
         _ => {
-            let length_id = bits[6];
+            let length_id = r.bit();
             let mut subpacket_vals = vec![];
             match length_id {
                 true => {
-                    let num_subpackets = to_value(&bits[7..18]);
-                    cursor = 18;
+                    let num_subpackets: usize = r.load(11);
                     for _ in 0..num_subpackets {
-                        let (version_sub, bits_read, val_sub) = parse_packet(&bits[cursor..]);
-                        subpacket_vals.push(val_sub);
-                        version += version_sub;
-                        cursor += bits_read;
+                        let sub = parse_packet(r);
+                        subpacket_vals.push(sub.val);
+                        version_sum += sub.version_sum;
                     }
                 }
                 false => {
-                    let total_length = to_value(&bits[7..22]);
-                    cursor = 22;
-                    while cursor - 22 < total_length {
-                        let (version_sub, bits_read, val_sub) = parse_packet(&bits[cursor..]);
-                        subpacket_vals.push(val_sub);
-                        version += version_sub;
-                        cursor += bits_read;
+                    let total_length = r.load(15);
+                    let target = r.pos + total_length;
+                    while r.pos < target {
+                        let sub = parse_packet(r);
+                        subpacket_vals.push(sub.val);
+                        version_sum += sub.version_sum;
                     }
                 }
             }
             eval(typ, &subpacket_vals)
         }
     };
-    (version, cursor, val)
+    PacketEval { version_sum, val }
 }
 
-fn parse_number(bits: &BitSlice) -> (usize, usize) {
-    let mut cursor = 0;
-    let mut number_bits = BitVec::new();
+fn parse_literal(r: &mut BitReader) -> usize {
+    let mut number_bits = BitVec::<Msb0, u8>::new();
     loop {
-        let start = bits[cursor];
-        number_bits.extend_from_bitslice(&bits[cursor + 1..cursor + 5]);
-        cursor += 5;
+        let start = r.bit();
+        number_bits.extend(r.slice(4));
         if !start {
             break;
         }
     }
-    (to_value(&number_bits), cursor)
+    number_bits.load_be()
 }
 
 fn eval(typ: usize, vals: &[usize]) -> usize {
@@ -81,44 +93,24 @@ fn eval(typ: usize, vals: &[usize]) -> usize {
         1 => vals.iter().product(),
         2 => *vals.iter().min().unwrap(),
         3 => *vals.iter().max().unwrap(),
-        5 => {
-            if vals[0] > vals[1] {
-                1
-            } else {
-                0
-            }
-        }
-        6 => {
-            if vals[0] < vals[1] {
-                1
-            } else {
-                0
-            }
-        }
-        7 => {
-            if vals[0] == vals[1] {
-                1
-            } else {
-                0
-            }
-        }
-        _ => {
-            panic!("unknown type: {}", typ);
-        }
+        5 => (vals[0] > vals[1]) as usize,
+        6 => (vals[0] < vals[1]) as usize,
+        7 => (vals[0] == vals[1]) as usize,
+        _ => unreachable!(),
     }
 }
 
 impl Day for Day16 {
     fn star1(&self, input: &str) -> String {
-        let bits = parse_input(input);
-        let (version, _, _) = parse_packet(&bits);
-        format!("{}", version)
+        let mut bit_reader = parse_input(input);
+        let packet = parse_packet(&mut bit_reader);
+        format!("{}", packet.version_sum)
     }
 
     fn star2(&self, input: &str) -> String {
-        let bits = parse_input(input);
-        let (_, _, val) = parse_packet(&bits);
-        format!("{}", val)
+        let mut bit_reader = parse_input(input);
+        let packet = parse_packet(&mut bit_reader);
+        format!("{}", packet.val)
     }
 }
 
@@ -126,9 +118,9 @@ impl Day for Day16 {
 mod tests {
     use super::*;
 
-    fn vec2str(v: &BitVec) -> String {
+    fn vec2str(r: &mut BitReader) -> String {
         let mut s = String::new();
-        for c in v {
+        for c in r.bits.iter() {
             if *c {
                 s = format!("{}1", s);
             } else {
@@ -140,13 +132,16 @@ mod tests {
 
     #[test]
     fn test_parse() {
-        assert_eq!(vec2str(&parse_input("D2FE28")), "110100101111111000101000");
         assert_eq!(
-            vec2str(&parse_input("38006F45291200")),
+            vec2str(&mut parse_input("D2FE28")),
+            "110100101111111000101000"
+        );
+        assert_eq!(
+            vec2str(&mut parse_input("38006F45291200")),
             "00111000000000000110111101000101001010010001001000000000"
         );
         assert_eq!(
-            vec2str(&parse_input("EE00D40C823060")),
+            vec2str(&mut parse_input("EE00D40C823060")),
             "11101110000000001101010000001100100000100011000001100000"
         );
     }
