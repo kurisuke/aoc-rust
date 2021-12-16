@@ -9,4 +9,5 @@ edition = "2018"
 [dependencies]
 common = { path = "../common" }
 util = { path = "../util" }
+bitvec = "0.22.3"
 itertools = "0.10.3"
