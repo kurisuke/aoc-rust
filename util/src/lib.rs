@@ -5,3 +5,4 @@ pub mod grid2d;
 pub mod hex;
 pub mod intcode;
 pub mod knothash;
+pub mod wrist;
