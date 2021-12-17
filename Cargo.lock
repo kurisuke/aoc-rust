@@ -898,5 +898,6 @@ dependencies = [
  "bitvec",
  "common",
  "itertools",
+ "scan_fmt",
  "util",
 ]
