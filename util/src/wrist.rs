@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 pub struct Instruction {
     op: Op,
     a: usize,
@@ -47,6 +49,44 @@ impl Wrist {
         }
     }
 
+    pub fn run_d21_s1(&mut self) -> Option<usize> {
+        while self.ip < self.program.len() {
+            self.reg[self.ip_reg] = self.ip;
+
+            let instr = &self.program[self.ip];
+            if instr.op == Op::Eqrr {
+                return Some(self.reg[1]);
+            }
+            self.reg = exec_op(instr, &self.reg).unwrap();
+
+            self.ip = self.reg[self.ip_reg];
+            self.ip += 1;
+        }
+        None
+    }
+
+    pub fn run_d21_s2(&mut self) -> Option<usize> {
+        let mut values = HashSet::new();
+        let mut last_inserted = 0;
+        while self.ip < self.program.len() {
+            self.reg[self.ip_reg] = self.ip;
+
+            let instr = &self.program[self.ip];
+            if instr.op == Op::Eqrr {
+                if !values.insert(self.reg[1]) {
+                    return Some(last_inserted);
+                } else {
+                    last_inserted = self.reg[1];
+                }
+            }
+            self.reg = exec_op(instr, &self.reg).unwrap();
+
+            self.ip = self.reg[self.ip_reg];
+            self.ip += 1;
+        }
+        None
+    }
+
     pub fn run_y2018_s2(&mut self, max_cycles: usize) -> usize {
         let mut cycles = 0;
         let mut max_reg = 0;
@@ -67,7 +107,7 @@ impl Wrist {
         max_reg
     }
 
-    pub fn from_str(input: &str) -> Wrist {
+    pub fn new_from_str(input: &str) -> Wrist {
         let ip_reg = input
             .lines()
             .next()

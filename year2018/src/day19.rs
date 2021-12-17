@@ -19,13 +19,13 @@ fn factors(n: usize) -> Vec<usize> {
 
 impl Day for Day19 {
     fn star1(&self, input: &str) -> String {
-        let mut wrist = Wrist::from_str(input);
+        let mut wrist = Wrist::new_from_str(input);
         wrist.run();
         format!("{}", wrist.reg[0])
     }
 
     fn star2(&self, input: &str) -> String {
-        let mut wrist = Wrist::from_str(input);
+        let mut wrist = Wrist::new_from_str(input);
         wrist.reg[0] = 1;
         let max_reg = wrist.run_y2018_s2(30);
         let sum_factors = factors(max_reg).into_iter().sum::<usize>();
