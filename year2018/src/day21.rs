@@ -14,14 +14,3 @@ impl Day for Day21 {
         format!("{}", wrist.run_d21_s2().unwrap())
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn ex1() {
-        let d = Day21 {};
-        assert_eq!(d.star1(""), "not implemented");
-    }
-}
