@@ -2,6 +2,7 @@ use std::collections::{HashMap, VecDeque};
 
 pub type IntSize = i64;
 
+#[derive(Clone)]
 struct IntcodeMem {
     mem: HashMap<IntSize, IntSize>,
 }
@@ -25,6 +26,7 @@ impl IntcodeMem {
     }
 }
 
+#[derive(Clone)]
 pub struct Intcode {
     pub state: RunState,
 
@@ -35,8 +37,9 @@ pub struct Intcode {
     rel_base: IntSize,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum RunState {
+    Reset,
     Halted,
     Running,
     Blocked,
@@ -70,7 +73,7 @@ impl Intcode {
             pc: 0,
             inp: VecDeque::new(),
             outp: VecDeque::new(),
-            state: RunState::Halted,
+            state: RunState::Reset,
             rel_base: 0,
         }
     }
@@ -89,7 +92,7 @@ impl Intcode {
         self.pc = 0;
         self.inp.clear();
         self.outp.clear();
-        self.state = RunState::Halted;
+        self.state = RunState::Reset;
         self.rel_base = 0;
     }
 
