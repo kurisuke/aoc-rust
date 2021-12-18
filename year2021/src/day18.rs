@@ -46,8 +46,6 @@ impl SfNum {
                 let nesting_level = front.iter().filter(|t| t == &&Token::BracketL).count()
                     - front.iter().filter(|t| t == &&Token::BracketR).count();
                 if nesting_level >= 4 {
-                    let mut front: Vec<_> = self.tokens[..i].to_vec();
-                    let mut back: Vec<_> = self.tokens[i + 5..].to_vec();
                     let lval = match w[1] {
                         Token::Num(n) => n,
                         _ => unreachable!(),
@@ -58,7 +56,7 @@ impl SfNum {
                     };
 
                     // add lval
-                    for t in front.iter_mut().rev() {
+                    for t in self.tokens[..i].iter_mut().rev() {
                         if let Token::Num(n) = t {
                             *t = Token::Num(*n + lval);
                             break;
@@ -66,16 +64,14 @@ impl SfNum {
                     }
 
                     // add rval
-                    for t in back.iter_mut() {
+                    for t in self.tokens[i + 5..].iter_mut() {
                         if let Token::Num(n) = t {
                             *t = Token::Num(*n + rval);
                             break;
                         }
                     }
 
-                    front.push(Token::Num(0));
-                    front.extend(back);
-                    self.tokens = front;
+                    self.tokens.splice(i..i + 5, vec![Token::Num(0)]);
                     return true;
                 }
             }
@@ -102,11 +98,7 @@ impl SfNum {
                         Token::BracketR,
                     ];
 
-                    let mut front: Vec<_> = self.tokens[..i].to_vec();
-                    let back: Vec<_> = self.tokens[i + 1..].to_vec();
-                    front.extend(middle);
-                    front.extend(back);
-                    self.tokens = front;
+                    self.tokens.splice(i..i + 1, middle);
                     return true;
                 }
             }
