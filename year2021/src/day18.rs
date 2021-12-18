@@ -33,47 +33,55 @@ impl SfNum {
     }
 
     fn explode(&mut self) -> bool {
+        let mut nesting_level = 0;
         for (i, w) in self.tokens.windows(5).enumerate() {
+            if i > 0 {
+                match self.tokens[i] {
+                    Token::BracketL => {
+                        nesting_level += 1;
+                    }
+                    Token::BracketR => {
+                        nesting_level -= 1;
+                    }
+                    _ => {}
+                }
+            }
+
             // find pair
-            if w[0] == Token::BracketL
+            if nesting_level >= 4
+                && w[0] == Token::BracketL
                 && matches!(w[1], Token::Num(_))
                 && w[2] == Token::Comma
                 && matches!(w[3], Token::Num(_))
                 && w[4] == Token::BracketR
             {
-                // check nesting level
-                let front = &self.tokens[..i];
-                let nesting_level = front.iter().filter(|t| t == &&Token::BracketL).count()
-                    - front.iter().filter(|t| t == &&Token::BracketR).count();
-                if nesting_level >= 4 {
-                    let lval = match w[1] {
-                        Token::Num(n) => n,
-                        _ => unreachable!(),
-                    };
-                    let rval = match w[3] {
-                        Token::Num(n) => n,
-                        _ => unreachable!(),
-                    };
+                let lval = match w[1] {
+                    Token::Num(n) => n,
+                    _ => unreachable!(),
+                };
+                let rval = match w[3] {
+                    Token::Num(n) => n,
+                    _ => unreachable!(),
+                };
 
-                    // add lval
-                    for t in self.tokens[..i].iter_mut().rev() {
-                        if let Token::Num(n) = t {
-                            *t = Token::Num(*n + lval);
-                            break;
-                        }
+                // add lval
+                for t in self.tokens[..i].iter_mut().rev() {
+                    if let Token::Num(n) = t {
+                        *t = Token::Num(*n + lval);
+                        break;
                     }
-
-                    // add rval
-                    for t in self.tokens[i + 5..].iter_mut() {
-                        if let Token::Num(n) = t {
-                            *t = Token::Num(*n + rval);
-                            break;
-                        }
-                    }
-
-                    self.tokens.splice(i..i + 5, vec![Token::Num(0)]);
-                    return true;
                 }
+
+                // add rval
+                for t in self.tokens[i + 5..].iter_mut() {
+                    if let Token::Num(n) = t {
+                        *t = Token::Num(*n + rval);
+                        break;
+                    }
+                }
+
+                self.tokens.splice(i..i + 5, vec![Token::Num(0)]);
+                return true;
             }
         }
         false
