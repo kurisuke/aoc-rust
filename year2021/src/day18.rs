@@ -172,6 +172,20 @@ fn sum(nums: &[SfNum]) -> SfNum {
     sum
 }
 
+fn get_max_mgt(nums: &[SfNum]) -> usize {
+    let mut max_mgt = 0;
+    for (i, ni) in nums.iter().enumerate() {
+        for (j, nj) in nums.iter().enumerate() {
+            if i != j {
+                let mut nsum = ni.clone();
+                nsum.add(nj);
+                max_mgt = max_mgt.max(nsum.magnitude());
+            }
+        }
+    }
+    max_mgt
+}
+
 fn parse_input(input: &str) -> Vec<SfNum> {
     input.lines().map(SfNum::new).collect()
 }
@@ -205,8 +219,10 @@ impl Day for Day18 {
         format!("{}", sf_sum.magnitude())
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let sf_nums = parse_input(input);
+        let max_mgt = get_max_mgt(&sf_nums);
+        format!("{}", max_mgt)
     }
 }
 
@@ -362,5 +378,6 @@ mod tests {
 
         let d = Day18 {};
         assert_eq!(d.star1(input), "4140");
+        assert_eq!(d.star2(input), "3993");
     }
 }
