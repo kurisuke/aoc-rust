@@ -8,6 +8,7 @@ mod day04;
 mod day05;
 mod day06;
 mod day07;
+mod day08;
 
 pub struct Year2019 {}
 
@@ -21,6 +22,7 @@ impl Year for Year2019 {
             5 => Some(Box::new(day05::Day05 {})),
             6 => Some(Box::new(day06::Day06 {})),
             7 => Some(Box::new(day07::Day07 {})),
+            8 => Some(Box::new(day08::Day08 {})),
             _ => None,
         }
     }
