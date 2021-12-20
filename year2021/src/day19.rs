@@ -1,13 +1,27 @@
 use common::day::Day;
 use std::collections::{HashMap, HashSet};
+use std::hash::{Hash, Hasher};
 
 pub struct Day19 {}
 
-#[derive(Eq, PartialEq, Hash, Debug, Copy, Clone)]
+#[derive(Eq, Debug, Copy, Clone)]
 struct Vec3D {
     x: i64,
     y: i64,
     z: i64,
+}
+
+// Seems that the fxhash is slower than this:
+impl Hash for Vec3D {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write_i64(self.x ^ self.y ^ self.z);
+    }
+}
+
+impl PartialEq for Vec3D {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y && self.z == other.z
+    }
 }
 
 impl Vec3D {
