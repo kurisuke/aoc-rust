@@ -222,7 +222,7 @@ impl Day for Day24 {
 
     fn star2(&self, input: &str) -> String {
         let armies_orig = parse_input(input);
-        let mut boost = 40;
+        let mut boost = 1;
         loop {
             let mut armies = armies_orig.clone();
             immune_boost(&mut armies, boost);
