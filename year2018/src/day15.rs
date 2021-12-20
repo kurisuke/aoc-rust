@@ -86,7 +86,7 @@ fn find_move_step(
     let move_target = adjacents
         .iter()
         .filter_map(|a| {
-            if let Some(dist) = bfs(grid, unit_pos, &a) {
+            if let Some(dist) = bfs(grid, unit_pos, a) {
                 return Some((dist, a));
             }
             None
