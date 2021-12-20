@@ -1,4 +1,5 @@
 use common::day::Day;
+use util::intcode::Intcode;
 
 pub struct Day07 {}
 
@@ -24,6 +25,10 @@ fn sum_seq(n: i64) -> i64 {
 
 impl Day for Day07 {
     fn star1(&self, input: &str) -> String {
+        let mut intcode = Intcode::new_from_str(input);
+        intcode.run();
+        print!("Easter egg: {}", intcode.read_outp_ascii());
+
         let pos = parse_input(input);
         let pos_min = *pos.iter().min().unwrap();
         let pos_max = *pos.iter().max().unwrap();
