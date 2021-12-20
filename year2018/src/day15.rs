@@ -55,14 +55,14 @@ fn find_adjacent(grid: &Grid2D<Field>, targets: &BTreeSet<Coords>) -> BTreeSet<C
     adjacents
 }
 
-fn bfs(grid: &Grid2D<Field>, src: &Coords, dests: &BTreeSet<Coords>) -> Option<usize> {
+fn bfs(grid: &Grid2D<Field>, src: &Coords, dest: &Coords) -> Option<usize> {
     let mut visited = HashSet::new();
     let mut frontier = VecDeque::new();
     frontier.push_back((*src, 0));
     visited.insert(*src);
 
     while let Some((f, dist)) = frontier.pop_front() {
-        if dests.contains(&f) {
+        if &f == dest {
             return Some(dist);
         } else {
             for n in grid.neighbors_cardinal_coords(&f) {
@@ -83,23 +83,37 @@ fn find_move_step(
     unit_pos: &Coords,
     adjacents: &BTreeSet<Coords>,
 ) -> Option<Coords> {
-    // for all neighboring fields
-    let move_cands = grid.neighbors_cardinal_coords(unit_pos);
-    let mut move_cands: Vec<(usize, Coords)> = move_cands
-        .into_iter()
-        .filter_map(|cand| {
-            if let Some(Field::Open) = grid.at(&cand) {
-                if let Some(dist) = bfs(grid, &cand, adjacents) {
-                    return Some((dist, cand));
-                }
+    let move_target = adjacents
+        .iter()
+        .filter_map(|a| {
+            if let Some(dist) = bfs(grid, unit_pos, &a) {
+                return Some((dist, a));
             }
             None
         })
-        .collect();
-    // chose neighboring field with shortest path. on tie, choose first in order
-    move_cands.sort();
+        .min();
 
-    move_cands.into_iter().map(|(_, pos)| pos).next()
+    if let Some(move_target) = move_target {
+        // for all neighboring fields
+        let move_cands = grid.neighbors_cardinal_coords(unit_pos);
+        let mut move_cands: Vec<(usize, Coords)> = move_cands
+            .into_iter()
+            .filter_map(|cand| {
+                if let Some(Field::Open) = grid.at(&cand) {
+                    if let Some(dist) = bfs(grid, &cand, move_target.1) {
+                        return Some((dist, cand));
+                    }
+                }
+                None
+            })
+            .collect();
+        // chose neighboring field with shortest path. on tie, choose first in order
+        move_cands.sort();
+
+        move_cands.into_iter().map(|(_, pos)| pos).next()
+    } else {
+        None
+    }
 }
 
 fn find_in_range(
