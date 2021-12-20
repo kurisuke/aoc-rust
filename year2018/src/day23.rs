@@ -173,9 +173,9 @@ fn bounding_cube(bots: &[Bot]) -> Cube {
         .map(|b| b.pos.z)
         .unwrap();
 
-    let length_x = max_x - min_x;
-    let length_y = max_y - min_y;
-    let length_z = max_z - min_z;
+    let length_x = max_x - min_x + 1;
+    let length_y = max_y - min_y + 1;
+    let length_z = max_z - min_z + 1;
     let length_max = length_x.max(length_y).max(length_z);
 
     let mut length_2 = 1;
