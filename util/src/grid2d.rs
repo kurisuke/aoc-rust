@@ -209,6 +209,13 @@ impl<T> Grid2D<T> {
         self.width as i64
     }
 
+    pub fn dimensions(&self) -> Coords {
+        Coords {
+            x: self.width as i64,
+            y: self.height as i64,
+        }
+    }
+
     pub fn col(&self, x: i64) -> Option<Vec<&T>> {
         (0..self.height)
             .map(|y| self.at(&Coords { x, y: y as i64 }))
