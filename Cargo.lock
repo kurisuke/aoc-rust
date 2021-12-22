@@ -879,6 +879,7 @@ dependencies = [
  "common",
  "itertools",
  "regex",
+ "scan_fmt",
  "util",
 ]
 
