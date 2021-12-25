@@ -2,10 +2,8 @@ use common::day::Day;
 
 pub struct Day24 {}
 
-
-
 impl Day for Day24 {
-    fn star1(&self, input: &str) -> String {
+    fn star1(&self, _input: &str) -> String {
         String::from("not implemented")
     }
 
