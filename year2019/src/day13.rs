@@ -1,7 +1,7 @@
 use common::day::Day;
 use std::cmp::Ordering;
 use std::collections::HashMap;
-use util::intcode::{Intcode,IntSize,RunState};
+use util::intcode::{IntSize, Intcode, RunState};
 
 pub struct Day13 {}
 
@@ -28,8 +28,16 @@ fn play(intcode: &mut Intcode) -> IntSize {
 
     while intcode.state != RunState::Halted {
         score = read_screen(&mut screen, intcode);
-        let paddle_x = screen.iter().find(|(_, v)| v == &&3).map(|(k, _)| k.0).unwrap();
-        let ball_x = screen.iter().find(|(_, v)| v == &&4).map(|(k, _)| k.0).unwrap();
+        let paddle_x = screen
+            .iter()
+            .find(|(_, v)| v == &&3)
+            .map(|(k, _)| k.0)
+            .unwrap();
+        let ball_x = screen
+            .iter()
+            .find(|(_, v)| v == &&4)
+            .map(|(k, _)| k.0)
+            .unwrap();
 
         let inp = match ball_x.cmp(&paddle_x) {
             Ordering::Less => -1,
