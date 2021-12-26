@@ -1,4 +1,5 @@
 use common::day::Day;
+use std::collections::HashSet;
 use util::grid2d::{Coords, Direction, Grid2D};
 use util::intcode::{IntSize, Intcode};
 
@@ -113,27 +114,53 @@ fn find_robot(grid: &Grid2D<char>) -> Option<(Coords, char)> {
     None
 }
 
+fn subsequences(strings: &[String], max_len: usize) -> HashSet<String> {
+    let mut ret = HashSet::new();
+    for i in 1..=max_len {
+        for (j, w) in strings.windows(i * 2).enumerate() {
+            if j % 2 == 0 {
+                ret.insert(w.join(","));
+            }
+        }
+    }
+    ret
+}
+
+fn find_compression(movements: &[String]) -> Option<(String, String, String, String)> {
+    let subs = subsequences(movements, 5);
+
+    let movements = movements.join(",");
+    for a in subs.iter() {
+        for b in subs.iter() {
+            if a != b {
+                for c in subs.iter() {
+                    if a != c && b != c {
+                        let main = movements.replace(a, "A").replace(b, "B").replace(c, "C");
+                        if main
+                            .chars()
+                            .all(|c| c == 'A' || c == 'B' || c == 'C' || c == ',')
+                            && main.len() <= 20
+                        {
+                            return Some((main, a.clone(), b.clone(), c.clone()));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    None
+}
+
 fn part2(program: &str, grid: &mut Grid2D<char>) -> IntSize {
     let movements = get_movements(grid);
-
-    // manual partitioning for the input, as I could not be bothered
-    // to code a general solution
-    let main = "A,B,B,C,B,C,B,C,A,A";
-    let prog_a = "L,6,R,8,L,4,R,8,L,12";
-    let prog_b = "L,12,R,10,L,4";
-    let prog_c = "L,12,L,6,L,4,L,4";
-    let expansion = main
-        .replace("A", prog_a)
-        .replace("B", prog_b)
-        .replace("C", prog_c);
-    assert_eq!(expansion, movements.join(","));
+    let (main, prog_a, prog_b, prog_c) = find_compression(&movements).unwrap();
 
     let mut intcode = Intcode::new_from_str(program);
     intcode.set_mem_at(0, 2);
-    feed_program(&mut intcode, main);
-    feed_program(&mut intcode, prog_a);
-    feed_program(&mut intcode, prog_b);
-    feed_program(&mut intcode, prog_c);
+    feed_program(&mut intcode, &main);
+    feed_program(&mut intcode, &prog_a);
+    feed_program(&mut intcode, &prog_b);
+    feed_program(&mut intcode, &prog_c);
 
     // disable continuous video feed
     intcode.write_inp_ascii("n\n");
