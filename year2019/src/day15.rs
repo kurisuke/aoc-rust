@@ -170,14 +170,3 @@ impl Day for Day15 {
         format!("{}", flood(&mut maze))
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn ex1() {
-        let d = Day15 {};
-        assert_eq!(d.star1(""), "not implemented");
-    }
-}
