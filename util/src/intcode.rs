@@ -133,6 +133,10 @@ impl Intcode {
         self.mem.load(a)
     }
 
+    pub fn set_mem_at(&mut self, a: IntSize, v: IntSize) {
+        self.mem.store(a, v);
+    }
+
     pub fn run(&mut self) {
         self.state = RunState::Running;
         while self.state == RunState::Running {
