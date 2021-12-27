@@ -10,5 +10,6 @@ edition = "2018"
 common = { path = "../common" }
 util = { path = "../util" }
 itertools = "0.10.3"
+num-bigint = "0.4.3"
 regex = "1.5.4"
 scan_fmt = "0.2.6"
