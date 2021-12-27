@@ -1,10 +1,10 @@
 use common::day::Day;
 use std::collections::{HashSet, VecDeque};
-use util::intcode::{Intcode,IntSize};
+use util::intcode::{IntSize, Intcode};
 
 pub struct Day23 {}
 
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 struct Packet {
     dest: IntSize,
     x: IntSize,
@@ -24,7 +24,6 @@ fn sim_network(input: &str, part1: bool) -> IntSize {
     let mut last_nat_y = None;
 
     loop {
-
         // send phase
         let mut send_queue = VecDeque::new();
         for comp in comps.iter_mut() {
@@ -87,16 +86,5 @@ impl Day for Day23 {
 
     fn star2(&self, input: &str) -> String {
         format!("{}", sim_network(input, false))
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn ex1() {
-        let d = Day23 {};
-        assert_eq!(d.star1(""), "not implemented");
     }
 }
