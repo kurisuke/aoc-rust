@@ -35,6 +35,7 @@ dependencies = [
  "year2019",
  "year2020",
  "year2021",
+ "year2022",
 ]
 
 [[package]]
@@ -961,5 +962,13 @@ dependencies = [
  "common",
  "itertools",
  "scan_fmt",
+ "util",
+]
+
+[[package]]
+name = "year2022"
+version = "0.1.0"
+dependencies = [
+ "common",
  "util",
 ]
