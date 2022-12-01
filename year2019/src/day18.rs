@@ -65,7 +65,7 @@ type KeyPaths = HashMap<(char, char), KeyPath>;
 
 fn find_all_keys(grid: &Grid2D<char>) -> HashMap<char, Coords> {
     grid.coords_iter()
-        .map(|c| {
+        .filter_map(|c| {
             let v = grid.at(&c).unwrap();
             if v == &'@' || (v.is_alphabetic() && v.is_lowercase()) {
                 Some((*v, c))
@@ -73,7 +73,6 @@ fn find_all_keys(grid: &Grid2D<char>) -> HashMap<char, Coords> {
                 None
             }
         })
-        .flatten()
         .collect()
 }
 

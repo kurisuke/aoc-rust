@@ -9,7 +9,7 @@ type Grids = HashMap<i64, Grid2D<char>>;
 fn rating(grid: &Grid2D<char>) -> usize {
     let mut rating = 0;
     for (i, c) in grid.coords_iter().enumerate() {
-        rating += (1 << i) * if grid.at(&c).unwrap() == &'#' { 1 } else { 0 };
+        rating += (1 << i) * usize::from(grid.at(&c).unwrap() == &'#');
     }
     rating
 }
