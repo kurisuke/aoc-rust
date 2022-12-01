@@ -12,7 +12,7 @@ struct Room<'a> {
 }
 
 fn calc_checksum(s: &str) -> String {
-    let freq = char_distribution(&s.replace("-", ""));
+    let freq = char_distribution(&s.replace('-', ""));
     let mut freq: Vec<(_, _)> = freq.iter().collect();
     freq.sort_by(|a, b| match a.1.cmp(b.1) {
         Ordering::Less => Ordering::Greater,

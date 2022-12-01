@@ -49,7 +49,7 @@ impl<'a> PartialOrd for StateSearch<'a> {
 fn dist(a: &State, b: &State) -> usize {
     ((b.equipment.values().sum::<usize>() + a.elevator) as isize
         - (b.equipment.values().sum::<usize>() + b.elevator) as isize)
-        .abs() as usize
+        .unsigned_abs()
 }
 
 fn neighbors<'a>(state: &State<'a>) -> Vec<State<'a>> {

@@ -3,7 +3,7 @@ use common::day::Day;
 pub struct Day16 {}
 
 fn fill_disk(input: &[bool], req_size: usize) -> Vec<bool> {
-    let mut output: Vec<_> = input.iter().copied().collect();
+    let mut output = input.to_vec();
     while output.len() < req_size {
         let inv: Vec<_> = output.iter().rev().copied().map(|x| !x).collect();
         output.push(false);
@@ -14,7 +14,7 @@ fn fill_disk(input: &[bool], req_size: usize) -> Vec<bool> {
 }
 
 fn checksum(data: &[bool]) -> String {
-    let mut checksum: Vec<_> = data.iter().copied().collect();
+    let mut checksum = data.to_vec();
     while checksum.len() % 2 == 0 {
         checksum = checksum.chunks(2).map(|c| c[0] == c[1]).collect();
     }

@@ -53,7 +53,7 @@ fn apply_cmd(display: &mut Grid2D<char>, cmd: &Cmd) {
 fn parse_input(input: &str) -> Vec<Cmd> {
     input
         .lines()
-        .map(|line| {
+        .filter_map(|line| {
             if line.starts_with("rect") {
                 let parts: Vec<_> = line.split_whitespace().collect();
                 let coords: Vec<_> = parts[1]
@@ -77,7 +77,6 @@ fn parse_input(input: &str) -> Vec<Cmd> {
                 None
             }
         })
-        .flatten()
         .collect()
 }
 

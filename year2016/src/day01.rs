@@ -12,7 +12,7 @@ enum LR {
 fn parse_input(input: &str) -> Vec<(LR, isize)> {
     input
         .split(", ")
-        .map(|cmd| {
+        .filter_map(|cmd| {
             if cmd.len() < 2 {
                 None
             } else {
@@ -27,7 +27,6 @@ fn parse_input(input: &str) -> Vec<(LR, isize)> {
                 Some((lr, n))
             }
         })
-        .flatten()
         .collect()
 }
 

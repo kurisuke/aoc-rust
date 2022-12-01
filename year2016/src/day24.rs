@@ -35,7 +35,7 @@ fn search(grid: &Grid2D<char>, from: &Coords, max_num: usize, no_return: bool) -
     while !frontier.is_empty() {
         let mut current = frontier.pop_front().unwrap();
         let ch = grid.at(&current.pos).unwrap();
-        if ch.is_digit(10) {
+        if ch.is_ascii_digit() {
             current.visited.insert(*ch);
             if (current.visited.len() == max_num + 1) && (no_return || *ch == '0') {
                 return Some(current.steps);

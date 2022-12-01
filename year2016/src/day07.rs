@@ -42,14 +42,13 @@ fn find_aba(s: &str) -> Vec<(char, char)> {
     let chars: Vec<_> = s.chars().collect();
     chars
         .windows(3)
-        .map(|w| {
+        .filter_map(|w| {
             if w[0] == w[2] && w[0] != w[1] {
                 Some((w[0], w[1]))
             } else {
                 None
             }
         })
-        .flatten()
         .collect()
 }
 
@@ -78,11 +77,8 @@ impl Day for Day07 {
             .lines()
             .filter(|line| {
                 let (inside_slices, outside_slices) = split_by_brackets(line);
-                let abas: Vec<(char, char)> = outside_slices
-                    .iter()
-                    .map(|sl| find_aba(sl))
-                    .flatten()
-                    .collect();
+                let abas: Vec<(char, char)> =
+                    outside_slices.iter().flat_map(|sl| find_aba(sl)).collect();
                 abas.iter()
                     .any(|x| inside_slices.iter().any(|s| has_bab(s, x.0, x.1)))
             })

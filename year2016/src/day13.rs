@@ -26,7 +26,7 @@ impl PartialOrd for State {
 }
 
 fn dist(a: &(usize, usize), b: &(usize, usize)) -> usize {
-    (a.0 as isize - b.0 as isize).abs() as usize + (a.1 as isize - b.1 as isize).abs() as usize
+    (a.0 as isize - b.0 as isize).unsigned_abs() + (a.1 as isize - b.1 as isize).unsigned_abs()
 }
 
 fn is_wall(pos: &(usize, usize), magic: usize) -> bool {

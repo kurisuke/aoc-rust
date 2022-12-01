@@ -21,7 +21,7 @@ struct Bot {
 
 type Outputs = Vec<Option<usize>>;
 
-fn run_transfers(bots: &mut Vec<Bot>, outputs: &mut Outputs, transfers: &[usize]) {
+fn run_transfers(bots: &mut [Bot], outputs: &mut Outputs, transfers: &[usize]) {
     for src_id in transfers {
         let (val_lo, val_hi) = if bots[*src_id].chips[0] < bots[*src_id].chips[1] {
             (bots[*src_id].chips[0], bots[*src_id].chips[1])
