@@ -75,11 +75,7 @@ impl Day for Day07 {
     fn star1(&self, input: &str) -> String {
         let discs = parse_input(input);
         let all_nodes: HashSet<_> = discs.keys().collect();
-        let child_nodes: HashSet<_> = discs
-            .values()
-            .map(|v| v.children.iter())
-            .flatten()
-            .collect();
+        let child_nodes: HashSet<_> = discs.values().flat_map(|v| v.children.iter()).collect();
         (&all_nodes - &child_nodes)
             .iter()
             .next()
@@ -90,11 +86,7 @@ impl Day for Day07 {
     fn star2(&self, input: &str) -> String {
         let discs = parse_input(input);
         let all_nodes: HashSet<_> = discs.keys().collect();
-        let child_nodes: HashSet<_> = discs
-            .values()
-            .map(|v| v.children.iter())
-            .flatten()
-            .collect();
+        let child_nodes: HashSet<_> = discs.values().flat_map(|v| v.children.iter()).collect();
         let root_node_name = *(&all_nodes - &child_nodes).iter().next().unwrap();
         // print_tree_weights(&discs, root_node_name);
 

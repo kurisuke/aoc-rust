@@ -46,7 +46,7 @@ fn last_corner(n: usize) -> (usize, usize) {
 }
 
 fn dist(c: (isize, isize)) -> usize {
-    c.0.abs() as usize + c.1.abs() as usize
+    c.0.unsigned_abs() + c.1.unsigned_abs()
 }
 
 fn neighbors(c: &(isize, isize)) -> Vec<(isize, isize)> {
@@ -80,8 +80,7 @@ impl Day for Day03 {
             let pos = coords_nth(n);
             last_written = neighbors(&pos)
                 .iter()
-                .map(|c| vals.get(c))
-                .flatten()
+                .filter_map(|c| vals.get(c))
                 .sum::<usize>();
             vals.insert(pos, last_written);
         }

@@ -16,7 +16,6 @@ fn cycle(banks: &mut Vec<usize>) {
 impl Day for Day06 {
     fn star1(&self, input: &str) -> String {
         let mut banks: Vec<_> = input
-            .trim()
             .split_whitespace()
             .map(|n| n.parse::<usize>().unwrap())
             .collect();
@@ -33,7 +32,6 @@ impl Day for Day06 {
 
     fn star2(&self, input: &str) -> String {
         let mut banks: Vec<_> = input
-            .trim()
             .split_whitespace()
             .map(|n| n.parse::<usize>().unwrap())
             .collect();

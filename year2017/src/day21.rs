@@ -66,10 +66,10 @@ fn evolve(grid: Grid2D<char>, replacements: &Replacements) -> Grid2D<char> {
 fn parse_input(input: &str) -> Replacements {
     input
         .lines()
-        .map(|line| {
+        .flat_map(|line| {
             let parts: Vec<_> = line.split(" => ").collect();
-            let key = Grid2D::new(&parts[0].replace("/", "\n")).unwrap();
-            let value = Grid2D::new(&parts[1].replace("/", "\n")).unwrap();
+            let key = Grid2D::new(&parts[0].replace('/', "\n")).unwrap();
+            let value = Grid2D::new(&parts[1].replace('/', "\n")).unwrap();
             let mut transforms = vec![];
             for flip in [Flip::FlipNone, Flip::FlipH].iter() {
                 let trans = key.flip(*flip);
@@ -80,7 +80,6 @@ fn parse_input(input: &str) -> Replacements {
             }
             transforms
         })
-        .flatten()
         .collect()
 }
 

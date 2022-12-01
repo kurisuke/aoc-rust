@@ -6,14 +6,13 @@ fn sum_equal(digits: &[char], off: usize) -> u32 {
     digits
         .iter()
         .enumerate()
-        .map(|(i, c)| {
+        .filter_map(|(i, c)| {
             if *c == digits[(i + off) % digits.len()] {
                 Some(c.to_digit(10).unwrap())
             } else {
                 None
             }
         })
-        .flatten()
         .sum::<u32>()
 }
 
