@@ -22,7 +22,13 @@ pub fn download(year_no: usize, day_no: usize) {
         .unwrap();
 
     let agent = ureq::builder().cookie_store(store).build();
-    let body = agent.get(&dl_url).call().unwrap().into_string().unwrap();
+    let body = agent
+        .get(&dl_url)
+        .set("User-Agent", &env::var("USER_AGENT").unwrap())
+        .call()
+        .unwrap()
+        .into_string()
+        .unwrap();
 
     let filename = format!("input/year{:04}/day{:02}.input", year_no, day_no);
     std::fs::write(filename, body).unwrap();
