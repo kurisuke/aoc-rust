@@ -23,7 +23,7 @@ pub enum Wrap {
 }
 
 #[allow(dead_code)]
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Flip {
     FlipNone,
     FlipH,
@@ -31,7 +31,7 @@ pub enum Flip {
 }
 
 #[allow(dead_code)]
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Direction {
     N,
     NE,
@@ -115,7 +115,7 @@ impl SubAssign for Coords {
 
 impl Coords {
     pub fn manhattan(&self, other: &Coords) -> u64 {
-        (self.x - other.x).abs() as u64 + (self.y - other.y).abs() as u64
+        (self.x - other.x).unsigned_abs() + (self.y - other.y).unsigned_abs()
     }
 
     pub fn mov(&self, d: Direction) -> Coords {

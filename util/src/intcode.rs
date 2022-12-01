@@ -37,7 +37,7 @@ pub struct Intcode {
     rel_base: IntSize,
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum RunState {
     Reset,
     Halted,
@@ -216,7 +216,7 @@ impl Intcode {
                 // lt
                 let p1 = self.mem.load(a[0]);
                 let p2 = self.mem.load(a[1]);
-                let res = if p1 < p2 { 1 } else { 0 };
+                let res = i64::from(p1 < p2);
                 self.mem.store(a[2], res);
                 self.pc += 4;
             }
@@ -224,7 +224,7 @@ impl Intcode {
                 // eq
                 let p1 = self.mem.load(a[0]);
                 let p2 = self.mem.load(a[1]);
-                let res = if p1 == p2 { 1 } else { 0 };
+                let res = i64::from(p1 == p2);
                 self.mem.store(a[2], res);
                 self.pc += 4;
             }

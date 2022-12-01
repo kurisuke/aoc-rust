@@ -244,7 +244,7 @@ fn exec_op(instr: &Instruction, regs_in: &Registers) -> Option<Registers> {
         }
         Op::Gtir => {
             if instr.b < 6 && instr.c < 6 {
-                regs_out[instr.c] = if instr.a > regs_in[instr.b] { 1 } else { 0 };
+                regs_out[instr.c] = usize::from(instr.a > regs_in[instr.b]);
                 Some(regs_out)
             } else {
                 None
@@ -252,7 +252,7 @@ fn exec_op(instr: &Instruction, regs_in: &Registers) -> Option<Registers> {
         }
         Op::Gtri => {
             if instr.a < 6 && instr.c < 6 {
-                regs_out[instr.c] = if regs_in[instr.a] > instr.b { 1 } else { 0 };
+                regs_out[instr.c] = usize::from(regs_in[instr.a] > instr.b);
                 Some(regs_out)
             } else {
                 None
@@ -260,11 +260,7 @@ fn exec_op(instr: &Instruction, regs_in: &Registers) -> Option<Registers> {
         }
         Op::Gtrr => {
             if instr.a < 6 && instr.b < 6 && instr.c < 6 {
-                regs_out[instr.c] = if regs_in[instr.a] > regs_in[instr.b] {
-                    1
-                } else {
-                    0
-                };
+                regs_out[instr.c] = usize::from(regs_in[instr.a] > regs_in[instr.b]);
                 Some(regs_out)
             } else {
                 None
@@ -272,7 +268,7 @@ fn exec_op(instr: &Instruction, regs_in: &Registers) -> Option<Registers> {
         }
         Op::Eqir => {
             if instr.b < 6 && instr.c < 6 {
-                regs_out[instr.c] = if instr.a == regs_in[instr.b] { 1 } else { 0 };
+                regs_out[instr.c] = usize::from(instr.a == regs_in[instr.b]);
                 Some(regs_out)
             } else {
                 None
@@ -280,7 +276,7 @@ fn exec_op(instr: &Instruction, regs_in: &Registers) -> Option<Registers> {
         }
         Op::Eqri => {
             if instr.a < 6 && instr.c < 6 {
-                regs_out[instr.c] = if regs_in[instr.a] == instr.b { 1 } else { 0 };
+                regs_out[instr.c] = usize::from(regs_in[instr.a] == instr.b);
                 Some(regs_out)
             } else {
                 None
@@ -288,11 +284,7 @@ fn exec_op(instr: &Instruction, regs_in: &Registers) -> Option<Registers> {
         }
         Op::Eqrr => {
             if instr.a < 6 && instr.b < 6 && instr.c < 6 {
-                regs_out[instr.c] = if regs_in[instr.a] == regs_in[instr.b] {
-                    1
-                } else {
-                    0
-                };
+                regs_out[instr.c] = usize::from(regs_in[instr.a] == regs_in[instr.b]);
                 Some(regs_out)
             } else {
                 None

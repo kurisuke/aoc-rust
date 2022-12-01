@@ -45,9 +45,9 @@ impl HexCoord {
     }
 
     pub fn dist(self, other: &HexCoord) -> u32 {
-        ((self.0 - other.0).abs() as u32
-            + (self.0 + self.1 - other.0 - other.1).abs() as u32
-            + (self.1 - other.1).abs() as u32)
+        ((self.0 - other.0).unsigned_abs()
+            + (self.0 + self.1 - other.0 - other.1).unsigned_abs()
+            + (self.1 - other.1).unsigned_abs())
             / 2
     }
 }

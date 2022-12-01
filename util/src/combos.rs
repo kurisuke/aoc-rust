@@ -9,7 +9,7 @@ pub fn get_combos(target: usize, containers: &[usize]) -> Vec<Vec<usize>> {
             }
             Ordering::Greater => {
                 let new_target = target - container;
-                let new_containers: Vec<usize> = containers[idx + 1..].iter().copied().collect();
+                let new_containers = containers[idx + 1..].to_vec();
                 for sub_combo in get_combos(new_target, &new_containers) {
                     let mut combo = vec![*container];
                     combo.extend(&sub_combo);

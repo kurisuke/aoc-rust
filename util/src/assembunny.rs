@@ -169,7 +169,7 @@ fn parse_val(s: &str) -> Val {
 fn parse_input(input: &str) -> Vec<Op> {
     input
         .lines()
-        .map(|line| {
+        .filter_map(|line| {
             let words: Vec<_> = line.split_whitespace().collect();
             match words[0] {
                 "cpy" => Some(Op::Cpy(parse_val(words[1]), to_regid(words[2]).unwrap())),
@@ -181,6 +181,5 @@ fn parse_input(input: &str) -> Vec<Op> {
                 _ => None,
             }
         })
-        .flatten()
         .collect()
 }
