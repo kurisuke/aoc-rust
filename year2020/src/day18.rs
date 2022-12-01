@@ -130,8 +130,8 @@ where
     input
         .lines()
         .map(|l| {
-            let l = l.replace("(", " ( ");
-            let l = l.replace(")", " ) ");
+            let l = l.replace('(', " ( ");
+            let l = l.replace(')', " ) ");
             let tokens: Vec<_> = l.split_whitespace().collect();
             convert_rpn(&tokens, precedence_fn)
         })

@@ -25,8 +25,8 @@ fn seat_str_to_id(seat_str: &str) -> u16 {
     let fb_str = &seat_str[0..7];
     let lr_str = &seat_str[7..10];
 
-    u16::from_str_radix(&fb_str.replace("F", "0").replace("B", "1"), 2).unwrap() * 8
-        + u16::from_str_radix(&lr_str.replace("L", "0").replace("R", "1"), 2).unwrap()
+    u16::from_str_radix(&fb_str.replace('F', "0").replace('B', "1"), 2).unwrap() * 8
+        + u16::from_str_radix(&lr_str.replace('L', "0").replace('R', "1"), 2).unwrap()
 }
 
 #[cfg(test)]

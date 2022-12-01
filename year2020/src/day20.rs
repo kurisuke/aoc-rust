@@ -125,7 +125,7 @@ fn place_next(
 fn parse_input(input: &str) -> Tiles {
     input
         .split("\n\n")
-        .map(|sec| {
+        .filter_map(|sec| {
             let mut it = sec.lines();
             if let Some(first_line) = it.next() {
                 if !first_line.is_empty() {
@@ -140,7 +140,6 @@ fn parse_input(input: &str) -> Tiles {
                 None
             }
         })
-        .flatten()
         .collect()
 }
 

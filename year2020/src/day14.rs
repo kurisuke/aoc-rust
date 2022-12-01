@@ -25,7 +25,7 @@ fn parse_input(input: &str) -> Vec<Cmd> {
             });
         } else if left.starts_with("mem") {
             let sb = left.find('[').unwrap_or(0);
-            let eb = left.find(']').unwrap_or_else(|| left.len());
+            let eb = left.find(']').unwrap_or(left.len());
             let addr = left[sb + 1..eb].parse::<u64>().unwrap();
             let value = right.parse::<u64>().unwrap();
             cmds.push(Cmd::MemSet { addr, value });

@@ -60,8 +60,7 @@ fn match_seq<'a>(ruleset: &Ruleset, seq: &[usize], msg: &'a str) -> Vec<&'a str>
     } else {
         match_msg(ruleset, seq[0], msg)
             .iter()
-            .map(|rest| match_seq(ruleset, &seq[1..], rest))
-            .flatten()
+            .flat_map(|rest| match_seq(ruleset, &seq[1..], rest))
             .collect()
     }
 }

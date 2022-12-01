@@ -63,12 +63,11 @@ fn direct_neighbors(grid: &Grid2D<char>, coords: Coords) -> Vec<&char> {
 
 fn visible_neighbors(grid: &Grid2D<char>, coords: Coords) -> Vec<&char> {
     DIRS.iter()
-        .map(|d| {
+        .filter_map(|d| {
             grid.traverse_init_wrap(&coords, &Coords { x: d.0, y: d.1 }, Wrap::None)
                 .skip(1)
                 .find(|&&v| v != '.')
         })
-        .flatten()
         .collect()
 }
 
