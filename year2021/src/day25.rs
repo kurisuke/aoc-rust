@@ -11,7 +11,7 @@ fn move_cucumbers(grid: &mut Grid2D<char>, cucumber: char, offset: &Coords) {
     let move_coords: Vec<_> = grid
         .coords_iter()
         .filter(|c| grid.at(c).unwrap() == &cucumber)
-        .map(|c| {
+        .filter_map(|c| {
             let t = Coords {
                 x: (c.x + offset.x) % grid.width(),
                 y: (c.y + offset.y) % grid.height(),
@@ -22,7 +22,6 @@ fn move_cucumbers(grid: &mut Grid2D<char>, cucumber: char, offset: &Coords) {
                 None
             }
         })
-        .flatten()
         .collect();
     for (c, t) in move_coords {
         grid.set(&c, '.');

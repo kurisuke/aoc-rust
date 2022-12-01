@@ -46,7 +46,7 @@ fn parse_input(input: &str) -> (HashSet<Coords>, Vec<FoldInstr>) {
 fn fold(dots_in: &HashSet<Coords>, instr: &FoldInstr) -> HashSet<Coords> {
     dots_in
         .iter()
-        .map(|c| match instr {
+        .filter_map(|c| match instr {
             FoldInstr::X(fold_x) => match c.x.cmp(fold_x) {
                 Ordering::Less => Some(Coords { x: c.x, y: c.y }),
                 Ordering::Equal => None,
@@ -64,7 +64,6 @@ fn fold(dots_in: &HashSet<Coords>, instr: &FoldInstr) -> HashSet<Coords> {
                 }
             },
         })
-        .flatten()
         .collect()
 }
 

@@ -33,8 +33,7 @@ fn parse_input(input: &str) -> Grid2D<u32> {
 fn neighbors(pos: &Coords, grid: &Grid2D<u32>) -> Vec<(Coords, u32)> {
     grid.neighbors_cardinal_coords(pos)
         .into_iter()
-        .map(|n| grid.at(&n).map(|v| (n, *v)))
-        .flatten()
+        .filter_map(|n| grid.at(&n).map(|v| (n, *v)))
         .collect()
 }
 

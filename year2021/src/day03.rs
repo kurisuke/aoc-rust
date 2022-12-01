@@ -22,11 +22,7 @@ impl Day for Day03 {
 
 fn most_common_at_pos(numbers: &[u64], w: usize) -> u64 {
     let sum_ones = numbers.iter().filter(|n| *n & (1 << w) > 0).count();
-    if sum_ones * 2 >= numbers.len() {
-        1
-    } else {
-        0
-    }
+    u64::from(sum_ones * 2 >= numbers.len())
 }
 
 fn gamma_epsilon(numbers: &[u64], width: usize) -> (u64, u64) {
@@ -49,21 +45,15 @@ fn filter_numbers(numbers: &[u64], width: usize, most_common: bool) -> Option<u6
     for w in (0..width).rev() {
         let c = most_common_at_pos(&numbers, w);
         if most_common {
-            numbers = numbers
-                .into_iter()
-                .filter(|n| {
-                    let n_bit = (*n & (1 << w)) >> w;
-                    n_bit == c
-                })
-                .collect();
+            numbers.retain(|n| {
+                let n_bit = (*n & (1 << w)) >> w;
+                n_bit == c
+            });
         } else {
-            numbers = numbers
-                .into_iter()
-                .filter(|n| {
-                    let n_bit = (*n & (1 << w)) >> w;
-                    n_bit != c
-                })
-                .collect();
+            numbers.retain(|n| {
+                let n_bit = (*n & (1 << w)) >> w;
+                n_bit != c
+            });
         }
         if numbers.len() == 1 {
             return Some(numbers[0]);

@@ -57,14 +57,13 @@ fn closing_characters(chars: &[char]) -> Vec<char> {
     chars
         .iter()
         .rev()
-        .map(|c| match c {
+        .filter_map(|c| match c {
             '(' => Some(')'),
             '{' => Some('}'),
             '[' => Some(']'),
             '<' => Some('>'),
             _ => None,
         })
-        .flatten()
         .collect()
 }
 
@@ -84,7 +83,7 @@ impl Day for Day10 {
         let lines = parse_input(input);
         let mut scores: Vec<_> = lines
             .iter()
-            .map(|l| match find_syntax_error(l) {
+            .filter_map(|l| match find_syntax_error(l) {
                 Ok(chars) => {
                     let closing = closing_characters(&chars);
                     let mut score = 0u64;
@@ -102,7 +101,6 @@ impl Day for Day10 {
                 }
                 Err(_) => None,
             })
-            .flatten()
             .collect();
         scores.sort_unstable();
         let middle_score = scores[scores.len() / 2];
