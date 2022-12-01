@@ -12,11 +12,9 @@ struct Rectangle {
 
 impl Rectangle {
     fn inside_coords(&self) -> impl Iterator<Item = Coords> + '_ {
-        (self.top_left.x..(self.top_left.x + self.size.x))
-            .map(move |x| {
-                (self.top_left.y..(self.top_left.y + self.size.y)).map(move |y| Coords { x, y })
-            })
-            .flatten()
+        (self.top_left.x..(self.top_left.x + self.size.x)).flat_map(move |x| {
+            (self.top_left.y..(self.top_left.y + self.size.y)).map(move |y| Coords { x, y })
+        })
     }
 }
 

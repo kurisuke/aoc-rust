@@ -25,11 +25,7 @@ fn parse_input(input: &str) -> Steps {
 
     // find the start step
     let next_steps: HashSet<_> = steps.keys().cloned().collect();
-    let prev_steps: HashSet<_> = steps
-        .values()
-        .map(|v| v.iter().cloned())
-        .flatten()
-        .collect();
+    let prev_steps: HashSet<_> = steps.values().flat_map(|v| v.iter().cloned()).collect();
     let no_prev: HashSet<_> = prev_steps.difference(&next_steps).collect();
     for step in no_prev {
         steps.insert(*step, vec![]);

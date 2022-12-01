@@ -166,12 +166,12 @@ fn parse_army(input: &str, i: usize) -> Armies {
                     match sw[0] {
                         "weak" => {
                             for w in sw[2..].iter() {
-                                weak.insert(w.replace(",", ""));
+                                weak.insert(w.replace(',', ""));
                             }
                         }
                         "immune" => {
                             for w in sw[2..].iter() {
-                                immune.insert(w.replace(",", ""));
+                                immune.insert(w.replace(',', ""));
                             }
                         }
                         _ => { unreachable!(); }
@@ -205,8 +205,7 @@ fn parse_input(input: &str) -> Armies {
     input
         .split("\n\n")
         .enumerate()
-        .map(|(i, a)| parse_army(a, i))
-        .flatten()
+        .flat_map(|(i, a)| parse_army(a, i))
         .collect()
 }
 
