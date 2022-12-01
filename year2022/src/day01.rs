@@ -2,23 +2,22 @@ use common::day::Day;
 
 pub struct Day01 {}
 
-fn parse_input(input: &str) -> Vec<usize> {
+fn parse_input(input: &str) -> impl Iterator<Item = usize> + '_ {
     input
         .split("\n\n")
         .map(|elf| elf.lines().fold(0, |a, l| a + l.parse::<usize>().unwrap()))
-        .collect()
 }
 
 impl Day for Day01 {
     fn star1(&self, input: &str) -> String {
         let elves = parse_input(input);
-        let max_calories = elves.into_iter().max().unwrap();
+        let max_calories = elves.max().unwrap();
 
         format!("{}", max_calories)
     }
 
     fn star2(&self, input: &str) -> String {
-        let mut elves = parse_input(input);
+        let mut elves: Vec<_> = parse_input(input).collect();
         elves.sort_by(|a, b| b.cmp(a)); // descending sort
         let max3_calories: usize = elves.into_iter().take(3).sum();
 
