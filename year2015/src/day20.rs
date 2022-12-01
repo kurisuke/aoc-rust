@@ -75,7 +75,7 @@ fn prime_factors(mut n: usize) -> Vec<(usize, usize)> {
 
 fn divisors(div: usize, prime_factors: &[(usize, usize)]) -> Vec<usize> {
     if prime_factors.is_empty() {
-        return vec![div];
+        vec![div]
     } else {
         let mut res = vec![];
         let mut new_div = div;

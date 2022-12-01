@@ -15,11 +15,11 @@ fn parse_input(input: &str) -> Vec<IngredStats> {
         .lines()
         .map(|line| {
             let parts: Vec<_> = line.split_whitespace().collect();
-            let capacity = parts[2].replace(",", "").parse::<i64>().unwrap();
-            let durability = parts[4].replace(",", "").parse::<i64>().unwrap();
-            let flavor = parts[6].replace(",", "").parse::<i64>().unwrap();
-            let texture = parts[8].replace(",", "").parse::<i64>().unwrap();
-            let calories = parts[10].replace(",", "").parse::<i64>().unwrap();
+            let capacity = parts[2].replace(',', "").parse::<i64>().unwrap();
+            let durability = parts[4].replace(',', "").parse::<i64>().unwrap();
+            let flavor = parts[6].replace(',', "").parse::<i64>().unwrap();
+            let texture = parts[8].replace(',', "").parse::<i64>().unwrap();
+            let calories = parts[10].replace(',', "").parse::<i64>().unwrap();
             IngredStats {
                 capacity,
                 durability,

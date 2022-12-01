@@ -16,7 +16,7 @@ fn mem_diff(s: &str) -> usize {
                 'x' => {
                     let c3 = it.next().unwrap_or_else(|| panic!("Parsing error: {}", s));
                     let c4 = it.next().unwrap_or_else(|| panic!("Parsing error: {}", s));
-                    if c3.is_digit(16) && c4.is_digit(16) {
+                    if c3.is_ascii_hexdigit() && c4.is_ascii_hexdigit() {
                         diff += 3;
                     } else {
                         panic!("Parsing error: {}", s)

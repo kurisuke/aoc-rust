@@ -22,7 +22,7 @@ fn is_nice_star2(s: &str) -> bool {
     let chars: Vec<_> = s.chars().collect();
     let cond1 = chars.windows(2).enumerate().any(|(i, w)| {
         let find_str: String = w.iter().collect();
-        (&s[i + 2..]).contains(&find_str)
+        (s[i + 2..]).contains(&find_str)
     });
     let cond2 = chars.windows(3).any(|w| w[0] == w[2]);
     cond1 && cond2
