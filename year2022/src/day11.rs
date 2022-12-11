@@ -1,6 +1,5 @@
 use common::day::Day;
 
-use std::collections::HashMap;
 use std::collections::HashSet;
 use std::collections::VecDeque;
 
@@ -14,7 +13,7 @@ enum MonkeyOp {
 }
 
 struct Monkey {
-    items: VecDeque<usize>,
+    pub items: VecDeque<usize>,
     op: MonkeyOp,
     pub test_divisor: usize,
     target_true: usize,
@@ -76,12 +75,8 @@ impl Monkey {
         }
     }
 
-    fn inspect(
-        &mut self,
-        worry_divisor: Option<usize>,
-        modulo: usize,
-    ) -> HashMap<usize, Vec<usize>> {
-        let mut throw_items: HashMap<_, Vec<_>> = HashMap::new();
+    fn inspect(&mut self, worry_divisor: Option<usize>, modulo: usize) -> Vec<(usize, usize)> {
+        let mut throw_items = Vec::with_capacity(self.items.len());
 
         while let Some(mut worry_level) = self.items.pop_front() {
             // Monkey inspects, worry level increases
@@ -102,15 +97,9 @@ impl Monkey {
 
             // Test and throw
             if worry_level % self.test_divisor == 0 {
-                throw_items
-                    .entry(self.target_true)
-                    .or_default()
-                    .push(worry_level);
+                throw_items.push((self.target_true, worry_level));
             } else {
-                throw_items
-                    .entry(self.target_false)
-                    .or_default()
-                    .push(worry_level);
+                throw_items.push((self.target_false, worry_level));
             }
 
             // Update state
@@ -120,8 +109,8 @@ impl Monkey {
         throw_items
     }
 
-    fn add_to_list(&mut self, items: &[usize]) {
-        self.items.extend(items);
+    fn add_to_list(&mut self, item: usize) {
+        self.items.push_back(item);
     }
 }
 
@@ -134,8 +123,8 @@ fn run(mut monkeys: Vec<Monkey>, rounds: usize, worry_divisor: Option<usize>) ->
     for _ in 0..rounds {
         for i in 0..monkeys.len() {
             let throw_items = monkeys[i].inspect(worry_divisor, modulo);
-            for (throw_target, items) in throw_items.into_iter() {
-                monkeys[throw_target].add_to_list(&items);
+            for (throw_target, item) in throw_items.into_iter() {
+                monkeys[throw_target].add_to_list(item);
             }
         }
     }
