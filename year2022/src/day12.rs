@@ -1,31 +1,13 @@
 use common::day::Day;
 use util::grid2d::{Coords, Grid2D};
 
-use std::cmp::Ordering;
-use std::collections::BinaryHeap;
 use std::collections::HashSet;
+use std::collections::VecDeque;
 
 #[derive(Copy, Clone, Eq, PartialEq)]
 struct State {
     pos: Coords,
     steps: usize,
-    target_dist: u64,
-}
-
-impl Ord for State {
-    fn cmp(&self, other: &Self) -> Ordering {
-        other
-            .steps
-            .cmp(&self.steps)
-            .then_with(|| other.target_dist.cmp(&self.target_dist))
-            .then_with(|| other.pos.cmp(&self.pos))
-    }
-}
-
-impl PartialOrd for State {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
 }
 
 struct Map {
@@ -55,16 +37,15 @@ fn parse_input(input: &str) -> Map {
 }
 
 fn search(map: Map) -> Option<usize> {
-    let mut search_states = BinaryHeap::new();
-    search_states.push(State {
+    let mut search_states = VecDeque::new();
+    search_states.push_back(State {
         pos: map.start,
         steps: 0,
-        target_dist: map.start.manhattan(&map.end),
     });
     let mut visited = HashSet::new();
     visited.insert(map.start);
 
-    while let Some(state) = search_states.pop() {
+    while let Some(state) = search_states.pop_front() {
         if state.pos == map.end {
             return Some(state.steps);
         }
@@ -77,10 +58,9 @@ fn search(map: Map) -> Option<usize> {
         {
             if let Some(elevation_there) = map.heightmap.at(&npos) {
                 if elevation_there - elevation_here <= 1 && !visited.contains(&npos) {
-                    search_states.push(State {
+                    search_states.push_back(State {
                         pos: npos,
                         steps: state.steps + 1,
-                        target_dist: npos.manhattan(&map.end),
                     });
                     visited.insert(npos);
                 }
@@ -92,16 +72,15 @@ fn search(map: Map) -> Option<usize> {
 }
 
 fn search_pt2(map: Map) -> Option<usize> {
-    let mut search_states = BinaryHeap::new();
-    search_states.push(State {
+    let mut search_states = VecDeque::new();
+    search_states.push_back(State {
         pos: map.end,
         steps: 0,
-        target_dist: map.end.manhattan(&map.start),
     });
     let mut visited = HashSet::new();
     visited.insert(map.end);
 
-    while let Some(state) = search_states.pop() {
+    while let Some(state) = search_states.pop_front() {
         if map.heightmap.at(&state.pos).unwrap() == &1 {
             return Some(state.steps);
         }
@@ -114,10 +93,9 @@ fn search_pt2(map: Map) -> Option<usize> {
         {
             if let Some(elevation_there) = map.heightmap.at(&npos) {
                 if elevation_here - elevation_there <= 1 && !visited.contains(&npos) {
-                    search_states.push(State {
+                    search_states.push_back(State {
                         pos: npos,
                         steps: state.steps + 1,
-                        target_dist: npos.manhattan(&map.start),
                     });
                     visited.insert(npos);
                 }
