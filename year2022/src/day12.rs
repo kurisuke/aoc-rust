@@ -91,6 +91,43 @@ fn search(map: Map) -> Option<usize> {
     None
 }
 
+fn search_pt2(map: Map) -> Option<usize> {
+    let mut search_states = BinaryHeap::new();
+    search_states.push(State {
+        pos: map.end,
+        steps: 0,
+        target_dist: map.end.manhattan(&map.start),
+    });
+    let mut visited = HashSet::new();
+    visited.insert(map.end);
+
+    while let Some(state) = search_states.pop() {
+        if map.heightmap.at(&state.pos).unwrap() == &1 {
+            return Some(state.steps);
+        }
+
+        let elevation_here = map.heightmap.at(&state.pos).unwrap();
+        for npos in map
+            .heightmap
+            .neighbors_cardinal_coords(&state.pos)
+            .into_iter()
+        {
+            if let Some(elevation_there) = map.heightmap.at(&npos) {
+                if elevation_here - elevation_there <= 1 && !visited.contains(&npos) {
+                    search_states.push(State {
+                        pos: npos,
+                        steps: state.steps + 1,
+                        target_dist: npos.manhattan(&map.start),
+                    });
+                    visited.insert(npos);
+                }
+            }
+        }
+    }
+
+    None
+}
+
 pub struct Day12 {}
 
 impl Day for Day12 {
@@ -101,20 +138,7 @@ impl Day for Day12 {
 
     fn star2(&self, input: &str) -> String {
         let map = parse_input(input);
-        let start_poses = map.heightmap.filter(&[1]);
-        let min_steps = start_poses
-            .into_iter()
-            .filter_map(|start| {
-                let map = Map {
-                    start,
-                    end: map.end,
-                    heightmap: map.heightmap.clone(),
-                };
-                search(map)
-            })
-            .min()
-            .unwrap();
-        format!("{}", min_steps)
+        format!("{}", search_pt2(map).unwrap())
     }
 }
 
