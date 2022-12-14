@@ -39,7 +39,7 @@ fn parse(input: &str, part2: bool) -> Map {
 
     let origin = Coords { x: x_min, y: y_min };
     let source = Coords { x: 500, y: 0 } - origin;
-    
+
     let grid_size = Coords {
         x: x_max - x_min + 1,
         y: y_max - y_min + 1,
@@ -76,7 +76,7 @@ fn parse(input: &str, part2: bool) -> Map {
     if part2 {
         let y = grid.height() - 1;
         for x in 0..grid.width() {
-            grid.set(&Coords {x, y}, '#');
+            grid.set(&Coords { x, y }, '#');
         }
     }
 
@@ -84,8 +84,12 @@ fn parse(input: &str, part2: bool) -> Map {
 }
 
 impl Map {
-    fn pour(&mut self) {
+    fn pour(&mut self) -> bool {
         let mut pos = self.source;
+        if let Some(&'o') = self.grid.at(&pos) {
+            return false;
+        }
+
         while self.grid.at(&pos).is_some() {
             let next_pos_list = [
                 Coords {
@@ -114,25 +118,17 @@ impl Map {
 
             if settled {
                 self.grid.set(&pos, 'o');
-                break;
+                return true;
             }
         }
         // left the grid area, done
+        false
     }
 }
 
 fn run(mut map: Map) -> usize {
-    let mut units_last = 0;
-    loop {
-        map.pour();
-        let units_now = map.grid.count('o');
-        if units_now == units_last {
-            break;
-        } else {
-            units_last = units_now;
-        }
-    }
-    units_last
+    while map.pour() {}
+    map.grid.count('o')
 }
 
 pub struct Day14 {}
