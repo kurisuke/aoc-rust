@@ -40,8 +40,8 @@ fn merge(mut input: Vec<Interval>) -> Vec<Interval> {
     output
 }
 
-fn beacon_free_fields_in_row(sensors: &[Sensor], row_y: i64) -> usize {
-    let beacon_poses: HashSet<_> = sensors
+fn known_beacons(sensors: &[Sensor], row_y: i64) -> HashSet<i64> {
+    sensors
         .iter()
         .filter_map(|s| {
             if s.beacon.y == row_y {
@@ -50,20 +50,26 @@ fn beacon_free_fields_in_row(sensors: &[Sensor], row_y: i64) -> usize {
                 None
             }
         })
-        .collect();
+        .collect()
+}
 
+fn coverage_in_row(sensors: &[Sensor], row_y: i64) -> Vec<Interval> {
     let coverages: Vec<_> = sensors
         .iter()
         .filter_map(|s| s.coverage_row(row_y))
         .collect();
+    merge(coverages)
+}
 
-    let coverages = merge(coverages);
+fn beacon_free_fields_in_row(sensors: &[Sensor], row_y: i64) -> usize {
+    let beacons = known_beacons(sensors, row_y);
+    let coverages = coverage_in_row(sensors, row_y);
 
     coverages
         .iter()
         .map(|c| (c.1 - c.0 + 1) as usize)
         .sum::<usize>()
-        - beacon_poses.len()
+        - beacons.len()
 }
 
 fn parse_input(input: &str) -> impl Iterator<Item = Sensor> + '_ {
@@ -92,14 +98,32 @@ fn parse_input(input: &str) -> impl Iterator<Item = Sensor> + '_ {
     })
 }
 
+fn find_beacon(sensors: &[Sensor], y_min: i64, y_max: i64) -> Option<Coords> {
+    for y in y_min..=y_max {
+        let intervals = coverage_in_row(sensors, y);
+        if intervals.len() > 1 && intervals[0].1 + 2 == intervals[1].0 {
+            return Some(Coords {
+                x: intervals[0].1 + 1,
+                y,
+            });
+        }
+    }
+    None
+}
+
 impl Day for Day15 {
     fn star1(&self, input: &str) -> String {
         let sensors: Vec<_> = parse_input(input).collect();
         format!("{}", beacon_free_fields_in_row(&sensors, 2000000))
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let sensors: Vec<_> = parse_input(input).collect();
+        let y_min = sensors.iter().map(|s| s.pos.y).min().unwrap();
+        let y_max = sensors.iter().map(|s| s.pos.y).max().unwrap();
+
+        let beacon = find_beacon(&sensors, y_min, y_max).unwrap();
+        format!("{}", beacon.x * 4000000 + beacon.y)
     }
 }
 
@@ -156,6 +180,9 @@ Sensor at x=14, y=3: closest beacon is at x=15, y=3
 Sensor at x=20, y=1: closest beacon is at x=15, y=3"#;
 
         let sensors: Vec<_> = parse_input(input).collect();
+        // part 1
         assert_eq!(beacon_free_fields_in_row(&sensors, 10), 26);
+        // part 2
+        assert_eq!(find_beacon(&sensors, 0, 20), Some(Coords { x: 14, y: 11 }));
     }
 }
