@@ -10,3 +10,4 @@ edition = "2021"
 common = { path = "../common" }
 util = { path = "../util" }
 regex = "1.7"
+itertools = "0.10.3"

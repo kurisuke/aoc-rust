@@ -1,23 +1,27 @@
 use common::day::Day;
+use itertools::Itertools;
 use regex::Regex;
 use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
 
 pub struct Day16 {}
 
-type Valves = HashMap<String, Valve>;
-type Distances = HashMap<(String, String), usize>;
-type Path = Vec<(String, usize)>;
+type ValveLabel = u8;
+type Valves = Vec<Valve>;
+type Distances = HashMap<(ValveLabel, ValveLabel), usize>;
+type Path = Vec<(ValveLabel, usize)>;
 
+#[derive(Eq, PartialEq, Hash)]
 struct Valve {
     flow_rate: usize,
-    tunnels: Vec<String>,
+    tunnels: Vec<ValveLabel>,
 }
 
-fn shortest_paths(valves: &Valves, from: &str) -> Distances {
+fn shortest_paths(valves: &Valves, from: ValveLabel) -> Distances {
     let mut targets: HashSet<_> = valves
         .iter()
-        .filter(|(n, v)| v.flow_rate > 0 && *n != from)
-        .map(|(n, _)| n.as_str())
+        .enumerate()
+        .filter(|(n, v)| v.flow_rate > 0 && *n != from.into())
+        .map(|(n, _)| n as u8)
         .collect();
 
     let mut paths = HashMap::new();
@@ -28,18 +32,18 @@ fn shortest_paths(valves: &Valves, from: &str) -> Distances {
     while let Some((pos, steps)) = next_queue.pop_front() {
         visited.insert(pos);
 
-        if targets.contains(pos) {
-            paths.insert((from.to_string(), pos.to_string()), steps);
-            targets.remove(pos);
+        if targets.contains(&pos) {
+            paths.insert((from, pos), steps);
+            targets.remove(&pos);
 
             if targets.is_empty() {
                 break;
             }
         }
 
-        for next in valves.get(pos).unwrap().tunnels.iter() {
-            if !visited.contains(next.as_str()) {
-                next_queue.push_back((next, steps + 1));
+        for next in valves[pos as usize].tunnels.iter() {
+            if !visited.contains(next) {
+                next_queue.push_back((*next, steps + 1));
             }
         }
     }
@@ -47,85 +51,89 @@ fn shortest_paths(valves: &Valves, from: &str) -> Distances {
     paths
 }
 
-fn find_paths(distances: &Distances, targets: HashSet<String>, path_now: Path) -> Vec<Path> {
-    if targets.is_empty() {
+fn find_paths(distances: &Distances, targets: &HashSet<ValveLabel>, path_now: Path) -> Vec<Path> {
+    let mut paths = vec![];
+    let (pos, time_limit) = path_now.last().unwrap();
+
+    for target in targets.iter() {
+        let distance = distances.get(&(*pos, *target)).unwrap();
+        if distance + 2 < *time_limit {
+            let mut targets_new = targets.clone();
+            let mut path_new = path_now.clone();
+            targets_new.remove(target);
+            path_new.push((*target, time_limit - distance - 1));
+            paths.extend(find_paths(distances, &targets_new, path_new));
+        }
+    }
+
+    if paths.is_empty() {
         vec![path_now]
     } else {
-        let mut paths = vec![];
-        let (pos, time_limit) = path_now.last().unwrap();
-
-        for target in targets.iter() {
-            let distance = distances
-                .get(&(pos.to_string(), target.to_string()))
-                .unwrap();
-            if distance + 1 < *time_limit {
-                let mut targets_new = targets.clone();
-                let mut path_new = path_now.clone();
-                targets_new.remove(target.as_str());
-                path_new.push((target.clone(), time_limit - distance - 1));
-                paths.extend(find_paths(distances, targets_new, path_new));
-            }
-        }
-
-        if paths.is_empty() {
-            vec![path_now]
-        } else {
-            paths
-        }
+        paths
     }
 }
 
 fn total_flow(valves: &Valves, path: &Path) -> usize {
     let mut total_flow = 0;
     for (valve_label, minutes_open) in path.iter().skip(1) {
-        let flow_rate = valves.get(valve_label).unwrap().flow_rate;
+        let flow_rate = valves[*valve_label as usize].flow_rate;
         total_flow += flow_rate * minutes_open;
     }
     total_flow
 }
 
-fn parse_input(input: &str) -> Valves {
+fn parse_input(input: &str) -> (Valves, ValveLabel) {
+    let map_labels: HashMap<&str, ValveLabel> = input
+        .lines()
+        .enumerate()
+        .map(|(i, line)| (line.split_whitespace().nth(1).unwrap(), i as u8))
+        .collect();
+
     let re = Regex::new(
         r"^Valve ([A-Z]{2}) has flow rate=(\d+); tunnel[s]? lead[s]? to valve[s]? ([A-Z,\s]+)$",
     )
     .unwrap();
-    input
-        .lines()
-        .map(|line| {
-            let captures = re.captures(line).unwrap();
-            let name = &captures[1];
-            let flow_rate = captures[2].parse().unwrap();
-            let tunnels = captures[3].split(", ").map(|s| s.to_string()).collect();
-            (name.to_string(), Valve { flow_rate, tunnels })
-        })
-        .collect()
+    (
+        input
+            .lines()
+            .map(|line| {
+                let captures = re.captures(line).unwrap();
+                let flow_rate = captures[2].parse().unwrap();
+                let tunnels = captures[3]
+                    .split(", ")
+                    .map(|s| *map_labels.get(s).unwrap())
+                    .collect();
+                Valve { flow_rate, tunnels }
+            })
+            .collect(),
+        *map_labels.get("AA").unwrap(),
+    )
+}
+
+fn prepare(input: &str) -> (Valves, Distances, HashSet<ValveLabel>, ValveLabel) {
+    let (valves, start) = parse_input(input);
+
+    let mut distances = shortest_paths(&valves, start);
+
+    let targets: HashSet<_> = valves
+        .iter()
+        .enumerate()
+        .filter(|(_, v)| v.flow_rate > 0)
+        .map(|(n, _)| n as u8)
+        .collect();
+
+    for from in targets.iter() {
+        distances.extend(shortest_paths(&valves, *from as u8));
+    }
+
+    (valves, distances, targets, start)
 }
 
 impl Day for Day16 {
     fn star1(&self, input: &str) -> String {
-        let valves = parse_input(input);
-        assert_eq!(input.lines().count(), valves.len());
+        let (valves, distances, targets, start) = prepare(input);
 
-        let mut distances = shortest_paths(&valves, "AA");
-
-        let targets: HashSet<_> = valves
-            .iter()
-            .filter(|(_, v)| v.flow_rate > 0)
-            .map(|(n, _)| n.to_string())
-            .collect();
-
-        for from in targets.iter() {
-            distances.extend(shortest_paths(&valves, from));
-        }
-
-        for ((src, dest), steps) in distances.iter() {
-            if src != "AA" {
-                let reverse = (dest.to_string(), src.to_string());
-                assert_eq!(steps, distances.get(&reverse).unwrap());
-            }
-        }
-
-        let paths = find_paths(&distances, targets, vec![(String::from("AA"), 30)]);
+        let paths = find_paths(&distances, &targets, vec![(start, 30)]);
 
         let max_total_flow = paths
             .iter()
@@ -136,36 +144,15 @@ impl Day for Day16 {
     }
 
     fn star2(&self, input: &str) -> String {
-        let valves = parse_input(input);
-        assert_eq!(input.lines().count(), valves.len());
+        let (valves, distances, targets, start) = prepare(input);
 
-        let mut distances = shortest_paths(&valves, "AA");
-
-        let targets: HashSet<_> = valves
-            .iter()
-            .filter(|(_, v)| v.flow_rate > 0)
-            .map(|(n, _)| n.to_string())
-            .collect();
-
-        for from in targets.iter() {
-            distances.extend(shortest_paths(&valves, from));
-        }
-
-        for ((src, dest), steps) in distances.iter() {
-            if src != "AA" {
-                let reverse = (dest.to_string(), src.to_string());
-                assert_eq!(steps, distances.get(&reverse).unwrap());
-            }
-        }
-
-        let paths = find_paths(&distances, targets.clone(), vec![(String::from("AA"), 26)]);
+        let paths = find_paths(&distances, &targets, vec![(start, 26)]);
         let mut best_scores = HashMap::new();
 
         for mut path in paths {
             while path.len() > 1 {
                 let total_flow_first = total_flow(&valves, &path);
-                let opened_valves: BTreeSet<_> =
-                    path.iter().map(|(valve, _)| valve.to_string()).collect();
+                let opened_valves: BTreeSet<_> = path.iter().map(|(valve, _)| *valve).collect();
                 let entry = best_scores.entry(opened_valves).or_insert(total_flow_first);
                 if total_flow_first > *entry {
                     *entry = total_flow_first;
@@ -175,19 +162,14 @@ impl Day for Day16 {
         }
 
         let mut total_flow_max = 0;
-        for (opened_valves, total_flow_first) in best_scores.iter() {
-            let mut left_valves = targets.clone();
-            for valve in opened_valves.iter() {
-                left_valves.remove(valve);
-            }
+        for c in best_scores.iter().combinations(2) {
+            let (valves1, score1) = c[0];
+            let (valves2, score2) = c[1];
 
-            let paths_second = find_paths(&distances, left_valves, vec![(String::from("AA"), 26)]);
-            let total_flow_second = paths_second
-                .iter()
-                .map(|path_second| total_flow(&valves, path_second))
-                .max()
-                .unwrap();
-            total_flow_max = total_flow_max.max(total_flow_first + total_flow_second);
+            // ensure only common node is the start (AA)
+            if valves1.intersection(valves2).count() == 1 {
+                total_flow_max = total_flow_max.max(score1 + score2);
+            }
         }
 
         format!("{}", total_flow_max)
