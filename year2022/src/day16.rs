@@ -123,7 +123,7 @@ fn prepare(input: &str) -> (Valves, Distances, HashSet<ValveLabel>, ValveLabel) 
         .collect();
 
     for from in targets.iter() {
-        distances.extend(shortest_paths(&valves, *from as u8));
+        distances.extend(shortest_paths(&valves, *from));
     }
 
     (valves, distances, targets, start)

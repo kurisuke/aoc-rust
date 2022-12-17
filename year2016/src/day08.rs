@@ -13,8 +13,8 @@ enum Cmd {
 fn apply_cmd(display: &mut Grid2D<char>, cmd: &Cmd) {
     match cmd {
         Cmd::Rect(x_max, y_max) => {
-            for x in 0..(*x_max as usize) {
-                for y in 0..(*y_max as usize) {
+            for x in 0..*x_max {
+                for y in 0..*y_max {
                     display.set(
                         &Coords {
                             x: x as i64,

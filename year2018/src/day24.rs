@@ -24,6 +24,7 @@ impl Group {
     }
 
     fn dmg_to(&self, target: &Group) -> usize {
+        #[allow(clippy::bool_to_int_with_if)]
         let factor = if target.weak.contains(&self.at_type) {
             2
         } else if target.immune.contains(&self.at_type) {

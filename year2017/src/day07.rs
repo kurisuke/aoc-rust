@@ -48,7 +48,7 @@ fn find_wrong_weight(discs: &Discs, root_node_name: &str, weight_diff: isize) ->
         find_wrong_weight(discs, root_node.children[i], weight_diff)
     } else {
         // Children are balanced, so the problem is in this node.
-        (root_node.weight as isize + weight_diff as isize) as usize
+        (root_node.weight as isize + weight_diff) as usize
     }
 }
 

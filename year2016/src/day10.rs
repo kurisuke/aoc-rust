@@ -134,7 +134,7 @@ fn parse_input(input: &str) -> (Vec<Bot>, Outputs) {
             ));
         }
     }
-    let mut bots: Vec<_> = bots.into_iter().map(|(_, v)| v).collect();
+    let mut bots: Vec<_> = bots.into_values().collect();
     for v in init_values {
         bots[v.0].chips.push(v.1);
     }

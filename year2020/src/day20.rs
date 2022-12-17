@@ -85,12 +85,12 @@ fn place_next(
                             rotation: rotation * 90,
                             flip: *flip,
                             right_border: flipped
-                                .col(flipped.width() as i64 - 1)
+                                .col(flipped.width() - 1)
                                 .unwrap()
                                 .into_iter()
                                 .collect(),
                             bottom_border: flipped
-                                .row(flipped.height() as i64 - 1)
+                                .row(flipped.height() - 1)
                                 .unwrap()
                                 .into_iter()
                                 .collect(),

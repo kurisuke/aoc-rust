@@ -287,24 +287,33 @@ fn simulate(jet_pattern: &[char], target_rocks: usize, check_cycle: bool) -> usi
         }
 
         if check_cycle && stack.len() >= CYCLE_HEIGHT {
-            let pattern: Vec<_> = stack[stack.len() - CYCLE_HEIGHT..stack.len() - 1].iter().flatten().cloned().collect();
-            if let Some((first_cycle, first_height)) = seen_states.get(&pattern) {                
-                let height_map: HashMap<usize, usize> = seen_states.iter().filter_map(|(_, (n, height))| {
-                    if n >= first_cycle {
-                        Some((*n - first_cycle, *height - first_height))
-                    } else {
-                        None
-                    }
-                }).collect();
+            let pattern: Vec<_> = stack[stack.len() - CYCLE_HEIGHT..stack.len() - 1]
+                .iter()
+                .flatten()
+                .cloned()
+                .collect();
+            if let Some((first_cycle, first_height)) = seen_states.get(&pattern) {
+                let height_map: HashMap<usize, usize> = seen_states
+                    .iter()
+                    .filter_map(|(_, (n, height))| {
+                        if n >= first_cycle {
+                            Some((*n - first_cycle, *height - first_height))
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
 
                 let cycle_len = rocks_fallen - first_cycle;
                 let offset = first_cycle;
                 let height_diff_per_cycle = stack.len() - empty_on_top(&stack) - first_height;
-                
+
                 let num_cycles = (target_rocks - offset) / cycle_len;
                 let offset_in_cycle = (target_rocks - offset) % cycle_len;
 
-                return first_height + num_cycles * height_diff_per_cycle + height_map.get(&offset_in_cycle).unwrap()
+                return first_height
+                    + num_cycles * height_diff_per_cycle
+                    + height_map.get(&offset_in_cycle).unwrap();
             } else {
                 seen_states.insert(pattern, (rocks_fallen, stack.len() - empty_on_top(&stack)));
             }
