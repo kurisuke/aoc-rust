@@ -1,11 +1,10 @@
 use common::day::Day;
-use itertools::Itertools;
 use std::collections::{HashMap, HashSet, VecDeque};
 
 pub struct Day18 {}
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
-struct Coords3D(i16, i16, i16);
+struct Coords3D(i8, i8, i8);
 
 impl Coords3D {
     fn parse(line: &str) -> Coords3D {
@@ -17,8 +16,15 @@ impl Coords3D {
         )
     }
 
-    fn dist(&self, other: &Self) -> i16 {
-        (self.0 - other.0).abs() + (self.1 - other.1).abs() + (self.2 - other.2).abs()
+    fn neighbors(&self) -> [Coords3D; 6] {
+        [
+            Coords3D(self.0 - 1, self.1, self.2),
+            Coords3D(self.0 + 1, self.1, self.2),
+            Coords3D(self.0, self.1 - 1, self.2),
+            Coords3D(self.0, self.1 + 1, self.2),
+            Coords3D(self.0, self.1, self.2 - 1),
+            Coords3D(self.0, self.1, self.2 + 1),
+        ]
     }
 }
 
@@ -26,26 +32,22 @@ fn parse_input(input: &str) -> impl Iterator<Item = Coords3D> + '_ {
     input.lines().map(Coords3D::parse)
 }
 
-fn surface_area(cubes: &[Coords3D]) -> u16 {
-    let mut surfaces_exposed: HashMap<_, _> = cubes.iter().map(|c| (c, 6)).collect();
-
-    for c in cubes.iter().combinations(2) {
-        let c1 = c[0];
-        let c2 = c[1];
-
-        if c1.dist(c2) == 1 {
-            let e1 = surfaces_exposed.entry(c1).or_insert(6);
-            *e1 -= 1;
-            let e2 = surfaces_exposed.entry(c2).or_insert(6);
-            *e2 -= 1;
-        }
-    }
-    surfaces_exposed.values().sum()
+fn surface_area(cubes: HashSet<Coords3D>) -> usize {
+    cubes
+        .iter()
+        .map(|cube| {
+            6 - cube
+                .neighbors()
+                .into_iter()
+                .filter(|n| cubes.contains(n))
+                .count()
+        })
+        .sum()
 }
 
-fn flood_outside_area(cubes: &[Coords3D]) -> u16 {
+fn flood_outside_area(cubes: HashSet<Coords3D>) -> usize {
     let (x_min, x_max, y_min, y_max, z_min, z_max) = cubes.iter().fold(
-        (i16::MAX, i16::MIN, i16::MAX, i16::MIN, i16::MAX, i16::MIN),
+        (i8::MAX, i8::MIN, i8::MAX, i8::MIN, i8::MAX, i8::MIN),
         |a, c| {
             (
                 a.0.min(c.0),
@@ -67,11 +69,9 @@ fn flood_outside_area(cubes: &[Coords3D]) -> u16 {
         z_max + 1,
     );
 
-    let cubes_set: HashSet<_> = cubes.iter().collect();
-
     let mut queue = VecDeque::new();
     let start = Coords3D(x_min, y_min, z_min);
-    assert!(!cubes_set.contains(&start));
+    assert!(!cubes.contains(&start));
     queue.push_back(start);
 
     let mut visited = HashSet::new();
@@ -80,14 +80,7 @@ fn flood_outside_area(cubes: &[Coords3D]) -> u16 {
     let mut surface_cubes = HashMap::new();
 
     while let Some(pos) = queue.pop_front() {
-        for neighbor in [
-            Coords3D(pos.0 - 1, pos.1, pos.2),
-            Coords3D(pos.0 + 1, pos.1, pos.2),
-            Coords3D(pos.0, pos.1 - 1, pos.2),
-            Coords3D(pos.0, pos.1 + 1, pos.2),
-            Coords3D(pos.0, pos.1, pos.2 - 1),
-            Coords3D(pos.0, pos.1, pos.2 + 1),
-        ] {
+        for neighbor in pos.neighbors() {
             if !visited.contains(&neighbor)
                 && pos.0 >= x_min
                 && pos.0 <= x_max
@@ -96,7 +89,7 @@ fn flood_outside_area(cubes: &[Coords3D]) -> u16 {
                 && pos.2 >= z_min
                 && pos.2 <= z_max
             {
-                if cubes_set.contains(&neighbor) {
+                if cubes.contains(&neighbor) {
                     // count from how many neighboring cubes we can reach this
                     // this is the number of surfaces
                     let e = surface_cubes.entry(neighbor).or_insert(0);
@@ -114,13 +107,13 @@ fn flood_outside_area(cubes: &[Coords3D]) -> u16 {
 
 impl Day for Day18 {
     fn star1(&self, input: &str) -> String {
-        let cubes: Vec<_> = parse_input(input).collect();
-        format!("{}", surface_area(&cubes))
+        let cubes = parse_input(input).collect();
+        format!("{}", surface_area(cubes))
     }
 
     fn star2(&self, input: &str) -> String {
-        let cubes: Vec<_> = parse_input(input).collect();
-        format!("{}", flood_outside_area(&cubes))
+        let cubes = parse_input(input).collect();
+        format!("{}", flood_outside_area(cubes))
     }
 }
 
