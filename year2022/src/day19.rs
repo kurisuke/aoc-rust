@@ -58,12 +58,21 @@ fn geodes(blueprint: &Blueprint, minutes: usize) -> usize {
     search(blueprint, state, &mut best_so_far)
 }
 
+fn prune_heuristic(state: &State) -> usize {
+    // - current geodes stash
+    // - existing robots produce 1 geode per remaining minute
+    // - assume that ideally we produce 1 more geode robot per remaining minute
+    state.stash[Resource::Geode as usize]
+        + state.robots[Resource::Geode as usize] * state.minutes
+        + state.minutes * (state.minutes + 1) / 2
+}
+
 fn search(blueprint: &Blueprint, state: State, best_so_far: &mut [usize]) -> usize {
-    if state.minutes == 0 || state.robots[Resource::Geode as usize] < best_so_far[state.minutes - 1]
-    {
+    let score = prune_heuristic(&state);
+    if state.minutes == 0 || score < best_so_far[state.minutes - 1] {
         state.stash[Resource::Geode as usize]
     } else {
-        best_so_far[state.minutes - 1] = state.robots[Resource::Geode as usize];
+        best_so_far[state.minutes - 1] = score;
         let mut max_geodes = 0;
         for robot_type in choose_build(blueprint, &state) {
             let mut new_state = state;
