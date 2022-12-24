@@ -466,6 +466,14 @@ impl<T: Copy> Grid2D<T> {
     }
 }
 
+impl<T: std::cmp::PartialEq + Copy> Grid2D<T> {
+    pub fn replace(&mut self, from: &T, to: &T) {
+        for c in self.filter(&[*from]) {
+            self.set(&c, *to);
+        }
+    }
+}
+
 impl Display for Grid2D<char> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         let mut s = String::from("");
