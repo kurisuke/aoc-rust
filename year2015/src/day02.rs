@@ -15,7 +15,7 @@ fn parse_input(input: &str) -> Vec<Dims> {
 }
 
 fn wrapping_paper(package: Dims) -> usize {
-    let side_areas = vec![
+    let side_areas = [
         package.0 * package.1,
         package.0 * package.2,
         package.1 * package.2,
@@ -25,7 +25,7 @@ fn wrapping_paper(package: Dims) -> usize {
 }
 
 fn ribbon(package: Dims) -> usize {
-    let mut sides = vec![package.0, package.1, package.2];
+    let mut sides = [package.0, package.1, package.2];
     sides.sort_unstable();
     2 * (sides[0] + sides[1]) + sides.iter().product::<usize>()
 }

@@ -93,7 +93,7 @@ fn check_hcl(hcl_str: &str) -> bool {
 
 fn check_pid(pid_str: &str) -> bool {
     if pid_str.len() == 9 {
-        matches!(pid_str.parse::<u64>(), Ok(_))
+        pid_str.parse::<u64>().is_ok()
     } else {
         false
     }

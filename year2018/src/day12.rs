@@ -19,7 +19,7 @@ fn next_val(pos: isize, last_gen: &Gen, rules: &Rules) -> bool {
 fn next_gen(last_gen: &Gen, rules: &Rules) -> Gen {
     let mut next_gen = BTreeSet::new();
     let min_pos = last_gen.iter().next().unwrap() - 2;
-    let max_pos = last_gen.iter().rev().next().unwrap() + 2;
+    let max_pos = last_gen.iter().next_back().unwrap() + 2;
     for pos in min_pos..=max_pos {
         if next_val(pos, last_gen, rules) {
             next_gen.insert(pos);

@@ -5,7 +5,7 @@ pub struct Day05 {}
 fn is_nice_star1(s: &str) -> bool {
     let chars: Vec<_> = s.chars().collect();
 
-    let vowels = vec!['a', 'e', 'i', 'o', 'u'];
+    let vowels = ['a', 'e', 'i', 'o', 'u'];
     let num_vowels = chars
         .iter()
         .filter(|c| vowels.iter().any(|v| *c == v))
@@ -13,7 +13,7 @@ fn is_nice_star1(s: &str) -> bool {
 
     let has_double = chars.windows(2).any(|w| w[0] == w[1]);
 
-    let forbidden = vec!["ab", "cd", "pq", "xy"];
+    let forbidden = ["ab", "cd", "pq", "xy"];
     let has_forbidden = forbidden.iter().any(|f| s.contains(f));
     (num_vowels >= 3) && has_double && !has_forbidden
 }

@@ -13,3 +13,4 @@ members = [
     "year2021",
     "year2022",
 ]
+resolver = "2"

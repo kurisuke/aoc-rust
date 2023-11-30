@@ -89,8 +89,8 @@ where
         }
     }
 
-    while !op_stack.is_empty() {
-        output.push(op_stack.pop().unwrap());
+    while let Some(el) = op_stack.pop() {
+        output.push(el);
     }
 
     output

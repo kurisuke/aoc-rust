@@ -23,7 +23,7 @@ pub const NEIGHBORS: [HexCoord; 6] = [
 pub struct Day24 {}
 
 fn parse_input(input: &str) -> Vec<Vec<HexCoord>> {
-    let dir_strs = vec!["e", "se", "sw", "w", "nw", "ne"];
+    let dir_strs = ["e", "se", "sw", "w", "nw", "ne"];
     input
         .lines()
         .map(|mut line| {

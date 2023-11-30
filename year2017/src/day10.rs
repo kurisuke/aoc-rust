@@ -10,7 +10,7 @@ impl Day for Day10 {
             .split(',')
             .map(|x| x.parse::<usize>().unwrap())
             .collect();
-        let mut v: Vec<_> = (0..=255).into_iter().collect();
+        let mut v: Vec<_> = (0..=255).collect();
         knot(&mut v, &lengths, 0, 0);
         format!("{}", v[0] as usize * v[1] as usize)
     }

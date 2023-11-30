@@ -27,7 +27,7 @@ impl KnotHash {
         let mut lengths: Vec<_> = s.chars().map(|c| c as u8 as usize).collect();
         let add = vec![17, 31, 73, 47, 23];
         lengths.extend(add);
-        let mut v: Vec<_> = (0..=255).into_iter().collect();
+        let mut v: Vec<_> = (0..=255).collect();
 
         let mut cur = 0;
         let mut skip = 0;
@@ -76,7 +76,9 @@ impl KnotHash {
 
 impl fmt::Display for KnotHash {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let out: String = self.v.iter().map(|x| format!("{:02x}", x)).collect();
-        write!(f, "{}", out)
+        for x in self.v {
+            write!(f, "{:02x}", x)?;
+        }
+        Ok(())
     }
 }

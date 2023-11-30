@@ -31,7 +31,7 @@ impl Day for Day03 {
 
     fn star2(&self, input: &str) -> String {
         let mut houses = vec![HashSet::new(), HashSet::new()];
-        let mut pos = vec![(0, 0), (0, 0)];
+        let mut pos = [(0, 0), (0, 0)];
         houses[0].insert(pos[0]);
         for (i, c) in input.chars().enumerate() {
             match c {

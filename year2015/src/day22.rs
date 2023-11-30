@@ -42,32 +42,32 @@ fn mana_cost(action: &Action) -> i64 {
     }
 }
 
-fn do_missile(mut state: &mut GameState) {
+fn do_missile(state: &mut GameState) {
     state.boss_stats.hp -= 4;
 }
 
-fn do_drain(mut state: &mut GameState) {
+fn do_drain(state: &mut GameState) {
     state.boss_stats.hp -= 2;
     state.player_stats.hp += 2;
 }
 
-fn start_shield(mut state: &mut GameState) {
+fn start_shield(state: &mut GameState) {
     state.player_stats.arm = 7;
 }
 
-fn stop_shield(mut state: &mut GameState) {
+fn stop_shield(state: &mut GameState) {
     state.player_stats.arm = 0;
 }
 
-fn do_poison(mut state: &mut GameState) {
+fn do_poison(state: &mut GameState) {
     state.boss_stats.hp -= 3;
 }
 
-fn do_recharge(mut state: &mut GameState) {
+fn do_recharge(state: &mut GameState) {
     state.mana += 101;
 }
 
-fn do_boss_attack(mut state: &mut GameState) {
+fn do_boss_attack(state: &mut GameState) {
     state.player_stats.hp -= (state.boss_stats.dmg - state.player_stats.arm).max(0);
 }
 

@@ -15,7 +15,7 @@ impl Day for Day03 {
 
     fn star2(&self, input: &str) -> String {
         let grid = Grid2D::new(input).unwrap();
-        let slopes = vec![
+        let slopes = [
             Coords { x: 1, y: 1 },
             Coords { x: 3, y: 1 },
             Coords { x: 5, y: 1 },

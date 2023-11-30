@@ -85,13 +85,12 @@ fn paths_between_keys(
     let mut key_paths = HashMap::new();
 
     // @ (start position)
-    let keys_to_find: HashSet<char> = ('a'..=*max_key).into_iter().collect();
+    let keys_to_find: HashSet<char> = ('a'..=*max_key).collect();
     key_paths.extend(bfs_keys(grid, &'@', start_pos, &keys_to_find).drain());
 
     // letters
     for i in 'a'..=*max_key {
-        let keys_to_find: HashSet<char> =
-            (((i as u8 + 1) as char)..=*max_key).into_iter().collect();
+        let keys_to_find: HashSet<char> = (((i as u8 + 1) as char)..=*max_key).collect();
         if !keys_to_find.is_empty() {
             key_paths.extend(bfs_keys(grid, &i, keys.get(&i).unwrap(), &keys_to_find).drain());
         }
