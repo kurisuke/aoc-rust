@@ -9,6 +9,6 @@ edition = "2021"
 [dependencies]
 common = { path = "../common" }
 util = { path = "../util" }
-bitvec = "0.22.3"
-itertools = "0.10.3"
+bitvec = "0.20.4"
+itertools = "0.12.0"
 scan_fmt = "0.2.6"

@@ -9,7 +9,7 @@ edition = "2021"
 [dependencies]
 common = { path = "../common" }
 util = { path = "../util" }
-itertools = "0.10.3"
-num-bigint = "0.4.3"
-regex = "1.5.4"
+itertools = "0.12.0"
+num-bigint = "0.4.4"
+regex = "1.10.2"
 scan_fmt = "0.2.6"
