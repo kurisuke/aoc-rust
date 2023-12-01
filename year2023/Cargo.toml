@@ -1,0 +1,12 @@
+[package]
+name = "year2023"
+version = "0.1.0"
+authors = ["Peter Helbing <peter@abulafia.org>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+common = { path = "../common" }
+util = { path = "../util" }
+aho-corasick = "1.1.2"
