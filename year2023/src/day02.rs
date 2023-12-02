@@ -17,8 +17,16 @@ impl Day for Day02 {
             .to_string()
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let games = parse_input(input);
+        games
+            .iter()
+            .map(|game| {
+                let min_cubes = game.min_cubes();
+                min_cubes.red * min_cubes.green * min_cubes.blue
+            })
+            .sum::<usize>()
+            .to_string()
     }
 }
 
@@ -33,6 +41,22 @@ impl Game {
         self.subsets
             .iter()
             .all(|subset| red >= subset.red && green >= subset.green && blue >= subset.blue)
+    }
+
+    fn min_cubes(&self) -> CubeSubset {
+        let mut min_cubes = CubeSubset {
+            red: 0,
+            green: 0,
+            blue: 0,
+        };
+
+        for subset in self.subsets.iter() {
+            min_cubes.red = min_cubes.red.max(subset.red);
+            min_cubes.green = min_cubes.green.max(subset.green);
+            min_cubes.blue = min_cubes.blue.max(subset.blue);
+        }
+
+        min_cubes
     }
 }
 
@@ -62,8 +86,7 @@ fn parse_input(input: &str) -> Vec<Game> {
                         blue: 0,
                     };
 
-                    let mut spl_subsets = subsets_str.split(", ");
-                    while let Some(subset_str) = spl_subsets.next() {
+                    for subset_str in subsets_str.split(", ") {
                         let mut spl_subset = subset_str.split(' ');
                         let count: usize = spl_subset.next().unwrap().parse().unwrap();
                         let color = spl_subset.next().unwrap();
@@ -96,15 +119,21 @@ fn parse_input(input: &str) -> Vec<Game> {
 mod tests {
     use super::*;
 
-    #[test]
-    fn star1() {
-        let input = r#"Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+    const INPUT: &str = r#"Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
 Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
 Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"#;
 
+    #[test]
+    fn star1() {
         let d = Day02 {};
-        assert_eq!(d.star1(input), "8");
+        assert_eq!(d.star1(INPUT), "8");
+    }
+
+    #[test]
+    fn star2() {
+        let d = Day02 {};
+        assert_eq!(d.star2(INPUT), "2286");
     }
 }
