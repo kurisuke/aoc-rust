@@ -38,11 +38,7 @@ fn calibration_value_1(line: &str) -> Option<u32> {
         .find(|c| c.is_ascii_digit())
         .map(|c| c.to_digit(10).unwrap());
 
-    if let Some(first) = first {
-        last.map(|last| first * 10 + last)
-    } else {
-        None
-    }
+    first.zip(last).map(|(first, last)| first * 10 + last)
 }
 
 fn calibration_value_2(line: &str, ac: &AhoCorasick) -> Option<usize> {
@@ -52,11 +48,7 @@ fn calibration_value_2(line: &str, ac: &AhoCorasick) -> Option<usize> {
         .last()
         .map(|m| m.pattern().as_usize() % 9 + 1);
 
-    if let Some(first) = first {
-        last.map(|last| first * 10 + last)
-    } else {
-        None
-    }
+    first.zip(last).map(|(first, last)| first * 10 + last)
 }
 
 #[cfg(test)]
