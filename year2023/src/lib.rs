@@ -4,6 +4,7 @@ use common::year::Year;
 mod day01;
 mod day02;
 mod day03;
+mod day04;
 
 pub struct Year2023 {}
 
@@ -13,6 +14,7 @@ impl Year for Year2023 {
             1 => Some(Box::new(day01::Day01 {})),
             2 => Some(Box::new(day02::Day02 {})),
             3 => Some(Box::new(day03::Day03 {})),
+            4 => Some(Box::new(day04::Day04 {})),
             _ => None,
         }
     }
