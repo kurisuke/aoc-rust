@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use common::day::Day;
 
 pub struct Day05 {}
@@ -14,7 +12,7 @@ impl Day for Day05 {
         let input = Input::parse(input);
         let mut location = 0;
         loop {
-            let seed = input.convert_rev(location, "location", "seed");
+            let seed = input.convert_rev(location);
             if input.in_seed_range(seed) {
                 break;
             }
@@ -26,7 +24,7 @@ impl Day for Day05 {
 
 struct Input {
     seeds: Vec<usize>,
-    maps: Maps,
+    maps: Vec<Map>,
 }
 
 impl Input {
@@ -40,47 +38,34 @@ impl Input {
             .map(|s| s.parse().unwrap())
             .collect();
 
-        let maps = sections
-            .map(Map::parse)
-            .map(|map| (map.src.clone(), map))
-            .collect();
+        let maps = sections.map(Map::parse).collect();
 
         Input { seeds, maps }
     }
 
-    fn convert(&self, seed: usize, start: &str, end: &str) -> usize {
-        let mut cur_src = start;
+    fn convert(&self, seed: usize) -> usize {
         let mut cur = seed;
-        while cur_src != end {
-            let cur_map = self.maps.get(cur_src).unwrap();
-
+        for cur_map in &self.maps {
             for map_line in &cur_map.lines {
                 if cur >= map_line.src && cur < map_line.src + map_line.len {
                     cur = map_line.dest + (cur - map_line.src);
                     break;
                 }
             }
-
-            cur_src = &cur_map.dest;
         }
         cur
     }
 
-    fn convert_rev(&self, seed: usize, start: &str, end: &str) -> usize {
-        let mut cur_dest = start;
+    fn convert_rev(&self, seed: usize) -> usize {
         let mut cur = seed;
 
-        while cur_dest != end {
-            let cur_map = self.maps.values().find(|m| m.dest == cur_dest).unwrap();
-
+        for cur_map in self.maps.iter().rev() {
             for map_line in &cur_map.lines {
                 if cur >= map_line.dest && cur < map_line.dest + map_line.len {
                     cur = map_line.src + (cur - map_line.dest);
                     break;
                 }
             }
-
-            cur_dest = &cur_map.src;
         }
         cur
     }
@@ -97,28 +82,20 @@ impl Input {
     fn lowest_location(&self) -> usize {
         self.seeds
             .iter()
-            .map(|seed| self.convert(*seed, "seed", "location"))
+            .map(|seed| self.convert(*seed))
             .min()
             .unwrap()
     }
 }
 
-type Maps = HashMap<String, Map>;
-
 struct Map {
-    src: String,
-    dest: String,
     lines: Vec<MapLine>,
 }
 
 impl Map {
     fn parse(sec: &str) -> Map {
-        let mut lines = sec.lines();
-        let heading = lines.next().unwrap().split_whitespace().next().unwrap();
-        let src = heading.split('-').next().unwrap().to_string();
-        let dest = heading.split('-').nth(2).unwrap().to_string();
-        let lines = lines.map(MapLine::parse).collect();
-        Map { src, dest, lines }
+        let lines = sec.lines().skip(1).map(MapLine::parse).collect();
+        Map { lines }
     }
 }
 
@@ -186,10 +163,10 @@ humidity-to-location map:
     #[test]
     fn convert_rev() {
         let input = Input::parse(INPUT);
-        assert_eq!(input.convert_rev(82, "location", "seed"), 79);
-        assert_eq!(input.convert_rev(43, "location", "seed"), 14);
-        assert_eq!(input.convert_rev(86, "location", "seed"), 55);
-        assert_eq!(input.convert_rev(35, "location", "seed"), 13);
+        assert_eq!(input.convert_rev(82), 79);
+        assert_eq!(input.convert_rev(43), 14);
+        assert_eq!(input.convert_rev(86), 55);
+        assert_eq!(input.convert_rev(35), 13);
     }
 
     #[test]
