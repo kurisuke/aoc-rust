@@ -10,8 +10,17 @@ impl Day for Day05 {
         input.lowest_location().to_string()
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let input = Input::parse(input);
+        let mut location = 0;
+        loop {
+            let seed = input.convert_rev(location, "location", "seed");
+            if input.in_seed_range(seed) {
+                break;
+            }
+            location += 1;
+        }
+        location.to_string()
     }
 }
 
@@ -55,6 +64,34 @@ impl Input {
             cur_src = &cur_map.dest;
         }
         cur
+    }
+
+    fn convert_rev(&self, seed: usize, start: &str, end: &str) -> usize {
+        let mut cur_dest = start;
+        let mut cur = seed;
+
+        while cur_dest != end {
+            let cur_map = self.maps.values().find(|m| m.dest == cur_dest).unwrap();
+
+            for map_line in &cur_map.lines {
+                if cur >= map_line.dest && cur < map_line.dest + map_line.len {
+                    cur = map_line.src + (cur - map_line.dest);
+                    break;
+                }
+            }
+
+            cur_dest = &cur_map.src;
+        }
+        cur
+    }
+
+    fn in_seed_range(&self, n: usize) -> bool {
+        for c in self.seeds.chunks(2) {
+            if n >= c[0] && n < c[0] + c[1] {
+                return true;
+            }
+        }
+        false
     }
 
     fn lowest_location(&self) -> usize {
@@ -141,8 +178,23 @@ humidity-to-location map:
 56 93 4"#;
 
     #[test]
-    fn ex1() {
+    fn star1() {
         let d = Day05 {};
         assert_eq!(d.star1(INPUT), "35");
+    }
+
+    #[test]
+    fn convert_rev() {
+        let input = Input::parse(INPUT);
+        assert_eq!(input.convert_rev(82, "location", "seed"), 79);
+        assert_eq!(input.convert_rev(43, "location", "seed"), 14);
+        assert_eq!(input.convert_rev(86, "location", "seed"), 55);
+        assert_eq!(input.convert_rev(35, "location", "seed"), 13);
+    }
+
+    #[test]
+    fn star2() {
+        let d = Day05 {};
+        assert_eq!(d.star2(INPUT), "46");
     }
 }
