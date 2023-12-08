@@ -1,11 +1,13 @@
 use std::{
     cmp::Ordering,
     collections::{BinaryHeap, HashSet},
-    mem::swap,
 };
 
 use common::day::Day;
-use util::grid2d::{Coords, Direction, Grid2D};
+use util::{
+    gcd::lcm,
+    grid2d::{Coords, Direction, Grid2D},
+};
 
 pub struct Day24 {}
 
@@ -179,27 +181,6 @@ impl Day for Day24 {
         let offset1 = search(&grids, start, end, 0).unwrap();
         let offset2 = search(&grids, end, start, offset1).unwrap();
         format!("{}", search(&grids, start, end, offset2).unwrap())
-    }
-}
-
-fn lcm(first: usize, second: usize) -> usize {
-    first * second / gcd(first, second)
-}
-
-fn gcd(first: usize, second: usize) -> usize {
-    let mut max = first;
-    let mut min = second;
-    if min > max {
-        swap(&mut max, &mut min);
-    }
-
-    loop {
-        let res = max % min;
-        if res == 0 {
-            return min;
-        }
-        max = min;
-        min = res;
     }
 }
 
