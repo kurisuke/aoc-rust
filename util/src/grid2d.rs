@@ -43,6 +43,21 @@ pub enum Direction {
     NW,
 }
 
+impl Direction {
+    pub fn opposite(&self) -> Direction {
+        match self {
+            Direction::N => Direction::S,
+            Direction::NE => Direction::SW,
+            Direction::E => Direction::W,
+            Direction::SE => Direction::NW,
+            Direction::S => Direction::N,
+            Direction::SW => Direction::NE,
+            Direction::W => Direction::E,
+            Direction::NW => Direction::SE,
+        }
+    }
+}
+
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 pub struct Coords {
     pub x: i64,
