@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use common::day::Day;
 use util::grid2d::{Coords, Direction, Grid2D};
 
@@ -6,11 +8,13 @@ pub struct Day10 {}
 impl Day for Day10 {
     fn star1(&self, input: &str) -> String {
         let (start_coords, grid) = parse_input(input);
-        traverse(start_coords, &grid).to_string()
+        (contour(start_coords, &grid).len() / 2).to_string()
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let (start_coords, grid) = parse_input(input);
+        let c = contour(start_coords, &grid);
+        enclosed_area(&grid, &c).to_string()
     }
 }
 
@@ -117,8 +121,10 @@ fn mov(grid: &Grid2D<Option<Pipe>>, pos: Coords, d: Direction) -> (Coords, Direc
     (pos_new, d_new)
 }
 
-fn traverse(start_coords: Coords, grid: &Grid2D<Option<Pipe>>) -> usize {
-    let mut mov_counter = 0;
+fn contour(start_coords: Coords, grid: &Grid2D<Option<Pipe>>) -> HashSet<Coords> {
+    let mut contour = HashSet::new();
+    contour.insert(start_coords);
+
     let mut mov1_pos = start_coords;
     let mut mov2_pos = start_coords;
     let (mut mov1_dir, mut mov2_dir) = match grid.at(&start_coords).unwrap().unwrap() {
@@ -131,15 +137,65 @@ fn traverse(start_coords: Coords, grid: &Grid2D<Option<Pipe>>) -> usize {
     };
 
     loop {
-        mov_counter += 1;
         (mov1_pos, mov1_dir) = mov(grid, mov1_pos, mov1_dir);
         (mov2_pos, mov2_dir) = mov(grid, mov2_pos, mov2_dir);
+        contour.insert(mov1_pos);
         if mov1_pos == mov2_pos {
             break;
         }
+        contour.insert(mov2_pos);
     }
 
-    mov_counter
+    contour
+}
+
+fn enclosed_area(grid: &Grid2D<Option<Pipe>>, contour: &HashSet<Coords>) -> usize {
+    let mut area = 0;
+
+    for y in 0..grid.height() {
+        let mut pipe_stack = vec![];
+        for x in 0..grid.width() {
+            let pos = Coords { x, y };
+            if contour.contains(&pos) {
+                // part of the loop
+                match grid.at(&pos).unwrap().unwrap() {
+                    Pipe::NS => {
+                        pipe_stack.push(Pipe::NS);
+                    }
+                    Pipe::EW => {}
+                    Pipe::NE => {
+                        pipe_stack.push(Pipe::NE);
+                    }
+                    Pipe::NW => {
+                        if pipe_stack.last().unwrap() == &Pipe::NE {
+                            pipe_stack.pop();
+                        } else if pipe_stack.last().unwrap() == &Pipe::SE {
+                            pipe_stack.pop();
+                            pipe_stack.push(Pipe::NS);
+                        }
+                    }
+                    Pipe::SW => {
+                        if pipe_stack.last().unwrap() == &Pipe::SE {
+                            pipe_stack.pop();
+                        } else if pipe_stack.last().unwrap() == &Pipe::NE {
+                            pipe_stack.pop();
+                            pipe_stack.push(Pipe::NS);
+                        }
+                    }
+                    Pipe::SE => {
+                        pipe_stack.push(Pipe::SE);
+                    }
+                }
+            } else {
+                // not part of the loop
+                if pipe_stack.len() % 2 == 1 {
+                    area += 1;
+                }
+            }
+        }
+    }
+
+    area
 }
 
 #[cfg(test)]
@@ -168,6 +224,56 @@ LJ..."#;
 
         let d = Day10 {};
         assert_eq!(d.star1(input), "8");
+    }
+
+    #[test]
+    fn ex3() {
+        let input = r#"...........
+.S-------7.
+.|F-----7|.
+.||.....||.
+.||.....||.
+.|L-7.F-J|.
+.|..|.|..|.
+.L--J.L--J.
+..........."#;
+
+        let d = Day10 {};
+        assert_eq!(d.star2(input), "4");
+    }
+
+    #[test]
+    fn ex4() {
+        let input = r#".F----7F7F7F7F-7....
+.|F--7||||||||FJ....
+.||.FJ||||||||L7....
+FJL7L7LJLJ||LJ.L-7..
+L--J.L7...LJS7F-7L7.
+....F-J..F7FJ|L7L7L7
+....L7.F7||L7|.L7L7|
+.....|FJLJ|FJ|F7|.LJ
+....FJL-7.||.||||...
+....L---J.LJ.LJLJ..."#;
+
+        let d = Day10 {};
+        assert_eq!(d.star2(input), "8");
+    }
+
+    #[test]
+    fn ex5() {
+        let input = r#"FF7FSF7F7F7F7F7F---7
+L|LJ||||||||||||F--J
+FL-7LJLJ||||||LJL-77
+F--JF--7||LJLJ7F7FJ-
+L---JF-JLJ.||-FJLJJ7
+|F|F-JF---7F7-L7L|7|
+|FFJF7L7F-JF7|JL---7
+7-L-JL7||F7|L7F-7F7|
+L.L7LFJ|||||FJL7||LJ
+L7JLJL-JLJLJL--JLJ.L"#;
+
+        let d = Day10 {};
+        assert_eq!(d.star2(input), "10");
     }
 
     #[test]
