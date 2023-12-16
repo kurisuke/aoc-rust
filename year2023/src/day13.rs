@@ -9,25 +9,54 @@ impl Day for Day13 {
             .split("\n\n")
             .map(|section| {
                 let grid = Grid2D::new(section).unwrap();
-
-                match find_reflection(&grid) {
-                    Some(n) => n,
-                    None => {
-                        let grid = grid.transpose();
-                        find_reflection(&grid).unwrap() * 100
-                    }
-                }
+                find_reflection(&grid, None).unwrap()
             })
             .sum::<i64>()
             .to_string()
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        input
+            .split("\n\n")
+            .map(|section| {
+                let grid = Grid2D::new(section).unwrap();
+                let orig_reflection = find_reflection(&grid, None).unwrap();
+
+                for smudge_pos in grid.coords_iter() {
+                    let mut grid_mod = grid.clone();
+                    match grid_mod.at(&smudge_pos).unwrap() {
+                        '#' => {
+                            grid_mod.set(&smudge_pos, '.');
+                        }
+                        '.' => {
+                            grid_mod.set(&smudge_pos, '#');
+                        }
+                        _ => unreachable!(),
+                    }
+
+                    if let Some(x) = find_reflection(&grid_mod, Some(orig_reflection)) {
+                        return x;
+                    }
+                }
+                unreachable!()
+            })
+            .sum::<i64>()
+            .to_string()
     }
 }
 
-fn find_reflection(grid: &Grid2D<char>) -> Option<i64> {
+fn find_reflection(grid: &Grid2D<char>, skip: Option<i64>) -> Option<i64> {
+    match find_reflection_1d(grid, skip) {
+        Some(n) => Some(n),
+        None => {
+            let grid = grid.transpose();
+            let skip = skip.map(|x| x / 100);
+            find_reflection_1d(&grid, skip).map(|x| x * 100)
+        }
+    }
+}
+
+fn find_reflection_1d(grid: &Grid2D<char>, skip: Option<i64>) -> Option<i64> {
     for col in 1..grid.width() {
         let mut col_left = col - 1;
         let mut col_right = col;
@@ -49,7 +78,13 @@ fn find_reflection(grid: &Grid2D<char>) -> Option<i64> {
             col_right += 1;
         }
         if fulfilled {
-            return Some(col);
+            if let Some(skip) = skip {
+                if skip != col {
+                    return Some(col);
+                }
+            } else {
+                return Some(col);
+            }
         }
     }
     None
@@ -59,9 +94,7 @@ fn find_reflection(grid: &Grid2D<char>) -> Option<i64> {
 mod tests {
     use super::*;
 
-    #[test]
-    fn ex1() {
-        let input = r#"#.##..##.
+    const INPUT: &str = r#"#.##..##.
 ..#.##.#.
 ##......#
 ##......#
@@ -77,7 +110,15 @@ mod tests {
 ..##..###
 #....#..#"#;
 
+    #[test]
+    fn ex1() {
         let d = Day13 {};
-        assert_eq!(d.star1(input), "405");
+        assert_eq!(d.star1(INPUT), "405");
+    }
+
+    #[test]
+    fn ex2() {
+        let d = Day13 {};
+        assert_eq!(d.star2(INPUT), "400");
     }
 }
