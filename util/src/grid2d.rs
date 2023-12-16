@@ -379,7 +379,7 @@ impl<T: std::cmp::PartialEq> Grid2D<T> {
     }
 }
 
-impl<T: Copy> Grid2D<T> {
+impl<T: Copy + Default> Grid2D<T> {
     pub fn with_default(dims: Coords, def: &T) -> Grid2D<T> {
         let el = vec![def; dims.x as usize * dims.y as usize];
         Grid2D {
@@ -387,6 +387,22 @@ impl<T: Copy> Grid2D<T> {
             width: dims.x as usize,
             height: dims.y as usize,
         }
+    }
+
+    pub fn transpose(&self) -> Grid2D<T> {
+        let mut grid_new = Grid2D::with_default(
+            Coords {
+                x: self.height(),
+                y: self.width(),
+            },
+            &T::default(),
+        );
+
+        for c in self.coords_iter() {
+            grid_new.set(&Coords { x: c.y, y: c.x }, *self.at(&c).unwrap());
+        }
+
+        grid_new
     }
 
     pub fn clip(&self, c1: Coords, c2: Coords) -> Option<Grid2D<T>> {
