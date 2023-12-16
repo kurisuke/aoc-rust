@@ -8,11 +8,50 @@ pub struct Day16 {}
 impl Day for Day16 {
     fn star1(&self, input: &str) -> String {
         let grid = Grid2D::new(input).unwrap();
-        energized(&grid).to_string()
+        let init = Beam {
+            pos: Coords { x: 0, y: 0 },
+            dir: Direction::E,
+        };
+        energized(&grid, init).to_string()
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let grid = Grid2D::new(input).unwrap();
+        let mut inits = vec![];
+
+        for y in 0..grid.height() {
+            inits.push(Beam {
+                pos: Coords { x: 0, y },
+                dir: Direction::E,
+            });
+            inits.push(Beam {
+                pos: Coords {
+                    x: grid.width() - 1,
+                    y,
+                },
+                dir: Direction::W,
+            });
+        }
+        for x in 0..grid.width() {
+            inits.push(Beam {
+                pos: Coords { x, y: 0 },
+                dir: Direction::S,
+            });
+            inits.push(Beam {
+                pos: Coords {
+                    x,
+                    y: grid.height() - 1,
+                },
+                dir: Direction::N,
+            });
+        }
+
+        inits
+            .into_iter()
+            .map(|init| energized(&grid, init))
+            .max()
+            .unwrap()
+            .to_string()
     }
 }
 
@@ -22,19 +61,15 @@ struct Beam {
     dir: Direction,
 }
 
-fn energized(grid: &Grid2D<char>) -> usize {
+fn energized(grid: &Grid2D<char>, init: Beam) -> usize {
     let mut seen = HashSet::new();
     let mut queue = VecDeque::new();
 
-    let init = Beam {
-        pos: Coords { x: 0, y: 0 },
-        dir: Direction::E,
-    };
     seen.insert(init);
     queue.push_back(init);
 
     while let Some(beam) = queue.pop_front() {
-        let beams_next = beam.next(&grid);
+        let beams_next = beam.next(grid);
         for beam_next in beams_next.into_iter() {
             if grid.at(&beam_next.pos).is_some() && seen.insert(beam_next) {
                 queue.push_back(beam_next);
@@ -142,5 +177,11 @@ mod tests {
     fn ex1() {
         let d = Day16 {};
         assert_eq!(d.star1(INPUT), "46");
+    }
+
+    #[test]
+    fn ex2() {
+        let d = Day16 {};
+        assert_eq!(d.star2(INPUT), "51");
     }
 }
