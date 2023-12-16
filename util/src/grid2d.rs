@@ -31,7 +31,7 @@ pub enum Flip {
 }
 
 #[allow(dead_code)]
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Direction {
     N,
     NE,
