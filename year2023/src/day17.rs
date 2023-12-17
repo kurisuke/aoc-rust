@@ -11,11 +11,12 @@ pub struct Day17 {}
 impl Day for Day17 {
     fn star1(&self, input: &str) -> String {
         let grid = Grid2D::new_by(input, |x| x.to_digit(10).unwrap() as usize).unwrap();
-        search(&grid).unwrap().to_string()
+        search(&grid, 0, 3).unwrap().to_string()
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let grid = Grid2D::new_by(input, |x| x.to_digit(10).unwrap() as usize).unwrap();
+        search(&grid, 4, 10).unwrap().to_string()
     }
 }
 
@@ -59,28 +60,33 @@ impl PartialOrd for SearchState {
     }
 }
 
-fn search(grid: &Grid2D<usize>) -> Option<usize> {
-    let init = SearchState {
-        heat_loss: 0,
-        pos: Coords { x: 0, y: 0 },
-        direction: Direction::E,
-        straight_steps: 0,
-    };
+fn search(
+    grid: &Grid2D<usize>,
+    min_before_turn_or_stop: usize,
+    max_before_turn: usize,
+) -> Option<usize> {
+    let mut visited = HashMap::new();
+    let mut queue = BinaryHeap::new();
 
     let end_pos = Coords {
         x: grid.width() - 1,
         y: grid.height() - 1,
     };
 
-    let mut visited = HashMap::new();
-    visited.insert(HashState::from(&init), init.heat_loss);
-
-    let mut queue = BinaryHeap::new();
-    queue.push(init);
+    for d_init in [Direction::E, Direction::S] {
+        let init = SearchState {
+            heat_loss: 0,
+            pos: Coords { x: 0, y: 0 },
+            direction: d_init,
+            straight_steps: 1,
+        };
+        visited.insert(HashState::from(&init), init.heat_loss);
+        queue.push(init);
+    }
 
     while let Some(state) = queue.pop() {
         // println!("state: {:?}", state);
-        if state.pos == end_pos {
+        if state.pos == end_pos && state.straight_steps >= min_before_turn_or_stop {
             return Some(state.heat_loss);
         }
 
@@ -88,7 +94,8 @@ fn search(grid: &Grid2D<usize>) -> Option<usize> {
             .into_iter()
             .filter(|d| {
                 d != &state.direction.opposite()
-                    && !(d == &state.direction && state.straight_steps >= 3)
+                    && !(d != &state.direction && state.straight_steps < min_before_turn_or_stop)
+                    && !(d == &state.direction && state.straight_steps >= max_before_turn)
             });
 
         let new_states = new_dirs
@@ -144,5 +151,23 @@ mod tests {
     fn ex1() {
         let d = Day17 {};
         assert_eq!(d.star1(INPUT), "102");
+    }
+    #[test]
+
+    fn ex2() {
+        let d = Day17 {};
+        assert_eq!(d.star2(INPUT), "94");
+    }
+
+    #[test]
+    fn ex3() {
+        let input = r#"111111111111
+999999999991
+999999999991
+999999999991
+999999999991"#;
+
+        let d = Day17 {};
+        assert_eq!(d.star2(input), "71");
     }
 }
