@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 
 use common::day::Day;
 
@@ -15,8 +15,19 @@ impl Day for Day19 {
             .to_string()
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let (workflows, _) = parse_input(input);
+        let accepted_ranges = accepted_ranges(&workflows);
+        accepted_ranges
+            .iter()
+            .map(|ranges| {
+                ranges
+                    .iter()
+                    .map(|range| range.1 - range.0)
+                    .product::<usize>()
+            })
+            .sum::<usize>()
+            .to_string()
     }
 }
 
@@ -171,6 +182,77 @@ impl Part {
     }
 }
 
+// part 2
+
+type Ranges = [(usize, usize); 4];
+
+struct SearchState<'a> {
+    node: &'a str,
+    ranges: Ranges,
+}
+
+fn accepted_ranges(workflows: &HashMap<&str, Workflow>) -> Vec<Ranges> {
+    let mut accepted = vec![];
+    let mut queue = VecDeque::new();
+    queue.push_back(SearchState {
+        node: "in",
+        ranges: [(1, 4001), (1, 4001), (1, 4001), (1, 4001)],
+    });
+
+    while let Some(mut cur) = queue.pop_front() {
+        let workflow = workflows.get(cur.node).unwrap();
+        for rule in &workflow.rules {
+            let mut ranges_new = cur.ranges;
+            if rule.greater {
+                ranges_new[rule.idx].0 = rule.val + 1;
+            } else {
+                ranges_new[rule.idx].1 = rule.val;
+            }
+
+            if ranges_new[rule.idx].0 >= ranges_new[rule.idx].1 {
+                // empty range, skip
+            } else {
+                if rule.greater {
+                    cur.ranges[rule.idx].1 = ranges_new[rule.idx].0;
+                } else {
+                    cur.ranges[rule.idx].0 = ranges_new[rule.idx].1;
+                }
+
+                match rule.target {
+                    Target::Accepted => accepted.push(ranges_new),
+                    Target::Rejected => {}
+                    Target::Other(node) => {
+                        queue.push_back(SearchState {
+                            node,
+                            ranges: ranges_new,
+                        });
+                    }
+                }
+            }
+
+            // check if remaining is empty
+            if cur.ranges.iter().any(|range| range.0 >= range.1) {
+                break;
+            }
+        }
+
+        if cur.ranges.iter().all(|range| range.0 < range.1) {
+            match workflow.default {
+                Target::Accepted => accepted.push(cur.ranges),
+                Target::Rejected => {}
+                Target::Other(node) => {
+                    queue.push_back(SearchState {
+                        node,
+                        ranges: cur.ranges,
+                    });
+                }
+            }
+        }
+    }
+
+    accepted
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -197,5 +279,11 @@ hdj{m>838:A,pv}
     fn ex1() {
         let d = Day19 {};
         assert_eq!(d.star1(INPUT), "19114");
+    }
+
+    #[test]
+    fn ex2() {
+        let d = Day19 {};
+        assert_eq!(d.star2(INPUT), "167409079868000");
     }
 }
