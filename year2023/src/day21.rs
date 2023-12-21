@@ -8,7 +8,7 @@ pub struct Day21 {}
 impl Day for Day21 {
     fn star1(&self, input: &str) -> String {
         let grid = Grid2D::new(input).unwrap();
-        search(&grid, 64, false).to_string()
+        search(&grid, 64, false).last().unwrap().to_string()
     }
 
     fn star2(&self, input: &str) -> String {
@@ -20,10 +20,13 @@ impl Day for Day21 {
         let x = (target_steps - offset) / grid.height();
 
         let xns: Vec<_> = (0..3)
-            .map(|i| {
-                let x = offset + i * grid.height();
-                search(&grid, x as usize, true) as i64
-            })
+            .map(|i| (offset + i * grid.height()) as usize)
+            .collect();
+        let xns: Vec<_> = search(&grid, xns[2], true)
+            .into_iter()
+            .enumerate()
+            .filter(|(i, _)| xns.contains(i))
+            .map(|(_, x)| x as i64)
             .collect();
 
         let c = xns[0];
@@ -35,12 +38,15 @@ impl Day for Day21 {
     }
 }
 
-fn search(grid: &Grid2D<char>, target_steps: usize, wrap: bool) -> usize {
+fn search(grid: &Grid2D<char>, target_steps: usize, wrap: bool) -> Vec<usize> {
     let start = grid.find('S').unwrap();
 
     let mut frontier = HashSet::new();
     let mut frontier_new = HashSet::new();
     frontier_new.insert(start);
+
+    let mut steps = vec![];
+    steps.push(frontier_new.len());
 
     for _ in 0..target_steps {
         frontier.clear();
@@ -65,9 +71,10 @@ fn search(grid: &Grid2D<char>, target_steps: usize, wrap: bool) -> usize {
                 }
             }
         }
-    }
 
-    frontier_new.len()
+        steps.push(frontier_new.len());
+    }
+    steps
 }
 
 #[cfg(test)]
@@ -89,12 +96,16 @@ mod tests {
     #[test]
     fn ex1() {
         let grid = Grid2D::new(INPUT).unwrap();
-        assert_eq!(search(&grid, 6, false), 16);
+        assert_eq!(search(&grid, 6, false)[6], 16);
     }
 
     #[test]
     fn ex2() {
         let grid = Grid2D::new(INPUT).unwrap();
-        assert_eq!(search(&grid, 100, true), 6536);
+        let steps = search(&grid, 100, true);
+        assert_eq!(steps[6], 16);
+        assert_eq!(steps[10], 50);
+        assert_eq!(steps[50], 1594);
+        assert_eq!(steps[100], 6536);
     }
 }
