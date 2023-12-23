@@ -10,3 +10,4 @@ edition = "2021"
 common = { path = "../common" }
 util = { path = "../util" }
 aho-corasick = "1.1.2"
+itertools = "0.12.0"

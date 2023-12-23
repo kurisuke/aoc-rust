@@ -842,5 +842,6 @@ version = "0.1.0"
 dependencies = [
  "aho-corasick",
  "common",
+ "itertools",
  "util",
 ]
