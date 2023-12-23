@@ -59,7 +59,6 @@ type Bricks = Vec<Brick>;
 
 struct BrickWithSupports {
     brick: Brick,
-    supports: HashSet<usize>,
     supported_by: HashSet<usize>,
 }
 
@@ -117,10 +116,9 @@ impl Brick {
 fn settle(bricks: Bricks) -> Vec<BrickWithSupports> {
     let mut settled_bricks: Vec<BrickWithSupports> = vec![];
 
-    for (i, brick) in bricks.iter().enumerate() {
+    for brick in &bricks {
         let mut moved_brick = BrickWithSupports {
             brick: brick.clone(),
-            supports: HashSet::new(),
             supported_by: HashSet::new(),
         };
 
@@ -133,7 +131,6 @@ fn settle(bricks: Bricks) -> Vec<BrickWithSupports> {
                 if moved_brick.brick.overlap(&settled_brick.brick) {
                     blocked = true;
                     moved_brick.supported_by.insert(j);
-                    settled_brick.supports.insert(i);
                 }
             }
 
