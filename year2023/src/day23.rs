@@ -53,8 +53,8 @@ fn search_longest_path(grid: &Grid2D<char>, icy_path: bool) -> Option<usize> {
         }
     }
 
-    let path = vec![start_pos];
-    find_max_path(&distances, 0, path, &end_pos)
+    let mut path = vec![start_pos];
+    find_max_path(&distances, 0, &mut path, &end_pos)
 }
 
 fn find_crossings(grid: &Grid2D<char>) -> HashSet<Coords> {
@@ -74,31 +74,33 @@ fn find_crossings(grid: &Grid2D<char>) -> HashSet<Coords> {
 fn find_max_path(
     distances: &HashMap<(Coords, Coords), usize>,
     steps: usize,
-    path: Vec<Coords>,
+    path: &mut Vec<Coords>,
     end: &Coords,
 ) -> Option<usize> {
-    let pos = path.last().unwrap();
-    if pos == end {
+    let pos = *path.last().unwrap();
+    if &pos == end {
         return Some(steps);
     }
 
-    let neighbors = distances
+    let neighbors: Vec<_> = distances
         .keys()
-        .filter(|(src, _)| src == pos)
-        .filter(|(_, dest)| !path.contains(dest));
+        .filter(|(src, _)| src == &pos)
+        .filter(|(_, dest)| !path.contains(dest))
+        .to_owned()
+        .collect();
 
     let mut max_steps = None;
     for neighbor in neighbors {
-        let mut new_path = path.clone();
-        new_path.push(neighbor.1);
+        path.push(neighbor.1);
         let new_steps = steps + distances.get(neighbor).unwrap();
-        if let Some(new_steps) = find_max_path(distances, new_steps, new_path, end) {
+        if let Some(new_steps) = find_max_path(distances, new_steps, path, end) {
             if let Some(old_steps) = max_steps {
                 max_steps = Some(new_steps.max(old_steps));
             } else {
                 max_steps = Some(new_steps);
             }
         }
+        path.pop().unwrap();
     }
 
     max_steps
