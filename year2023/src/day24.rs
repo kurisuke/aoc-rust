@@ -13,6 +13,23 @@ impl Day for Day24 {
     }
 
     fn star2(&self, _input: &str) -> String {
+        // sagemath:
+        //
+        // var('px vx py vy pz vz t0 t1 t2')
+        // eq1 = px + t0 * vx == 386183914429810 + t0 * 6
+        // eq2 = py + t0 * vy == 203234597957945 + t0 * 106
+        // eq3 = pz + t0 * vz == 537104238090859 + t0 * (-164)
+        //
+        // eq4 = px + t1 * vx == 191853805235172 + t1 * 205
+        // eq5 = py + t1 * vy == 96933297552275 + t1 * 517
+        // eq6 = pz + t1 * vz == 142797538377781 + t1 * 229
+        //
+        // eq7 = px + t2 * vx == 447902097938436 + t2 * (-136)
+        // eq8 = py + t2 * vy == 262258252263185 + t2 * 38
+        // eq9 = pz + t2 * vz == 255543483328939 + t2 * 89
+        //
+        // solve([eq1, eq2, eq3, eq4, eq5, eq6, eq7, eq8, eq9], px, vx, py, vy, pz, vz, t0, t1, t2)
+
         String::from("not implemented")
     }
 }
