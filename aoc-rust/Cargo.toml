@@ -18,8 +18,8 @@ year2020 = { path = "../year2020" }
 year2021 = { path = "../year2021" }
 year2022 = { path = "../year2022" }
 year2023 = { path = "../year2023" }
-cookie = "0.17.0"
-cookie_store = "0.20.0"
+cookie = "0.18.1"
+cookie_store = "0.21.1"
 dotenv = "0.15.0"
-ureq = { version = "2.9.1", features = ["tls", "cookies"] }
-url = "2.5.0"
+ureq = { version = "2.12.1", features = ["tls", "cookies"] }
+url = "2.5.4"

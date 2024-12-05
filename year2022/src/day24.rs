@@ -121,12 +121,7 @@ fn get_start_end(grids: &[Grid2D<char>]) -> (Coords, Coords) {
     (start, end)
 }
 
-fn search(
-    grids: &Vec<Grid2D<char>>,
-    start: Coords,
-    end: Coords,
-    time_offset: usize,
-) -> Option<usize> {
+fn search(grids: &[Grid2D<char>], start: Coords, end: Coords, time_offset: usize) -> Option<usize> {
     let init_state = SearchState {
         minute: time_offset,
         pos: start,

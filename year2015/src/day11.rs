@@ -68,10 +68,10 @@ mod tests {
 
     #[test]
     fn test_valid() {
-        assert_eq!(is_valid_pw("hijklmmn"), false);
-        assert_eq!(is_valid_pw("abbceffg"), false);
-        assert_eq!(is_valid_pw("abbcegjk"), false);
-        assert_eq!(is_valid_pw("abcdffaa"), true);
-        assert_eq!(is_valid_pw("ghjaabcc"), true);
+        assert!(!is_valid_pw("hijklmmn"));
+        assert!(!is_valid_pw("abbceffg"));
+        assert!(!is_valid_pw("abbcegjk"));
+        assert!(is_valid_pw("abcdffaa"));
+        assert!(is_valid_pw("ghjaabcc"));
     }
 }

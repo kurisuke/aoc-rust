@@ -46,18 +46,18 @@ mod tests {
 
     #[test]
     fn star1() {
-        assert_eq!(is_nice_star1("ugknbfddgicrmopn"), true);
-        assert_eq!(is_nice_star1("aaa"), true);
-        assert_eq!(is_nice_star1("jchzalrnumimnmhp"), false);
-        assert_eq!(is_nice_star1("haegwjzuvuyypxyu"), false);
-        assert_eq!(is_nice_star1("dvszwmarrgswjxmb"), false);
+        assert!(is_nice_star1("ugknbfddgicrmopn"));
+        assert!(is_nice_star1("aaa"));
+        assert!(!is_nice_star1("jchzalrnumimnmhp"));
+        assert!(!is_nice_star1("haegwjzuvuyypxyu"));
+        assert!(!is_nice_star1("dvszwmarrgswjxmb"));
     }
 
     #[test]
     fn star2() {
-        assert_eq!(is_nice_star2("qjhvhtzxzqqjkmpb"), true);
-        assert_eq!(is_nice_star2("xxyxx"), true);
-        assert_eq!(is_nice_star2("uurcxstgmygtbstg"), false);
-        assert_eq!(is_nice_star2("ieodomkazucvgmuy"), false);
+        assert!(is_nice_star2("qjhvhtzxzqqjkmpb"));
+        assert!(is_nice_star2("xxyxx"));
+        assert!(!is_nice_star2("uurcxstgmygtbstg"));
+        assert!(!is_nice_star2("ieodomkazucvgmuy"));
     }
 }

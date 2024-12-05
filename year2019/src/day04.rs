@@ -69,15 +69,15 @@ mod tests {
 
     #[test]
     fn star1() {
-        assert_eq!(is_valid_pt1(&111111), true);
-        assert_eq!(is_valid_pt1(&223450), false);
-        assert_eq!(is_valid_pt1(&123789), false);
+        assert!(is_valid_pt1(&111111));
+        assert!(!is_valid_pt1(&223450));
+        assert!(!is_valid_pt1(&123789));
     }
 
     #[test]
     fn star2() {
-        assert_eq!(is_valid_pt2(&112233), true);
-        assert_eq!(is_valid_pt2(&123444), false);
-        assert_eq!(is_valid_pt2(&111122), true);
+        assert!(is_valid_pt2(&112233));
+        assert!(!is_valid_pt2(&123444));
+        assert!(is_valid_pt2(&111122));
     }
 }

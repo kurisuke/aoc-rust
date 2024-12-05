@@ -136,7 +136,7 @@ fn combat(player_stats: &Stats, boss_stats: &Stats) -> bool {
 }
 
 fn min_cost_to_win(boss_stats: &Stats) -> i64 {
-    let mut min_cost = std::i64::MAX;
+    let mut min_cost = i64::MAX;
     for w in WEAPONS.iter() {
         for a in ARMOR.iter() {
             for rs in RINGS.iter().combinations(2) {
@@ -156,7 +156,7 @@ fn min_cost_to_win(boss_stats: &Stats) -> i64 {
 }
 
 fn max_cost_to_lose(boss_stats: &Stats) -> i64 {
-    let mut max_cost = std::i64::MIN;
+    let mut max_cost = i64::MIN;
     for w in WEAPONS.iter() {
         for a in ARMOR.iter() {
             for rs in RINGS.iter().combinations(2) {
@@ -232,6 +232,6 @@ mod tests {
             dmg: 7,
             arm: 2,
         };
-        assert_eq!(combat(&player_stats, &boss_stats), true);
+        assert!(combat(&player_stats, &boss_stats));
     }
 }

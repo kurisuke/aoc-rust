@@ -33,7 +33,7 @@ fn best_happiness(relations: &Relations) -> i64 {
     let first_person = *persons.iter().next().unwrap();
     persons.remove(first_person);
 
-    let mut best_happiness = std::i64::MIN;
+    let mut best_happiness = i64::MIN;
     for mut seating in persons.iter().permutations(num_persons - 1) {
         seating.push(&first_person);
         let mut happiness = 0;

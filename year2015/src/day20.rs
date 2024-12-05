@@ -104,7 +104,7 @@ fn presents_star2(n: usize) -> usize {
 
 impl Day for Day20 {
     fn star1(&self, input: &str) -> String {
-        let min_presents = input.parse::<usize>().unwrap();
+        let min_presents = input.trim().parse::<usize>().unwrap();
         let mut n = 2;
         while presents(n) < min_presents {
             n += 1;
@@ -113,7 +113,7 @@ impl Day for Day20 {
     }
 
     fn star2(&self, input: &str) -> String {
-        let min_presents = input.parse::<usize>().unwrap();
+        let min_presents = input.trim().parse::<usize>().unwrap();
         let mut n = 2;
         while presents_star2(n) < min_presents {
             n += 1;

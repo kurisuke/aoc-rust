@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 
 pub struct Day06 {}
 
-fn cycle(banks: &mut Vec<usize>) {
+fn cycle(banks: &mut [usize]) {
     let len = banks.len();
     let max_val = *banks.iter().max().unwrap();
     let max_pos = banks.iter().position(|v| *v == max_val).unwrap();

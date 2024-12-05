@@ -101,9 +101,6 @@ totally-real-room-200[decoy]"#;
     fn ex2() {
         let input = r#"qzmt-zixmtkozy-ivhz-343[abcde]"#;
         let rooms = parse_input(input);
-        assert_eq!(
-            decrypt_name(rooms.iter().next().unwrap()),
-            "very encrypted name"
-        );
+        assert_eq!(decrypt_name(rooms.first().unwrap()), "very encrypted name");
     }
 }

@@ -77,11 +77,11 @@ fn search(salt: &str, early_exit: bool) -> Option<String> {
 
 impl Day for Day17 {
     fn star1(&self, input: &str) -> String {
-        search(input, true).unwrap()
+        search(input.trim(), true).unwrap()
     }
 
     fn star2(&self, input: &str) -> String {
-        format!("{}", search(input, false).unwrap().len())
+        format!("{}", search(input.trim(), false).unwrap().len())
     }
 }
 

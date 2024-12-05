@@ -155,7 +155,7 @@ mod tests {
 
         assert_eq!(11 & mask0 | mask1, 73);
         assert_eq!(101 & mask0 | mask1, 101);
-        assert_eq!(0 & mask0 | mask1, 64);
+        assert_eq!(mask1, 64);
     }
 
     #[test]

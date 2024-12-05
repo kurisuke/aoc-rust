@@ -77,20 +77,20 @@ mod tests {
 
     #[test]
     fn test_diff_sequences() {
-        let diff_seqs = diff_sequences(&vec![0, 3, 6, 9, 12, 15]);
-        assert_eq!(diff_seqs.last().unwrap(), &vec![3, 3, 3, 3, 3]);
+        let diff_seqs = diff_sequences(&[0, 3, 6, 9, 12, 15]);
+        assert_eq!(diff_seqs.last().unwrap(), &[3, 3, 3, 3, 3]);
 
-        let diff_seqs = diff_sequences(&vec![1, 3, 6, 10, 15, 21]);
-        assert_eq!(diff_seqs.last().unwrap(), &vec![1, 1, 1, 1]);
+        let diff_seqs = diff_sequences(&[1, 3, 6, 10, 15, 21]);
+        assert_eq!(diff_seqs.last().unwrap(), &[1, 1, 1, 1]);
 
-        let diff_seqs = diff_sequences(&vec![10, 13, 16, 21, 30, 45]);
-        assert_eq!(diff_seqs.last().unwrap(), &vec![2, 2, 2]);
+        let diff_seqs = diff_sequences(&[10, 13, 16, 21, 30, 45]);
+        assert_eq!(diff_seqs.last().unwrap(), &[2, 2, 2]);
     }
 
     #[test]
     fn test_extrapolate() {
-        assert_eq!(extrapolate(&vec![0, 3, 6, 9, 12, 15]), 18);
-        assert_eq!(extrapolate(&vec![1, 3, 6, 10, 15, 21]), 28);
-        assert_eq!(extrapolate(&vec![10, 13, 16, 21, 30, 45]), 68);
+        assert_eq!(extrapolate(&[0, 3, 6, 9, 12, 15]), 18);
+        assert_eq!(extrapolate(&[1, 3, 6, 10, 15, 21]), 28);
+        assert_eq!(extrapolate(&[10, 13, 16, 21, 30, 45]), 68);
     }
 }

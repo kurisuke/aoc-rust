@@ -27,6 +27,7 @@ fn find_num(start_nums: &[u32], n: u32) -> u32 {
 impl Day for Day15 {
     fn star1(&self, input: &str) -> String {
         let start_nums: Vec<_> = input
+            .trim()
             .split(',')
             .map(|x| x.parse::<u32>().unwrap())
             .collect();
@@ -35,6 +36,7 @@ impl Day for Day15 {
 
     fn star2(&self, input: &str) -> String {
         let start_nums: Vec<_> = input
+            .trim()
             .split(',')
             .map(|x| x.parse::<u32>().unwrap())
             .collect();

@@ -180,40 +180,40 @@ iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719"#;
 
     #[test]
     fn test_check_hgt() {
-        assert_eq!(check_hgt("58in"), false);
-        assert_eq!(check_hgt("59in"), true);
-        assert_eq!(check_hgt("193cm"), true);
-        assert_eq!(check_hgt("194cm"), false);
-        assert_eq!(check_hgt("gibberish"), false);
-        assert_eq!(check_hgt(""), false);
+        assert!(!check_hgt("58in"));
+        assert!(check_hgt("59in"));
+        assert!(check_hgt("193cm"));
+        assert!(!check_hgt("194cm"));
+        assert!(!check_hgt("gibberish"));
+        assert!(!check_hgt(""));
     }
 
     #[test]
     fn test_check_yr() {
-        assert_eq!(check_yr("1919", 1920, 2002), false);
-        assert_eq!(check_yr("1920", 1920, 2002), true);
-        assert_eq!(check_yr("2002", 1920, 2002), true);
-        assert_eq!(check_yr("2003", 1920, 2002), false);
-        assert_eq!(check_yr("", 1920, 2002), false);
-        assert_eq!(check_yr("gibberish", 1920, 2002), false);
-        assert_eq!(check_yr("2002c", 1920, 2002), false);
+        assert!(!check_yr("1919", 1920, 2002));
+        assert!(check_yr("1920", 1920, 2002));
+        assert!(check_yr("2002", 1920, 2002));
+        assert!(!check_yr("2003", 1920, 2002));
+        assert!(!check_yr("", 1920, 2002));
+        assert!(!check_yr("gibberish", 1920, 2002));
+        assert!(!check_yr("2002c", 1920, 2002));
     }
 
     #[test]
     fn test_check_hcl() {
-        assert_eq!(check_hcl("#abc123"), true);
-        assert_eq!(check_hcl("#abcxyz"), false);
-        assert_eq!(check_hcl("#abc"), false);
-        assert_eq!(check_hcl("invalid"), false);
+        assert!(check_hcl("#abc123"));
+        assert!(!check_hcl("#abcxyz"));
+        assert!(!check_hcl("#abc"));
+        assert!(!check_hcl("invalid"));
     }
 
     #[test]
     fn test_check_pid() {
-        assert_eq!(check_pid("gibberish"), false);
-        assert_eq!(check_pid("123"), false);
-        assert_eq!(check_pid("123123123123"), false);
-        assert_eq!(check_pid("123456789"), true);
-        assert_eq!(check_pid("000000123"), true);
-        assert_eq!(check_pid("      123"), false);
+        assert!(!check_pid("gibberish"));
+        assert!(!check_pid("123"));
+        assert!(!check_pid("123123123123"));
+        assert!(check_pid("123456789"));
+        assert!(check_pid("000000123"));
+        assert!(!check_pid("      123"));
     }
 }

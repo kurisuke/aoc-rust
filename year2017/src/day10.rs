@@ -27,7 +27,7 @@ mod tests {
 
     #[test]
     fn star1() {
-        let mut v: Vec<_> = (0..=4).into_iter().collect();
+        let mut v: Vec<_> = (0..=4).collect();
         let lengths = vec![3, 4, 1, 5];
         knot(&mut v, &lengths, 0, 0);
         assert_eq!(v[0] * v[1], 12);

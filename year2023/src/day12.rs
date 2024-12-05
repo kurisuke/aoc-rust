@@ -85,7 +85,7 @@ impl Record {
                                 .chars()
                                 .nth(i)
                                 .is_some_and(|c| c == '#' || c == '?')
-                        }) && !self.springs.chars().nth(n).is_some_and(|c| c == '#')
+                        }) && self.springs.chars().nth(n).is_none_or(|c| c != '#')
                         {
                             self.springs = self.springs.chars().skip(n).collect();
                             self.sizes.pop();

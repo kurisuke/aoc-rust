@@ -7,7 +7,7 @@ type Interval = (u32, u32);
 fn merge(mut input: Vec<Interval>) -> Vec<Interval> {
     input.sort_unstable_by(|a, b| b.0.cmp(&a.0)); // sort by max first
     let mut output = vec![input.pop().unwrap()];
-    while !input.is_empty() && output.last().unwrap().1 != std::u32::MAX {
+    while !input.is_empty() && output.last().unwrap().1 != u32::MAX {
         let next = input.pop().unwrap();
         let top = output.pop().unwrap();
         if next.0 <= top.1 + 1 {

@@ -113,9 +113,9 @@ frs: qnr lhk lsr"#;
             .contains(&("cmg".to_string(), "qnr".to_string())));
 
         graph.contract("cmg", "qnr");
-        assert!(!graph.nodes.contains(&"cmg".to_string()));
-        assert!(!graph.nodes.contains(&"qnr".to_string()));
-        assert!(graph.nodes.contains(&"cmgqnr".to_string()));
+        assert!(!graph.nodes.contains("cmg"));
+        assert!(!graph.nodes.contains("qnr"));
+        assert!(graph.nodes.contains("cmgqnr"));
         assert!(!graph
             .edges
             .contains(&("cmg".to_string(), "qnr".to_string())));

@@ -23,7 +23,7 @@ fn find_shortest(distances: &Distances) -> usize {
     let locations1: HashSet<_> = distances.keys().map(|x| x.0).collect();
     let locations2: HashSet<_> = distances.keys().map(|x| x.1).collect();
     let locations: HashSet<_> = locations1.union(&locations2).collect();
-    let mut best_dist = std::usize::MAX;
+    let mut best_dist = usize::MAX;
     for perm in locations.iter().permutations(locations.len()) {
         let mut dist = 0;
         for places in perm.windows(2) {
@@ -39,7 +39,7 @@ fn find_longest(distances: &Distances) -> usize {
     let locations1: HashSet<_> = distances.keys().map(|x| x.0).collect();
     let locations2: HashSet<_> = distances.keys().map(|x| x.1).collect();
     let locations: HashSet<_> = locations1.union(&locations2).collect();
-    let mut best_dist = std::usize::MIN;
+    let mut best_dist = usize::MIN;
     for perm in locations.iter().permutations(locations.len()) {
         let mut dist = 0;
         for places in perm.windows(2) {

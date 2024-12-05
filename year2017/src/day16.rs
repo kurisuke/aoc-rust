@@ -32,7 +32,7 @@ fn parse_input(input: &str) -> Vec<Move> {
         .collect()
 }
 
-fn apply(progs: &mut Vec<char>, mov: &Move) {
+fn apply(progs: &mut [char], mov: &Move) {
     let plen = progs.len();
     match mov {
         Move::Spin(x) => {

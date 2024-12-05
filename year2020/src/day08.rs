@@ -12,7 +12,7 @@ enum Instruction {
 
 enum EndState {
     Loop(i64),
-    JmpErr(i64),
+    JmpErr,
     Succ(i64),
 }
 
@@ -84,7 +84,7 @@ fn run_program(ins: &[Instruction]) -> EndState {
             Instruction::Jmp(v) => {
                 let pc_new = pc as i64 + v;
                 if pc_new < 0 || pc_new > ins.len() as i64 {
-                    return EndState::JmpErr(acc);
+                    return EndState::JmpErr;
                 } else {
                     pc = pc_new as usize;
                 }

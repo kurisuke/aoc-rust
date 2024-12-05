@@ -18,7 +18,7 @@ fn make_linked(cups: Vec<u32>) -> Vec<u32> {
     cups_linked
 }
 
-fn mv_cups_ll(cups_linked: &mut Vec<u32>, cur_cup: &mut u32) {
+fn mv_cups_ll(cups_linked: &mut [u32], cur_cup: &mut u32) {
     // find the 3 cups following the current cup (they will be moved)
     let mv1 = cups_linked[*cur_cup as usize];
     let mv2 = cups_linked[mv1 as usize];
@@ -63,7 +63,11 @@ fn order_str(cups_linked: &[u32]) -> String {
 
 impl Day for Day23 {
     fn star1(&self, input: &str) -> String {
-        let cups: Vec<_> = input.chars().map(|x| x.to_digit(10).unwrap()).collect();
+        let cups: Vec<_> = input
+            .trim()
+            .chars()
+            .map(|x| x.to_digit(10).unwrap())
+            .collect();
         let mut cur_cup = cups[0];
         let mut cups_linked = make_linked(cups);
         for _ in 0..100 {
@@ -73,7 +77,11 @@ impl Day for Day23 {
     }
 
     fn star2(&self, input: &str) -> String {
-        let mut cups: Vec<_> = input.chars().map(|x| x.to_digit(10).unwrap()).collect();
+        let mut cups: Vec<_> = input
+            .trim()
+            .chars()
+            .map(|x| x.to_digit(10).unwrap())
+            .collect();
         for i in 10..=1_000_000 {
             cups.push(i);
         }

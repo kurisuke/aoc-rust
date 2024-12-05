@@ -31,7 +31,7 @@ struct StateSearch<'a> {
     target_dist: usize,
 }
 
-impl<'a> Ord for StateSearch<'a> {
+impl Ord for StateSearch<'_> {
     fn cmp(&self, other: &Self) -> Ordering {
         (other.cost + other.target_dist)
             .cmp(&(self.cost + self.target_dist))
@@ -40,7 +40,7 @@ impl<'a> Ord for StateSearch<'a> {
     }
 }
 
-impl<'a> PartialOrd for StateSearch<'a> {
+impl PartialOrd for StateSearch<'_> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }

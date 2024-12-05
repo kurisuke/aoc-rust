@@ -107,7 +107,7 @@ impl Day for Day08 {
     fn star2(&self, input: &str) -> String {
         let instrs: Vec<_> = input.lines().map(parse_instr).collect();
         let mut regs = HashMap::new();
-        let mut largest_ever = std::isize::MIN;
+        let mut largest_ever = isize::MIN;
         for instr in instrs.iter() {
             eval(&mut regs, instr);
             if !regs.is_empty() {

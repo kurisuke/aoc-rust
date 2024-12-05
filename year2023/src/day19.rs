@@ -48,7 +48,7 @@ struct Workflow<'a> {
     default: Target<'a>,
 }
 
-impl<'a> Workflow<'a> {
+impl Workflow<'_> {
     fn parse(line: &str) -> Workflow {
         let spl: Vec<_> = line.split('{').collect();
         let name = spl[0];
@@ -105,7 +105,7 @@ enum Target<'a> {
     Other(&'a str),
 }
 
-impl<'a> Target<'a> {
+impl Target<'_> {
     fn parse(s: &str) -> Target {
         match s {
             "A" => Target::Accepted,

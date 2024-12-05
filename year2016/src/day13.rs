@@ -115,13 +115,13 @@ fn search(init_pos: (usize, usize), target_pos: (usize, usize), magic: usize) ->
 
 impl Day for Day13 {
     fn star1(&self, input: &str) -> String {
-        let magic = input.parse::<usize>().unwrap();
+        let magic = input.trim().parse::<usize>().unwrap();
         let steps = search((1, 1), (31, 39), magic).unwrap();
         format!("{}", steps)
     }
 
     fn star2(&self, input: &str) -> String {
-        let magic = input.parse::<usize>().unwrap();
+        let magic = input.trim().parse::<usize>().unwrap();
         let filled = fill((1, 1), 50, magic);
         format!("{}", filled)
     }

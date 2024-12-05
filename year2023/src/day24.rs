@@ -133,7 +133,7 @@ mod tests {
         let i = a.intersect_2d(&b);
         assert!(i.is_some());
         let i = i.unwrap();
-        assert_eq!(a.intersect_in_future(&i), true);
+        assert!(a.intersect_in_future(&i));
         assert!(i.x - 14.333 < 0.001);
         assert!(i.y - 15.333 < 0.001);
 
@@ -142,7 +142,7 @@ mod tests {
         let i = a.intersect_2d(&b);
         assert!(i.is_some());
         let i = i.unwrap();
-        assert_eq!(a.intersect_in_future(&i), true);
+        assert!(a.intersect_in_future(&i));
         assert!(i.x - 11.667 < 0.001);
         assert!(i.y - 16.667 < 0.001);
 
@@ -151,8 +151,8 @@ mod tests {
         let i = a.intersect_2d(&b);
         assert!(i.is_some());
         let i = i.unwrap();
-        assert_eq!(a.intersect_in_future(&i), false);
-        assert_eq!(b.intersect_in_future(&i), true);
+        assert!(!a.intersect_in_future(&i));
+        assert!(b.intersect_in_future(&i));
 
         let a = Path::parse("18, 19, 22 @ -1, -1, -2");
         let b = Path::parse("20, 25, 34 @ -2, -2, -4");

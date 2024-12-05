@@ -188,7 +188,7 @@ mod tests {
         let brick1 = Brick::parse("1,0,1~1,2,1");
         let brick2 = Brick::parse("0,0,2~2,0,2");
         let brick3 = Brick::parse("0,0,1~2,0,1");
-        assert_eq!(brick1.overlap(&brick2), false);
-        assert_eq!(brick1.overlap(&brick3), true);
+        assert!(!brick1.overlap(&brick2));
+        assert!(brick1.overlap(&brick3));
     }
 }

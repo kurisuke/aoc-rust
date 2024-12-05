@@ -523,8 +523,8 @@ pub struct Iter<'a, T> {
     cur: Coords,
 }
 
-impl<'a, T> Iter<'a, T> {
-    fn new(grid: &'a Grid2D<T>) -> Iter<T> {
+impl<T> Iter<'_, T> {
+    fn new(grid: &Grid2D<T>) -> Iter<T> {
         Iter {
             grid,
             cur: Coords { x: 0, y: 0 },
@@ -552,8 +552,8 @@ pub struct CoordsIter<'a, T> {
     cur: Coords,
 }
 
-impl<'a, T> CoordsIter<'a, T> {
-    fn new(grid: &'a Grid2D<T>) -> CoordsIter<T> {
+impl<T> CoordsIter<'_, T> {
+    fn new(grid: &Grid2D<T>) -> CoordsIter<T> {
         CoordsIter {
             grid,
             cur: Coords { x: 0, y: 0 },
@@ -561,7 +561,7 @@ impl<'a, T> CoordsIter<'a, T> {
     }
 }
 
-impl<'a, T> Iterator for CoordsIter<'a, T> {
+impl<T> Iterator for CoordsIter<'_, T> {
     type Item = Coords;
 
     fn next(&mut self) -> Option<Coords> {
@@ -739,7 +739,7 @@ mnop"#,
         .unwrap();
 
         let other = Grid2D::new("rs\ntu").unwrap();
-        assert_eq!(example.paste(Coords { x: 1, y: 1 }, &other), true);
+        assert!(example.paste(Coords { x: 1, y: 1 }, &other));
         assert_eq!(
             format!("{}", example),
             r#"abcd

@@ -242,27 +242,27 @@ mod tests {
     fn test_explode() {
         let s = "[[[[[9,8],1],2],3],4]";
         let mut n = SfNum::new(s);
-        assert_eq!(n.explode(), true);
+        assert!(n.explode());
         assert_eq!(format!("{}", n), "[[[[0,9],2],3],4]");
 
         let s = "[7,[6,[5,[4,[3,2]]]]]";
         let mut n = SfNum::new(s);
-        assert_eq!(n.explode(), true);
+        assert!(n.explode());
         assert_eq!(format!("{}", n), "[7,[6,[5,[7,0]]]]");
 
         let s = "[[6,[5,[4,[3,2]]]],1]";
         let mut n = SfNum::new(s);
-        assert_eq!(n.explode(), true);
+        assert!(n.explode());
         assert_eq!(format!("{}", n), "[[6,[5,[7,0]]],3]");
 
         let s = "[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]";
         let mut n = SfNum::new(s);
-        assert_eq!(n.explode(), true);
+        assert!(n.explode());
         assert_eq!(format!("{}", n), "[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]");
 
         let s = "[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]";
         let mut n = SfNum::new(s);
-        assert_eq!(n.explode(), true);
+        assert!(n.explode());
         assert_eq!(format!("{}", n), "[[3,[2,[8,0]]],[9,[5,[7,0]]]]");
     }
 
@@ -271,13 +271,13 @@ mod tests {
         let mut n = SfNum {
             tokens: vec![Token::Num(10)],
         };
-        assert_eq!(n.split(), true);
+        assert!(n.split());
         assert_eq!(format!("{}", n), "[5,5]");
 
         let mut n = SfNum {
             tokens: vec![Token::Num(11)],
         };
-        assert_eq!(n.split(), true);
+        assert!(n.split());
         assert_eq!(format!("{}", n), "[5,6]");
     }
 

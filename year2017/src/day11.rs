@@ -14,7 +14,7 @@ impl Day for Day11 {
 
     fn star2(&self, input: &str) -> String {
         let mut pos = HexCoord(0, 0);
-        let mut max_dist = std::u32::MIN;
+        let mut max_dist = u32::MIN;
         for dir_str in input.trim().split(',') {
             pos += HexCoord::direction_flat(dir_str).unwrap();
             max_dist = max_dist.max(pos.dist(&HexCoord(0, 0)));

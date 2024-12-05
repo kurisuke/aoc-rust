@@ -4,7 +4,7 @@ pub struct KnotHash {
     v: [u8; 16],
 }
 
-pub fn knot(v: &mut Vec<u8>, lengths: &[usize], mut cur: usize, mut skip: usize) -> (usize, usize) {
+pub fn knot(v: &mut [u8], lengths: &[usize], mut cur: usize, mut skip: usize) -> (usize, usize) {
     let vlen = v.len();
     for length in lengths {
         if *length > 1 {
