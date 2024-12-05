@@ -9,5 +9,5 @@ edition = "2021"
 [dependencies]
 common = { path = "../common" }
 util = { path = "../util" }
-regex = "1.10.2"
+regex = "1.11.1"
 itertools = "0.12.0"
