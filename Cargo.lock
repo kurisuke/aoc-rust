@@ -37,6 +37,7 @@ dependencies = [
  "year2021",
  "year2022",
  "year2023",
+ "year2024",
 ]
 
 [[package]]
@@ -1104,6 +1105,14 @@ dependencies = [
  "common",
  "itertools",
  "rand",
+ "util",
+]
+
+[[package]]
+name = "year2024"
+version = "0.1.0"
+dependencies = [
+ "common",
  "util",
 ]
 
