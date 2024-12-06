@@ -15,10 +15,15 @@ impl Day for Day06 {
 
     fn star2(&self, input: &str) -> String {
         let grid = Grid2D::new(input).unwrap();
-        let empty_pos = grid.filter(&['.']);
+
+        // when adding an obstacle, only consider positions the guard would actually visit
+        // on their normal walk, but ignore their start position
+        let visited = walk(grid.clone()).unwrap();
+        let mut visited_pos: HashSet<_> = visited.into_iter().map(|g| g.pos).collect();
+        visited_pos.remove(&grid.find('^').unwrap());
 
         let mut num_loop_pos = 0;
-        for add_pos in empty_pos {
+        for add_pos in visited_pos {
             let mut grid_add = grid.clone();
             grid_add.set(&add_pos, '#');
             if walk(grid_add).is_err() {
