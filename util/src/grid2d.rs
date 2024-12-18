@@ -56,6 +56,58 @@ impl Direction {
             Direction::NW => Direction::SE,
         }
     }
+
+    pub fn left45(&self) -> Direction {
+        match self {
+            Direction::N => Direction::NW,
+            Direction::NE => Direction::N,
+            Direction::E => Direction::NE,
+            Direction::SE => Direction::E,
+            Direction::S => Direction::SE,
+            Direction::SW => Direction::S,
+            Direction::W => Direction::SW,
+            Direction::NW => Direction::W,
+        }
+    }
+
+    pub fn right45(&self) -> Direction {
+        match self {
+            Direction::N => Direction::NE,
+            Direction::NE => Direction::E,
+            Direction::E => Direction::SE,
+            Direction::SE => Direction::S,
+            Direction::S => Direction::SW,
+            Direction::SW => Direction::W,
+            Direction::W => Direction::NW,
+            Direction::NW => Direction::N,
+        }
+    }
+
+    pub fn left90(&self) -> Direction {
+        match self {
+            Direction::N => Direction::W,
+            Direction::NE => Direction::NW,
+            Direction::E => Direction::N,
+            Direction::SE => Direction::NE,
+            Direction::S => Direction::E,
+            Direction::SW => Direction::SE,
+            Direction::W => Direction::S,
+            Direction::NW => Direction::SW,
+        }
+    }
+
+    pub fn right90(&self) -> Direction {
+        match self {
+            Direction::N => Direction::E,
+            Direction::NE => Direction::SE,
+            Direction::E => Direction::S,
+            Direction::SE => Direction::SW,
+            Direction::S => Direction::W,
+            Direction::SW => Direction::NW,
+            Direction::W => Direction::N,
+            Direction::NW => Direction::NE,
+        }
+    }
 }
 
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
