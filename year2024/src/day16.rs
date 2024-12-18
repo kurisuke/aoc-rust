@@ -1,4 +1,4 @@
-use std::collections::{BinaryHeap, HashMap};
+use std::collections::{BinaryHeap, HashMap, HashSet};
 
 use common::day::Day;
 use util::grid2d::{Coords, Direction, Grid2D};
@@ -8,11 +8,12 @@ pub struct Day16 {}
 impl Day for Day16 {
     fn star1(&self, input: &str) -> String {
         let grid = parse_input(input);
-        search(&grid).unwrap().to_string()
+        search(&grid).0.unwrap().to_string()
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let grid = parse_input(input);
+        search(&grid).1.len().to_string()
     }
 }
 
@@ -26,6 +27,7 @@ struct State {
 struct SearchState {
     state: State,
     score: usize,
+    path: Vec<Coords>,
 }
 
 impl Ord for SearchState {
@@ -59,12 +61,15 @@ fn parse_input(input: &str) -> Grid2D<Field> {
     .unwrap()
 }
 
-fn search(grid: &Grid2D<Field>) -> Option<usize> {
+fn search(grid: &Grid2D<Field>) -> (Option<usize>, HashSet<Coords>) {
     let start_pos = grid.find(Field::Start).unwrap();
     let end_pos = grid.find(Field::End).unwrap();
 
     let mut search_states = BinaryHeap::new();
     let mut min_cost_for_state = HashMap::new();
+
+    let mut best_path_score = None;
+    let mut on_best_path = HashSet::new();
 
     let init_state = State {
         pos: start_pos,
@@ -74,24 +79,35 @@ fn search(grid: &Grid2D<Field>) -> Option<usize> {
     search_states.push(SearchState {
         state: init_state,
         score: 0,
+        path: vec![start_pos],
     });
     min_cost_for_state.insert(init_state, 0);
 
     while let Some(search_state) = search_states.pop() {
         // println!("check state: {:?}", search_state);
         if search_state.state.pos == end_pos {
-            return Some(search_state.score);
+            if let Some(score) = best_path_score {
+                if score < search_state.score {
+                    return (best_path_score, on_best_path);
+                } else {
+                    on_best_path.extend(search_state.path);
+                }
+            } else {
+                best_path_score = Some(search_state.score);
+                on_best_path.extend(search_state.path);
+            }
+            continue;
         }
 
         for next in next_states(grid, &search_state) {
-            if &next.score < min_cost_for_state.get(&next.state).unwrap_or(&usize::MAX) {
+            if &next.score <= min_cost_for_state.get(&next.state).unwrap_or(&usize::MAX) {
                 min_cost_for_state.insert(next.state, next.score);
                 search_states.push(next);
             }
         }
     }
 
-    None
+    (None, on_best_path)
 }
 
 fn next_states(grid: &Grid2D<Field>, search_state: &SearchState) -> Vec<SearchState> {
@@ -100,12 +116,15 @@ fn next_states(grid: &Grid2D<Field>, search_state: &SearchState) -> Vec<SearchSt
     // forward
     let forward_pos = search_state.state.pos.mov(search_state.state.orientation);
     if grid.at(&forward_pos).unwrap() != &Field::Wall {
+        let mut next_path = search_state.path.clone();
+        next_path.push(forward_pos);
         next.push(SearchState {
             state: State {
                 pos: forward_pos,
                 orientation: search_state.state.orientation,
             },
             score: search_state.score + 1,
+            path: next_path,
         });
     }
 
@@ -120,6 +139,7 @@ fn next_states(grid: &Grid2D<Field>, search_state: &SearchState) -> Vec<SearchSt
                 orientation,
             },
             score: search_state.score + 1000,
+            path: search_state.path.clone(),
         });
     }
 
@@ -169,5 +189,12 @@ mod tests {
         let d = Day16 {};
         assert_eq!(d.star1(INPUT1), "7036");
         assert_eq!(d.star1(INPUT2), "11048");
+    }
+
+    #[test]
+    fn star2() {
+        let d = Day16 {};
+        assert_eq!(d.star2(INPUT1), "45");
+        assert_eq!(d.star2(INPUT2), "64");
     }
 }
