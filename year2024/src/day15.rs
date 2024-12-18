@@ -6,24 +6,25 @@ pub struct Day15 {}
 impl Day for Day15 {
     fn star1(&self, input: &str) -> String {
         let (mut grid, dirs) = parse_input(input);
-        let mut cur_pos = grid.find(Field::Robot).unwrap();
-        for dir in dirs {
-            cur_pos = move_robot(&mut grid, cur_pos, dir);
-        }
-        gps_sum(&grid).to_string()
+        execute_moves(&mut grid, &dirs).to_string()
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let (grid, dirs) = parse_input(input);
+        let mut grid = scale_wide(grid);
+        execute_moves(&mut grid, &dirs).to_string()
     }
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Copy, Clone, Default)]
 enum Field {
+    #[default]
+    Empty,
+    Wall,
     Robot,
     Box,
-    Wall,
-    Empty,
+    BoxLeft,
+    BoxRight,
 }
 
 fn parse_input(input: &str) -> (Grid2D<Field>, Vec<Direction>) {
@@ -56,51 +57,118 @@ fn parse_input(input: &str) -> (Grid2D<Field>, Vec<Direction>) {
     (grid, dirs)
 }
 
-fn move_robot(grid: &mut Grid2D<Field>, mut cur_pos: Coords, dir: Direction) -> Coords {
-    let new_pos = cur_pos.mov(dir);
-    match grid.at(&new_pos).unwrap() {
-        Field::Robot => unreachable!(),
-        Field::Box => {
-            let mut shift_pos = new_pos.mov(dir);
-            let can_move = loop {
-                match grid.at(&shift_pos).unwrap() {
-                    Field::Robot => unreachable!(),
-                    Field::Box => {}
-                    Field::Wall => {
-                        break false;
-                    }
-                    Field::Empty => {
-                        break true;
-                    }
-                }
-                shift_pos = shift_pos.mov(dir);
-            };
-
-            if can_move {
-                grid.set(&shift_pos, Field::Box);
-                grid.set(&new_pos, Field::Robot);
-                grid.set(&cur_pos, Field::Empty);
-                cur_pos = new_pos;
-            }
-        }
-        Field::Wall => {
-            // cannot move
-        }
-        Field::Empty => {
-            grid.set(&new_pos, Field::Robot);
-            grid.set(&cur_pos, Field::Empty);
-            cur_pos = new_pos;
+fn execute_moves(grid: &mut Grid2D<Field>, dirs: &[Direction]) -> i64 {
+    let mut cur_pos = grid.find(Field::Robot).unwrap();
+    for dir in dirs {
+        if can_push(grid, &cur_pos, *dir) {
+            cur_pos = push(grid, &cur_pos, *dir);
         }
     }
+    gps_sum(grid)
+}
 
-    cur_pos
+fn can_push(grid: &Grid2D<Field>, cur_pos: &Coords, dir: Direction) -> bool {
+    let new_pos = cur_pos.mov(dir);
+    match grid.at(&new_pos).unwrap() {
+        Field::Box => can_push(grid, &new_pos, dir),
+        Field::Wall => false,
+        Field::Empty => true,
+        // part 2
+        Field::BoxLeft => {
+            if dir == Direction::N || dir == Direction::S {
+                can_push(grid, &new_pos, dir) && can_push(grid, &new_pos.mov(Direction::E), dir)
+            } else {
+                can_push(grid, &new_pos, dir)
+            }
+        }
+        Field::BoxRight => {
+            if dir == Direction::N || dir == Direction::S {
+                can_push(grid, &new_pos, dir) && can_push(grid, &new_pos.mov(Direction::W), dir)
+            } else {
+                can_push(grid, &new_pos, dir)
+            }
+        }
+        _ => unreachable!(),
+    }
+}
+
+fn push(grid: &mut Grid2D<Field>, cur_pos: &Coords, dir: Direction) -> Coords {
+    let new_value = *grid.at(cur_pos).unwrap();
+    let new_pos = cur_pos.mov(dir);
+    match grid.at(&new_pos).unwrap() {
+        Field::Empty => {
+            // nothing to do
+        }
+        Field::Box => {
+            // move that box first
+            push(grid, &new_pos, dir);
+        }
+        // part 2
+        Field::BoxLeft => {
+            if dir == Direction::N || dir == Direction::S {
+                push(grid, &new_pos, dir);
+                push(grid, &new_pos.mov(Direction::E), dir);
+            } else {
+                push(grid, &new_pos, dir);
+            }
+        }
+        Field::BoxRight => {
+            if dir == Direction::N || dir == Direction::S {
+                push(grid, &new_pos, dir);
+                push(grid, &new_pos.mov(Direction::W), dir);
+            } else {
+                push(grid, &new_pos, dir);
+            }
+        }
+        _ => unreachable!(),
+    }
+    grid.set(&new_pos, new_value);
+    grid.set(cur_pos, Field::Empty);
+
+    new_pos
 }
 
 fn gps_sum(grid: &Grid2D<Field>) -> i64 {
-    grid.filter(&[Field::Box])
+    grid.filter(&[Field::Box, Field::BoxLeft])
         .iter()
         .map(|c| c.x + 100 * c.y)
         .sum()
+}
+
+fn scale_wide(grid: Grid2D<Field>) -> Grid2D<Field> {
+    let mut grid_new = Grid2D::with_default(
+        Coords {
+            x: grid.width() * 2,
+            y: grid.height(),
+        },
+        &Field::Wall,
+    );
+
+    for (pos, value) in grid.enumerate() {
+        let (left, right) = match value {
+            Field::Robot => (Field::Robot, Field::Empty),
+            Field::Box => (Field::BoxLeft, Field::BoxRight),
+            Field::Wall => (Field::Wall, Field::Wall),
+            Field::Empty => (Field::Empty, Field::Empty),
+            _ => unreachable!(),
+        };
+        grid_new.set(
+            &Coords {
+                x: pos.x * 2,
+                y: pos.y,
+            },
+            left,
+        );
+        grid_new.set(
+            &Coords {
+                x: pos.x * 2 + 1,
+                y: pos.y,
+            },
+            right,
+        );
+    }
+
+    grid_new
 }
 
 #[cfg(test)]
@@ -145,5 +213,11 @@ v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^"#;
         let d = Day15 {};
         assert_eq!(d.star1(INPUT1), "2028");
         assert_eq!(d.star1(INPUT2), "10092");
+    }
+
+    #[test]
+    fn star2() {
+        let d = Day15 {};
+        assert_eq!(d.star2(INPUT2), "9021");
     }
 }
