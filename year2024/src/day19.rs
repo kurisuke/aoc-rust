@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use common::day::Day;
 
 pub struct Day19 {}
@@ -12,8 +14,14 @@ impl Day for Day19 {
             .to_string()
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let (patterns, designs) = parse_input(input);
+        let mut cache = HashMap::new();
+        designs
+            .iter()
+            .map(|&design| variants(design, &patterns, &mut cache))
+            .sum::<usize>()
+            .to_string()
     }
 }
 
@@ -33,6 +41,27 @@ fn is_possible(design: &str, patterns: &[&str]) -> bool {
         })
 }
 
+fn variants<'a>(design: &'a str, patterns: &[&str], cache: &mut HashMap<&'a str, usize>) -> usize {
+    if design.is_empty() {
+        1
+    } else {
+        patterns
+            .iter()
+            .filter(|&pattern| design.starts_with(pattern))
+            .map(|&pattern| {
+                let suffix = &design[pattern.len()..];
+                if let Some(v) = cache.get(suffix) {
+                    *v
+                } else {
+                    let v = variants(suffix, patterns, cache);
+                    cache.insert(suffix, v);
+                    v
+                }
+            })
+            .sum()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -49,8 +78,14 @@ brgr
 bbrgwb"#;
 
     #[test]
-    fn ex1() {
+    fn star1() {
         let d = Day19 {};
         assert_eq!(d.star1(INPUT), "6");
+    }
+
+    #[test]
+    fn star2() {
+        let d = Day19 {};
+        assert_eq!(d.star2(INPUT), "16");
     }
 }
