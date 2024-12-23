@@ -5,13 +5,15 @@ pub struct Day22 {}
 impl Day for Day22 {
     fn star1(&self, input: &str) -> String {
         parse_input(input)
-            .map(|init| secret_number(init, 2000))
+            .map(|init| SecretNumber::new(init).nth(2000).unwrap())
             .sum::<usize>()
             .to_string()
     }
 
     fn star2(&self, input: &str) -> String {
-        let prices_per_buyer: Vec<_> = parse_input(input).map(prices).collect();
+        let prices_per_buyer: Vec<_> = parse_input(input)
+            .map(|init| SecretNumber::new(init).map(|i| i % 10).take(2001).collect())
+            .collect();
         let mut bananas_per_sequence = vec![0; ARRAY_SIZE];
         let mut seen = vec![0; ARRAY_SIZE];
         for (i, prices) in prices_per_buyer.into_iter().enumerate() {
@@ -30,29 +32,27 @@ fn parse_input(input: &str) -> impl Iterator<Item = usize> + '_ {
     input.lines().map(|line| line.parse().unwrap())
 }
 
-fn secret_number(init: usize, n: usize) -> usize {
-    let mut num = init;
-
-    for _ in 0..n {
-        num = ((num << 6) ^ num) % 16777216;
-        num = ((num >> 5) ^ num) % 16777216;
-        num = ((num << 11) ^ num) % 16777216;
-    }
-    num
+struct SecretNumber {
+    num: usize,
 }
 
-fn prices(init: usize) -> Vec<usize> {
-    let mut prices = vec![];
-
-    let mut num = init;
-    prices.push(num % 10);
-    for _ in 0..2000 {
-        num = ((num << 6) ^ num) % 16777216;
-        num = ((num >> 5) ^ num) % 16777216;
-        num = ((num << 11) ^ num) % 16777216;
-        prices.push(num % 10);
+impl SecretNumber {
+    fn new(init: usize) -> Self {
+        Self { num: init }
     }
-    prices
+}
+
+impl Iterator for SecretNumber {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let ret = self.num;
+        self.num = ((self.num << 6) ^ self.num) % 16777216;
+        self.num = ((self.num >> 5) ^ self.num) % 16777216;
+        self.num = ((self.num << 11) ^ self.num) % 16777216;
+
+        Some(ret)
+    }
 }
 
 fn diff_sequences(
@@ -77,13 +77,6 @@ fn diff_sequences(
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_secret_number() {
-        assert_eq!(secret_number(123, 1), 15887950);
-        assert_eq!(secret_number(123, 2), 16495136);
-        assert_eq!(secret_number(123, 10), 5908254);
-    }
 
     const INPUT1: &str = r#"1
 10
