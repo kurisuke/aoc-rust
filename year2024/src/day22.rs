@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use common::day::Day;
 
 pub struct Day22 {}
@@ -14,26 +12,19 @@ impl Day for Day22 {
 
     fn star2(&self, input: &str) -> String {
         let prices_per_buyer: Vec<_> = parse_input(input).map(prices).collect();
-        let mut seen = HashSet::new();
-        let sequences_per_buyer: Vec<_> = prices_per_buyer
-            .into_iter()
-            .map(|prices| diff_sequences(prices, &mut seen))
-            .collect();
+        let mut bananas_per_sequence = vec![0; ARRAY_SIZE];
+        let mut seen = vec![0; ARRAY_SIZE];
+        for (i, prices) in prices_per_buyer.into_iter().enumerate() {
+            diff_sequences(i + 1, prices, &mut bananas_per_sequence, &mut seen);
+        }
 
-        let most_bananas = seen
-            .into_iter()
-            .map(|sequence| {
-                sequences_per_buyer
-                    .iter()
-                    .map(|buyer| buyer[sequence])
-                    .sum::<usize>()
-            })
-            .max()
-            .unwrap();
+        let most_bananas = bananas_per_sequence.iter().max().unwrap();
 
         most_bananas.to_string()
     }
 }
+
+const ARRAY_SIZE: usize = 1 << 20;
 
 fn parse_input(input: &str) -> impl Iterator<Item = usize> + '_ {
     input.lines().map(|line| line.parse().unwrap())
@@ -50,35 +41,37 @@ fn secret_number(init: usize, n: usize) -> usize {
     num
 }
 
-fn prices(init: usize) -> Vec<i8> {
+fn prices(init: usize) -> Vec<usize> {
     let mut prices = vec![];
 
     let mut num = init;
-    prices.push((num % 10) as i8);
+    prices.push(num % 10);
     for _ in 0..2000 {
         num = ((num << 6) ^ num) % 16777216;
         num = ((num >> 5) ^ num) % 16777216;
         num = ((num << 11) ^ num) % 16777216;
-        prices.push((num % 10) as i8);
+        prices.push(num % 10);
     }
     prices
 }
 
-const ARRAY_SIZE: usize = 19 * 19 * 19 * 19;
-
-fn diff_sequences(prices: Vec<i8>, seen: &mut HashSet<usize>) -> Vec<usize> {
-    let mut sequences = vec![0; ARRAY_SIZE];
+fn diff_sequences(
+    i: usize,
+    prices: Vec<usize>,
+    bananas_per_sequence: &mut [usize],
+    seen: &mut [usize],
+) {
     for p in prices.windows(5) {
-        let diffs = [p[1] - p[0], p[2] - p[1], p[3] - p[2], p[4] - p[3]];
-        let key = (diffs[0] + 9) as usize * (19 * 19 * 19)
-            + (diffs[1] + 9) as usize * (19 * 19)
-            + (diffs[2] + 9) as usize * 19
-            + (diffs[3] + 9) as usize;
-        seen.insert(key);
+        let key = ((9 + p[1] - p[0]) << 15)
+            + ((9 + p[2] - p[1]) << 10)
+            + ((9 + p[3] - p[2]) << 5)
+            + (9 + p[4] - p[3]);
 
-        sequences[key] = p[4] as usize;
+        if seen[key] != i {
+            seen[key] = i;
+            bananas_per_sequence[key] += p[4];
+        }
     }
-    sequences
 }
 
 #[cfg(test)]
