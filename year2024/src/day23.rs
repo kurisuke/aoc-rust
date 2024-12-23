@@ -27,22 +27,19 @@ impl Day for Day23 {
     fn star2(&self, input: &str) -> String {
         let connections = parse_input(input);
 
-        let mut cliques = vec![];
+        let mut max_clique = HashSet::new();
         bron_kerbosch(
             &connections,
             HashSet::new(),
             connections.keys().cloned().collect(),
             HashSet::new(),
-            &mut cliques,
+            &mut max_clique,
         );
-        let max_set: BTreeSet<_> = cliques
-            .into_iter()
-            .max_by_key(|c| c.len())
-            .unwrap()
-            .into_iter()
-            .collect();
-
-        max_set.iter().map(|c| format!("{}{}", c.0, c.1)).join(",")
+        let max_clique: BTreeSet<_> = max_clique.into_iter().collect();
+        max_clique
+            .iter()
+            .map(|c| format!("{}{}", c.0, c.1))
+            .join(",")
     }
 }
 
@@ -73,10 +70,12 @@ fn bron_kerbosch(
     clique: HashSet<Computer>,
     mut potential: HashSet<Computer>,
     mut excluded: HashSet<Computer>,
-    cliques: &mut Vec<HashSet<Computer>>,
+    max_clique: &mut HashSet<Computer>,
 ) {
     if potential.is_empty() && excluded.is_empty() {
-        cliques.push(clique);
+        if clique.len() > max_clique.len() {
+            *max_clique = clique;
+        }
     } else {
         while !potential.is_empty() {
             let node = *potential.iter().next().unwrap();
@@ -98,7 +97,7 @@ fn bron_kerbosch(
                 clique_next,
                 potential_next,
                 excluded_next,
-                cliques,
+                max_clique,
             );
             potential.remove(&node);
             excluded.insert(node);
