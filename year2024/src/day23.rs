@@ -1,4 +1,4 @@
-use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
+use std::collections::{BTreeSet, HashMap, HashSet};
 
 use common::day::Day;
 use itertools::Itertools;
@@ -27,11 +27,20 @@ impl Day for Day23 {
     fn star2(&self, input: &str) -> String {
         let connections = parse_input(input);
 
-        let max_set = connections
-            .keys()
-            .map(|start| find_connected(&connections, start))
+        let mut cliques = vec![];
+        bron_kerbosch(
+            &connections,
+            HashSet::new(),
+            connections.keys().cloned().collect(),
+            HashSet::new(),
+            &mut cliques,
+        );
+        let max_set: BTreeSet<_> = cliques
+            .into_iter()
             .max_by_key(|c| c.len())
-            .unwrap();
+            .unwrap()
+            .into_iter()
+            .collect();
 
         max_set.iter().map(|c| format!("{}{}", c.0, c.1)).join(",")
     }
@@ -59,30 +68,42 @@ fn parse_input(input: &str) -> HashMap<Computer, HashSet<Computer>> {
     connections
 }
 
-fn find_connected(
+fn bron_kerbosch(
     connections: &HashMap<Computer, HashSet<Computer>>,
-    start: &Computer,
-) -> BTreeSet<Computer> {
-    let mut connected = BTreeSet::new();
+    clique: HashSet<Computer>,
+    mut potential: HashSet<Computer>,
+    mut excluded: HashSet<Computer>,
+    cliques: &mut Vec<HashSet<Computer>>,
+) {
+    if potential.is_empty() && excluded.is_empty() {
+        cliques.push(clique);
+    } else {
+        while !potential.is_empty() {
+            let node = *potential.iter().next().unwrap();
 
-    let mut search_nodes = VecDeque::new();
-    search_nodes.push_back(*start);
+            let mut clique_next = clique.clone();
+            clique_next.insert(node);
 
-    while let Some(cur_node) = search_nodes.pop_front() {
-        if connected
-            .iter()
-            .all(|node| connections.get(node).unwrap().contains(&cur_node))
-        {
-            connected.insert(cur_node);
-            for next_node in connections.get(&cur_node).unwrap() {
-                if !connected.contains(next_node) {
-                    search_nodes.push_back(*next_node);
-                }
-            }
+            let potential_next = potential
+                .intersection(connections.get(&node).unwrap())
+                .cloned()
+                .collect();
+            let excluded_next = excluded
+                .intersection(connections.get(&node).unwrap())
+                .cloned()
+                .collect();
+
+            bron_kerbosch(
+                connections,
+                clique_next,
+                potential_next,
+                excluded_next,
+                cliques,
+            );
+            potential.remove(&node);
+            excluded.insert(node);
         }
     }
-
-    connected
 }
 
 #[cfg(test)]
