@@ -1,6 +1,7 @@
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
 
 use common::day::Day;
+use itertools::Itertools;
 
 pub struct Day24 {}
 
@@ -10,8 +11,10 @@ impl Day for Day24 {
         output_number(&gates, &mut values).to_string()
     }
 
-    fn star2(&self, _input: &str) -> String {
-        String::from("not implemented")
+    fn star2(&self, input: &str) -> String {
+        let (gates, _) = parse_input(input);
+        let swapped = swapped_gates(&gates);
+        swapped.iter().join(",")
     }
 }
 
@@ -96,6 +99,59 @@ fn output_number<'a>(gates: &'a Gates, values: &mut Values<'a>) -> usize {
     }
 
     output
+}
+
+fn swapped_gates<'a>(gates: &Gates<'a>) -> BTreeSet<&'a str> {
+    let mut swapped = BTreeSet::new();
+
+    let z_max: usize = gates
+        .keys()
+        .filter(|&k| k.starts_with('z'))
+        .map(|&k| k[1..].parse().unwrap())
+        .max()
+        .unwrap();
+    let z_max = format!("z{:02}", z_max);
+
+    // z values must come from XOR gates (except z_max, which is the carry of the final full adder)
+    for (&output, gate) in gates
+        .iter()
+        .filter(|(&output, _)| output.starts_with('z') && output != z_max)
+    {
+        if gate.op != Op::Xor {
+            swapped.insert(output);
+        }
+    }
+
+    for (&output, gate) in gates {
+        match gate.op {
+            Op::Xor => {
+                // - XOR gates must be either connected to input (x,y) or output
+                // - XOR gates cannot feed into OR gate
+                if !(output.starts_with('z')
+                    || gate.input.0.starts_with(['x', 'y'])
+                    || gate.input.1.starts_with(['x', 'y']))
+                    || gates.values().any(|gate2| {
+                        (gate2.input.0 == output || gate2.input.1 == output) && gate2.op == Op::Or
+                    })
+                {
+                    swapped.insert(output);
+                }
+            }
+            Op::And => {
+                // AND gates (except for first bit, which is only a half-adder) must feed into OR gate
+                if (gate.input.0 != "x00" && gate.input.1 != "x00")
+                    && gates.values().any(|gate2| {
+                        (gate2.input.0 == output || gate2.input.1 == output) && gate2.op != Op::Or
+                    })
+                {
+                    swapped.insert(output);
+                }
+            }
+            Op::Or => {}
+        }
+    }
+
+    swapped
 }
 
 #[cfg(test)]
