@@ -6,7 +6,7 @@ pub struct Day13 {}
 
 type Relations<'a> = HashMap<(&'a str, &'a str), i64>;
 
-fn parse_input(input: &str) -> Relations {
+fn parse_input(input: &str) -> Relations<'_> {
     input
         .lines()
         .map(|line| {

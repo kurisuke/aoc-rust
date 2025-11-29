@@ -15,9 +15,9 @@ struct Reaction<'a> {
 }
 
 type Reactions<'a> = HashMap<&'a str, Reaction<'a>>;
-type Stockpile<'a> = HashMap<String, usize>;
+type Stockpile = HashMap<String, usize>;
 
-fn parse_input(input: &str) -> Reactions {
+fn parse_input(input: &str) -> Reactions<'_> {
     input
         .lines()
         .map(|l| {
@@ -60,7 +60,7 @@ fn produce(reactions: &Reactions, stockpile: &mut Stockpile, required: &Reactant
 
     // if not, we have to produce a certain net quantity (that we cannot take from the stockpile)
     let reaction = reactions.get(required.name).unwrap();
-    let eq_factor = if net_qty % reaction.product_qty > 0 {
+    let eq_factor = if !net_qty.is_multiple_of(reaction.product_qty) {
         net_qty / reaction.product_qty + 1
     } else {
         net_qty / reaction.product_qty

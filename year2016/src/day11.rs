@@ -212,7 +212,7 @@ fn is_valid(state: &State) -> bool {
     true
 }
 
-fn parse_input(input: &str) -> (State, State) {
+fn parse_input(input: &str) -> (State<'_>, State<'_>) {
     let mut init_equipment = BTreeMap::new();
     let re_gen = Regex::new(r"(\w+)\s+generator").unwrap();
     let re_chip = Regex::new(r"(\w+)-compatible\s+microchip").unwrap();

@@ -12,7 +12,7 @@ struct Path<'a> {
     pub single_visited: Option<&'a str>,
 }
 
-fn parse_input(input: &str) -> Connections {
+fn parse_input(input: &str) -> Connections<'_> {
     let mut connections = HashMap::new();
     for l in input.lines() {
         let spl: Vec<_> = l.split('-').collect();

@@ -387,29 +387,29 @@ impl<T> Grid2D<T> {
         ]
     }
 
-    pub fn iter(&self) -> Iter<T> {
+    pub fn iter(&self) -> Iter<'_, T> {
         Iter::new(self)
     }
 
     #[allow(dead_code)]
-    pub fn coords_iter(&self) -> CoordsIter<T> {
+    pub fn coords_iter(&self) -> CoordsIter<'_, T> {
         CoordsIter::new(self)
     }
 
-    pub fn enumerate(&self) -> Zip<CoordsIter<T>, Iter<T>> {
+    pub fn enumerate(&self) -> Zip<CoordsIter<'_, T>, Iter<'_, T>> {
         CoordsIter::new(self).zip(Iter::new(self))
     }
 
     #[allow(dead_code)]
-    pub fn traverse(&self, d: &Coords) -> TraverseIter<T> {
+    pub fn traverse(&self, d: &Coords) -> TraverseIter<'_, T> {
         TraverseIter::new(self, &Coords { x: 0, y: 0 }, d, Wrap::None)
     }
 
-    pub fn traverse_wrap(&self, d: &Coords, wrap: Wrap) -> TraverseIter<T> {
+    pub fn traverse_wrap(&self, d: &Coords, wrap: Wrap) -> TraverseIter<'_, T> {
         TraverseIter::new(self, &Coords { x: 0, y: 0 }, d, wrap)
     }
 
-    pub fn traverse_init_wrap(&self, init: &Coords, d: &Coords, wrap: Wrap) -> TraverseIter<T> {
+    pub fn traverse_init_wrap(&self, init: &Coords, d: &Coords, wrap: Wrap) -> TraverseIter<'_, T> {
         TraverseIter::new(self, init, d, wrap)
     }
 }
@@ -576,7 +576,7 @@ pub struct Iter<'a, T> {
 }
 
 impl<T> Iter<'_, T> {
-    fn new(grid: &Grid2D<T>) -> Iter<T> {
+    fn new(grid: &Grid2D<T>) -> Iter<'_, T> {
         Iter {
             grid,
             cur: Coords { x: 0, y: 0 },
@@ -605,7 +605,7 @@ pub struct CoordsIter<'a, T> {
 }
 
 impl<T> CoordsIter<'_, T> {
-    fn new(grid: &Grid2D<T>) -> CoordsIter<T> {
+    fn new(grid: &Grid2D<T>) -> CoordsIter<'_, T> {
         CoordsIter {
             grid,
             cur: Coords { x: 0, y: 0 },

@@ -58,9 +58,9 @@ fn prime_factors(mut n: usize) -> Vec<(usize, usize)> {
         if p * p > n {
             break;
         }
-        if n % p == 0 {
+        if n.is_multiple_of(*p) {
             let mut exp = 0;
-            while n % p == 0 {
+            while n.is_multiple_of(*p) {
                 exp += 1;
                 n /= p;
             }

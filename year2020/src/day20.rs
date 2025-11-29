@@ -50,7 +50,7 @@ fn fits_with_neighbors(length: usize, placed: &[PlacedTile], new_tile: &Grid2D<c
         let top_border: String = new_tile.row(0).unwrap().into_iter().collect();
         placed[next_idx - length].bottom_border == top_border
     };
-    let left_ok = if next_idx % length == 0 {
+    let left_ok = if next_idx.is_multiple_of(length) {
         true
     } else {
         let left_border: String = new_tile.col(0).unwrap().into_iter().collect();

@@ -47,8 +47,8 @@ impl Record {
     }
 
     fn unfold(self, n: usize) -> Record {
-        let springs: Vec<_> = iter::repeat(self.springs).take(n).collect();
-        let sizes = iter::repeat(self.sizes).take(n).flatten().collect();
+        let springs: Vec<_> = iter::repeat_n(self.springs, n).collect();
+        let sizes = iter::repeat_n(self.sizes, n).flatten().collect();
         Record {
             springs: springs.join("?"),
             sizes,

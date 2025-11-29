@@ -5,7 +5,7 @@ pub struct Day16 {}
 
 type Compounds<'a> = HashMap<&'a str, usize>;
 
-fn parse_input(input: &str) -> Vec<Compounds> {
+fn parse_input(input: &str) -> Vec<Compounds<'_>> {
     input
         .lines()
         .enumerate()

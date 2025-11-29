@@ -22,7 +22,7 @@ fn calc_checksum(s: &str) -> String {
     freq[0..5].iter().map(|x| x.0).collect()
 }
 
-fn parse_input(input: &str) -> Vec<Room> {
+fn parse_input(input: &str) -> Vec<Room<'_>> {
     let re = Regex::new(r"([a-z\-]+)-([0-9]+)\[([a-z]{5})\]").unwrap();
     input
         .lines()

@@ -45,7 +45,7 @@ fn change_stone(x: usize) -> Stones {
     }
 
     let s = x.to_string();
-    if s.len() % 2 == 0 {
+    if s.len().is_multiple_of(2) {
         let pivot = s.len() / 2;
         return Stones::Two(s[..pivot].parse().unwrap(), s[pivot..].parse().unwrap());
     }

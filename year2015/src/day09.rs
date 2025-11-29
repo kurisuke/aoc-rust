@@ -6,7 +6,7 @@ pub struct Day09 {}
 
 type Distances<'a> = HashMap<(&'a str, &'a str), usize>;
 
-fn parse_input(input: &str) -> Distances {
+fn parse_input(input: &str) -> Distances<'_> {
     input
         .lines()
         .map(|line| {

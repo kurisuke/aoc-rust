@@ -35,7 +35,7 @@ fn parse_rule(input: &str) -> Rule {
     }
 }
 
-fn parse_input(input: &str) -> InputInfo {
+fn parse_input(input: &str) -> InputInfo<'_> {
     let mut sections = input.split("\n\n");
     let rules_sec = sections.next().unwrap();
 

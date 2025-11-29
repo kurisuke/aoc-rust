@@ -73,6 +73,7 @@ fn check_board(board: &mut BingoBoard, new_number: u64) -> bool {
 }
 
 fn check_row(board: &mut BingoBoard, new_number: u64, x: usize) -> bool {
+    #[allow(clippy::needless_range_loop)]
     for y in 0..BINGO_SIZE {
         if !(board[x][y].marked) {
             if board[x][y].number == new_number {

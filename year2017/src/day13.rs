@@ -19,7 +19,7 @@ fn parse_input(input: &str) -> HashMap<usize, usize> {
 fn is_caught(t_start: usize, layers: &HashMap<usize, usize>) -> bool {
     layers.iter().any(|(t, range)| {
         let states = 2 * range - 2;
-        (t_start + t) % states == 0
+        (t_start + t).is_multiple_of(states)
     })
 }
 

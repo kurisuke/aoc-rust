@@ -11,7 +11,7 @@ struct InputInfo<'a> {
     els: Vec<&'a str>,
 }
 
-fn parse_input(input: &str) -> InputInfo {
+fn parse_input(input: &str) -> InputInfo<'_> {
     let mut secs = input.split("\n\n");
     let replacements_sec = secs.next().unwrap();
 

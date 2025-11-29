@@ -33,7 +33,7 @@ impl Day for Day13 {
 
         for bus in input_info.bus_infos.iter().skip(1) {
             for x in 0..bus.id {
-                if (off + x * mul + bus.dep_diff) % bus.id == 0 {
+                if (off + x * mul + bus.dep_diff).is_multiple_of(bus.id) {
                     off += x * mul;
                     mul *= bus.id;
                     break;

@@ -202,7 +202,7 @@ impl HandPt2 {
             Card::A,
         ];
 
-        let hand_type = if hand_pt1.cards.iter().any(|c| *c == Card::J) {
+        let hand_type = if hand_pt1.cards.contains(&Card::J) {
             other_cards
                 .into_iter()
                 .map(|o| {

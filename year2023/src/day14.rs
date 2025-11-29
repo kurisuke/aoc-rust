@@ -78,12 +78,12 @@ fn slide_col(col: Vec<&char>, north: bool) -> Vec<char> {
     for range in col.split(|x| x == &&'#') {
         let num_movable = range.iter().filter(|x| x == &&&'O').count();
         if north {
-            col_new.extend(std::iter::repeat('O').take(num_movable));
-            col_new.extend(std::iter::repeat('.').take(range.len() - num_movable));
+            col_new.extend(std::iter::repeat_n('O', num_movable));
+            col_new.extend(std::iter::repeat_n('.', range.len() - num_movable));
             col_new.push('#');
         } else {
-            col_new.extend(std::iter::repeat('.').take(range.len() - num_movable));
-            col_new.extend(std::iter::repeat('O').take(num_movable));
+            col_new.extend(std::iter::repeat_n('.', range.len() - num_movable));
+            col_new.extend(std::iter::repeat_n('O', num_movable));
             col_new.push('#');
         }
     }
@@ -96,12 +96,12 @@ fn slide_row(row: Vec<&char>, west: bool) -> Vec<char> {
     for range in row.split(|x| x == &&'#') {
         let num_movable = range.iter().filter(|x| x == &&&'O').count();
         if west {
-            row_new.extend(std::iter::repeat('O').take(num_movable));
-            row_new.extend(std::iter::repeat('.').take(range.len() - num_movable));
+            row_new.extend(std::iter::repeat_n('O', num_movable));
+            row_new.extend(std::iter::repeat_n('.', range.len() - num_movable));
             row_new.push('#');
         } else {
-            row_new.extend(std::iter::repeat('.').take(range.len() - num_movable));
-            row_new.extend(std::iter::repeat('O').take(num_movable));
+            row_new.extend(std::iter::repeat_n('.', range.len() - num_movable));
+            row_new.extend(std::iter::repeat_n('O', num_movable));
             row_new.push('#');
         }
     }

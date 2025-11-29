@@ -5,7 +5,7 @@ pub struct Day06 {}
 
 type Orbits<'a> = HashMap<&'a str, &'a str>;
 
-fn parse_input(input: &str) -> Orbits {
+fn parse_input(input: &str) -> Orbits<'_> {
     input
         .lines()
         .map(|l| {

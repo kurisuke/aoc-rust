@@ -52,7 +52,7 @@ fn find_wrong_weight(discs: &Discs, root_node_name: &str, weight_diff: isize) ->
     }
 }
 
-fn parse_input(input: &str) -> Discs {
+fn parse_input(input: &str) -> Discs<'_> {
     let re = Regex::new(r"(\w+) \((\d+)\)").unwrap();
     input
         .lines()

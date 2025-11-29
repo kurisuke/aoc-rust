@@ -9,7 +9,7 @@ fn reduce(s: &str) -> String {
             output.push(c);
         } else {
             let last = output.last().unwrap();
-            if last.to_ascii_uppercase() == c.to_ascii_uppercase() && *last != c {
+            if last.eq_ignore_ascii_case(&c) && *last != c {
                 output.pop();
             } else {
                 output.push(c);

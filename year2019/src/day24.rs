@@ -42,7 +42,7 @@ fn evolve(grid: &Grid2D<char>) -> Grid2D<char> {
 }
 
 fn evolve_rec(grids: &Grids) -> Grids {
-    let iter = if grids.len() % 2 == 0 {
+    let iter = if grids.len().is_multiple_of(2) {
         grids.len() / 2
     } else {
         grids.len() / 2 + 1

@@ -9,7 +9,7 @@ struct InputData<'a> {
     allergens: HashMap<&'a str, HashSet<usize>>,
 }
 
-fn parse_input(input: &str) -> InputData {
+fn parse_input(input: &str) -> InputData<'_> {
     let mut ingredients = HashMap::new();
     let mut allergens = HashMap::new();
     for (line_no, line) in input.lines().enumerate() {

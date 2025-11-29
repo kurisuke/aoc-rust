@@ -32,6 +32,7 @@ impl Day for Day03 {
             .collect();
         let mut triangles = 0;
         for i in 0..(nums.len() / 3) {
+            #[allow(clippy::needless_range_loop)]
             for j in 0..=2 {
                 if possible_triangle(&[nums[3 * i][j], nums[3 * i + 1][j], nums[3 * i + 2][j]]) {
                     triangles += 1;

@@ -18,7 +18,7 @@ pub enum OpType {
 
 type Nodes<'a> = HashMap<&'a str, Node<'a>>;
 
-fn parse_input(input: &str) -> Nodes {
+fn parse_input(input: &str) -> Nodes<'_> {
     input
         .lines()
         .map(|line| {

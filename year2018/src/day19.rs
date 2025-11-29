@@ -7,7 +7,7 @@ fn factors(n: usize) -> Vec<usize> {
     let mut fs = vec![];
     let upper = (f64::from(n as i32).sqrt() + 1.0) as usize;
     for i in 1..=upper {
-        if n % i == 0 {
+        if n.is_multiple_of(i) {
             fs.push(i);
             if i * i != n {
                 fs.push(n / i);

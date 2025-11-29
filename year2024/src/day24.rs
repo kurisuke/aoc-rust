@@ -52,7 +52,7 @@ fn solve<'a>(gate_id: &'a str, gates: &'a Gates, values: &mut Values<'a>) -> boo
     out
 }
 
-fn parse_input(input: &str) -> (Gates, Values) {
+fn parse_input(input: &str) -> (Gates<'_>, Values<'_>) {
     let mut secs = input.split("\n\n");
 
     let values = secs

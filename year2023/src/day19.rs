@@ -31,7 +31,7 @@ impl Day for Day19 {
     }
 }
 
-fn parse_input(input: &str) -> (HashMap<&str, Workflow>, Vec<Part>) {
+fn parse_input(input: &str) -> (HashMap<&str, Workflow<'_>>, Vec<Part>) {
     let secs: Vec<_> = input.split("\n\n").collect();
     let workflows = secs[0]
         .lines()
@@ -49,7 +49,7 @@ struct Workflow<'a> {
 }
 
 impl Workflow<'_> {
-    fn parse(line: &str) -> Workflow {
+    fn parse(line: &str) -> Workflow<'_> {
         let spl: Vec<_> = line.split('{').collect();
         let name = spl[0];
 
@@ -106,7 +106,7 @@ enum Target<'a> {
 }
 
 impl Target<'_> {
-    fn parse(s: &str) -> Target {
+    fn parse(s: &str) -> Target<'_> {
         match s {
             "A" => Target::Accepted,
             "R" => Target::Rejected,

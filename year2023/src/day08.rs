@@ -30,13 +30,13 @@ impl Day for Day08 {
 
 type Nodes<'a> = HashMap<&'a str, (&'a str, &'a str)>;
 
-fn parse_input(input: &str) -> (Vec<char>, Nodes) {
+fn parse_input(input: &str) -> (Vec<char>, Nodes<'_>) {
     let (instructions, rest) = input.split_once("\n\n").unwrap();
     let instructions = instructions.chars().collect();
     (instructions, parse_nodes(rest))
 }
 
-fn parse_nodes(input: &str) -> Nodes {
+fn parse_nodes(input: &str) -> Nodes<'_> {
     input
         .lines()
         .map(|line| {

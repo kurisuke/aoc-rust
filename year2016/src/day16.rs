@@ -15,7 +15,7 @@ fn fill_disk(input: &[bool], req_size: usize) -> Vec<bool> {
 
 fn checksum(data: &[bool]) -> String {
     let mut checksum = data.to_vec();
-    while checksum.len() % 2 == 0 {
+    while checksum.len().is_multiple_of(2) {
         checksum = checksum.chunks(2).map(|c| c[0] == c[1]).collect();
     }
     checksum

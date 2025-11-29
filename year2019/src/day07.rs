@@ -11,7 +11,7 @@ struct AmpSetup<'a> {
 }
 
 impl AmpSetup<'_> {
-    fn new(num_amps: usize, connections: Vec<Option<usize>>, program: &str) -> AmpSetup {
+    fn new(num_amps: usize, connections: Vec<Option<usize>>, program: &str) -> AmpSetup<'_> {
         AmpSetup {
             amps: vec![Intcode::new_from_str(program); num_amps],
             connections,

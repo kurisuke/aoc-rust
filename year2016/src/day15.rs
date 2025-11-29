@@ -12,7 +12,7 @@ fn check_fall(discs: &[Disc], t: usize) -> bool {
     discs
         .iter()
         .enumerate()
-        .all(|(i, disc)| (disc.off + t + i + 1) % disc.div == 0)
+        .all(|(i, disc)| (disc.off + t + i + 1).is_multiple_of(disc.div))
 }
 
 fn parse_input(input: &str) -> Vec<Disc> {

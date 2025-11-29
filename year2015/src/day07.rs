@@ -52,7 +52,7 @@ fn eval(gates: &Gates, results: &mut Results, id: &str) -> u16 {
     result
 }
 
-fn parse_input_val(s: &str) -> Input {
+fn parse_input_val(s: &str) -> Input<'_> {
     if let Ok(v) = s.parse::<u16>() {
         Input::Value(v)
     } else {
@@ -60,7 +60,7 @@ fn parse_input_val(s: &str) -> Input {
     }
 }
 
-fn parse_input(input: &str) -> Gates {
+fn parse_input(input: &str) -> Gates<'_> {
     let mut gates = HashMap::new();
     for line in input.lines() {
         let mut it = line.split(" -> ");
