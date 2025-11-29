@@ -6,7 +6,7 @@ use std::time::Instant;
 
 use dotenv::dotenv;
 
-const YEAR_MAX: usize = 2024;
+const YEAR_MAX: usize = 2025;
 
 fn parse_year(args: &[String]) -> Option<Box<dyn Year>> {
     match args.len() {
@@ -33,6 +33,7 @@ fn get_year(year_no: usize) -> Option<Box<dyn Year>> {
         2022 => Some(Box::new(year2022::Year2022 {})),
         2023 => Some(Box::new(year2023::Year2023 {})),
         2024 => Some(Box::new(year2024::Year2024 {})),
+        2025 => Some(Box::new(year2025::Year2025 {})),
         _ => None,
     }
 }

@@ -1,0 +1,11 @@
+[package]
+name = "year2025"
+version = "0.1.0"
+authors = ["Peter Helbing <github@ph157.de>"]
+edition = "2024"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+common = { path = "../common" }
+util = { path = "../util" }

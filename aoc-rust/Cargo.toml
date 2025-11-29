@@ -19,6 +19,7 @@ year2021 = { path = "../year2021" }
 year2022 = { path = "../year2022" }
 year2023 = { path = "../year2023" }
 year2024 = { path = "../year2024" }
+year2025 = { path = "../year2025" }
 cookie = "0.18.1"
 cookie_store = "0.21.1"
 dotenv = "0.15.0"
